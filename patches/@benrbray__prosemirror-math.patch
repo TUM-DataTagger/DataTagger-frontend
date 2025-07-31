@@ -1,0 +1,70 @@
+diff --git a/dist/prosemirror-math.js b/dist/prosemirror-math.js
+index 0f90e64b00b14eacdb4a2c68a8edefe56921707c..5b5588cba99c3684723ac762cbd3887031443a7d 100644
+--- a/dist/prosemirror-math.js
++++ b/dist/prosemirror-math.js
+@@ -1,8 +1,9 @@
+ var R = Object.defineProperty;
+ var C = (r, e, t) => e in r ? R(r, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : r[e] = t;
+ var h = (r, e, t) => (C(r, typeof e != "symbol" ? e + "" : e, t), t);
+-import { TextSelection as S, EditorState as P, PluginKey as y, Plugin as x, NodeSelection as _ } from "prosemirror-state";
++import { TextSelection as S, EditorState as P, PluginKey as y, Plugin as x, NodeSelection as _, Selection } from "prosemirror-state";
+ import { EditorView as L, DecorationSet as v, Decoration as O } from "prosemirror-view";
++import { history, redo, undo } from 'prosemirror-history'
+ import { StepMap as $ } from "prosemirror-transform";
+ import { keymap as D } from "prosemirror-keymap";
+ import { chainCommands as w, deleteSelection as A, newlineInCode as F } from "prosemirror-commands";
+@@ -22,11 +23,20 @@ function m(r, e, t, i = !0) {
+     }
+     if (s) {
+       let f = e > 0 ? a : l;
+-      r.dispatch(
+-        o.tr.setSelection(
+-          S.create(o.doc, f)
++      if (f == o.doc.content.size) {
++        r.dispatch(
++          o.tr.insert(f, o.schema.nodes.paragraph.create())
+         )
+-      ), r.focus();
++      } else {
++        r.dispatch(
++          o.tr.setSelection(
++            S.create(o.doc, f)
++          )
++        );
++      }
++      if (!r.hasFocus()) {
++        r.focus();
++      }
+     }
+     return !0;
+   };
+@@ -142,7 +152,7 @@ class T {
+     this._innerView = new L(this._mathSrcElt, {
+       state: P.create({
+         doc: this._node,
+-        plugins: [D({
++        plugins: [history(), D({
+           Tab: (o, a) => (a && a(o.tr.insertText("	")), !0),
+           Backspace: w(A, (o) => !o.selection.empty || this._node.textContent.length > 0 ? !1 : (this._outerView.dispatch(this._outerView.state.tr.insertText("")), this._outerView.focus(), !0)),
+           "Ctrl-Backspace": () => (this._outerView.dispatch(this._outerView.state.tr.insertText("")), this._outerView.focus(), !0),
+@@ -151,7 +161,10 @@ class T {
+           ArrowLeft: m(this._outerView, -1, !0),
+           ArrowRight: m(this._outerView, 1, !0),
+           ArrowUp: m(this._outerView, -1, !0),
+-          ArrowDown: m(this._outerView, 1, !0)
++          ArrowDown: m(this._outerView, 1, !0),
++          "Mod-a": () => (this._innerView?.state.tr.setSelection(_.create(this._innerView?.state.doc, 0)), !0),
++          "Mod-z": () => (undo(this._innerView?.state, this._innerView?.dispatch), !0),
++          "Mod-y": () => (redo(this._innerView?.state, this._innerView?.dispatch), !0),
+         })]
+       }),
+       dispatchTransaction: this.dispatchInner.bind(this)
+@@ -241,7 +254,7 @@ function K(r) {
+   return (e == null ? void 0 : e.getAttribute("alttext")) ?? !1;
+ }
+ function G(r) {
+-  let e = r.querySelector("math annotation[encoding='application/x-tex'");
++  let e = r.querySelector("math annotation[encoding='application/x-tex]'");
+   return (e == null ? void 0 : e.textContent) ?? !1;
+ }
+ function k(r) {

@@ -1,0 +1,12 @@
+dist/
+coverage/
+.cache
+build/
+.next/
+.cache/
+next-env.d.ts
+openapiSchema.ts
+version-info.ts
+openapi-schema.yml
+pnpm-lock.yaml
+.pnpm-store

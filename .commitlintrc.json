@@ -1,0 +1,8 @@
+{
+	"$schema": "https://json.schemastore.org/commitlintrc.json",
+	"extends": ["jira"],
+	"plugins": ["commitlint-plugin-jira-rules"],
+	"rules": {
+		"jira-task-id-max-length": [2, "always", 15]
+	}
+}

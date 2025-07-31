@@ -1,0 +1,16 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+patchedDependencies:
+  '@benrbray/prosemirror-math': patches/@benrbray__prosemirror-math.patch
+
+ignoredBuiltDependencies:
+  - commitlint-config-jira
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - esbuild
+  - msw
+  - sharp

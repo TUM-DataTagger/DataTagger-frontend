@@ -1,0 +1,34 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Next.js: debug server-side",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "yarn dev",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "Next.js: debug client-side",
+			"request": "launch",
+			"type": "msedge",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}",
+			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"name": "Next.js: debug full stack",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "yarn dev",
+			"autoAttachChildProcesses": true,
+			"skipFiles": ["<node_internals>/**"],
+			"serverReadyAction": {
+				"pattern": "- Local:.+(https?://.+)",
+				"uriFormat": "%s",
+				"action": "debugWithEdge",
+				"webRoot": "${workspaceFolder}"
+			}
+		}
+	]
+}

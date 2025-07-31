@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true
+	},
+	"include": [
+		"*.ts",
+		"*.tsx",
+		"*.js",
+		"*.jsx",
+		"*.cjs",
+		"*.mjs",
+		"apps/**/*.ts",
+		"apps/**/*.tsx",
+		"apps/**/*.js",
+		"apps/**/*.jsx",
+		"apps/**/*.cjs",
+		"apps/**/*.mjs"
+	],
+	"exclude": ["node_modules"]
+}

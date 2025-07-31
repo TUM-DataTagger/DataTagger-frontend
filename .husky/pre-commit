@@ -1,0 +1,2 @@
+# pnpm run lint && pnpm run test run && pnpm run build
+pnpm run lint && pnpm run build
