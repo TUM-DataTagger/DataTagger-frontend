@@ -1,8 +1,16 @@
-import { HydrationBoundary, QueryClient, dehydrate } from '@tanstack/react-query';
-import { SearchIcon } from 'lucide-react';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import type { Metadata } from 'next/types';
 import { openAPIClient } from '@/util/fetch';
+import { getQueryClient } from '@/util/getQueryClient';
+import { getSearchSchemaQueryKey, isSearchSchemaResponse } from '@/util/globalSearch';
 import { SearchView } from './SearchView';
+import { normalizeSearchLimit } from './searchLimit';
+import {
+	buildSearchRouteRequest,
+	getResolvedSearchResultTypes,
+	getSearchRouteResultsQueryKey,
+	hasSearchRouteCriteria,
+} from './searchRouteCriteria';
 
 export const metadata: Metadata = {
 	title: 'Search',
@@ -13,39 +21,72 @@ export default async function Page({
 }: {
 	readonly searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-	const { q: searchParamsQuery = '', page: searchParamsPage, sort: searchParamsSort } = await searchParams;
+	const {
+		created_by: searchParamsCreatedBy,
+		limit: searchParamsLimit,
+		my_permissions: searchParamsMyPermissions,
+		q: searchParamsQuery = '',
+		sort: searchParamsSort,
+		source: searchParamsSource,
+	} = await searchParams;
+	const limit = normalizeSearchLimit(searchParamsLimit);
+	const queryClient = getQueryClient();
 
-	const page = searchParamsPage ? Number(searchParamsPage) : 1;
-	const limit = 100;
-	const offset = (page - 1) * limit;
-	const sort = searchParamsSort ?? '-creation_date';
+	const { data: searchSchemaData } = await openAPIClient.GET('/api/v1/search/global/schema/');
+	if (isSearchSchemaResponse(searchSchemaData)) {
+		queryClient.setQueryData(getSearchSchemaQueryKey(), searchSchemaData);
+		const selectedTypes = getResolvedSearchResultTypes(searchParamsSource, searchSchemaData);
 
-	const queryClient = new QueryClient();
+		if (
+			hasSearchRouteCriteria({
+				createdByParam: searchParamsCreatedBy,
+				filters: [],
+				myPermissionsParam: searchParamsMyPermissions,
+				searchText: searchParamsQuery,
+				sourceParam: searchParamsSource,
+			})
+		) {
+			await queryClient.prefetchQuery({
+				queryKey: getSearchRouteResultsQueryKey({
+					createdByParam: searchParamsCreatedBy,
+					filtersParam: null,
+					limit,
+					myPermissionsParam: searchParamsMyPermissions,
+					responseMode: 'full',
+					schema: searchSchemaData,
+					searchText: searchParamsQuery,
+					selectedTypes,
+					sortParam: searchParamsSort,
+					sourceParam: searchParamsSource,
+				}),
+				queryFn: async () => {
+					const { data } = await openAPIClient.POST('/api/v1/search/global/', {
+						body: buildSearchRouteRequest({
+							createdByParam: searchParamsCreatedBy,
+							filters: [],
+							limit,
+							myPermissionsParam: searchParamsMyPermissions,
+							responseMode: 'full',
+							schema: searchSchemaData,
+							searchText: searchParamsQuery,
+							selectedTypes,
+							sortParam: searchParamsSort,
+							sourceParam: searchParamsSource,
+						}),
+					});
 
-	await queryClient.prefetchQuery({
-		queryKey: ['search', { query: searchParamsQuery, limit, offset, sort }],
-		queryFn: async () => {
-			const { data } = await openAPIClient.GET('/api/v1/search/global/', {
-				params: { query: { term: searchParamsQuery, limit } },
+					return data ?? null;
+				},
 			});
-
-			return data ?? null;
-		},
-	});
+		}
+	}
 
 	return (
-		<div className="mx-auto flex w-full max-w-[852px] grow flex-col gap-6 px-4 py-12 print:max-w-none">
-			<div className="flex flex-col gap-6">
-				<div className="flex flex-col gap-4">
-					<h1 className="text-base-heading-md flex place-items-center gap-3">
-						<SearchIcon aria-hidden size={40} strokeWidth={1} /> Search
-					</h1>
-				</div>
-			</div>
-			<div className="border-base-neutral-200 dark:border-base-neutral-600 border-b" />
+		<div className="mx-auto flex w-full max-w-[848px] grow flex-col px-4 py-8 print:max-w-none">
+			<h1 className="sr-only">Search</h1>
 
 			<HydrationBoundary state={dehydrate(queryClient)}>
-				<SearchView limit={limit} offset={offset} />
+				<SearchView />
 			</HydrationBoundary>
 		</div>
 	);

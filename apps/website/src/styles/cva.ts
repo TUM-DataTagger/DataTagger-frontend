@@ -4,6 +4,11 @@ import { extendTailwindMerge } from 'tailwind-merge';
 const twMergeConfig = {
 	classGroups: {
 		'font-size': [
+			'text-base-heading-xs',
+			'text-base-heading-sm',
+			'text-base-heading-md',
+			'text-base-heading-lg',
+			'text-base-heading-xl',
 			'text-base-xs',
 			'text-base-sm',
 			'text-base-md',
@@ -14,11 +19,6 @@ const twMergeConfig = {
 			'text-base-label-md',
 			'text-base-label-lg',
 			'text-base-label-xl',
-			'text-base-heading-xs',
-			'text-base-heading-sm',
-			'text-base-heading-md',
-			'text-base-heading-lg',
-			'text-base-heading-xl',
 		],
 	},
 };

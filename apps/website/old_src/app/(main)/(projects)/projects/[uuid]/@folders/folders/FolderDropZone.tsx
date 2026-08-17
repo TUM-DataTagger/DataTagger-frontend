@@ -72,7 +72,7 @@ export const FolderDropZone = (
 					)}
 				>
 					<div className="global-dropzone-border h-full w-full rounded-xl p-px">
-						<div className="bg-base-lavender-100/64 dark:bg-base-lavender-800/64 relative h-full w-full rounded-xl">
+						<div className="relative h-full w-full rounded-xl bg-base-lavender-100/64 dark:bg-base-lavender-800/64">
 							<MotionDiv
 								animate={{ opacity: 1, y: 0 }}
 								className="absolute bottom-6 left-0 w-full px-4"
@@ -83,7 +83,7 @@ export const FolderDropZone = (
 							>
 								<MotionDiv
 									animate={{ y: [0, -10] }}
-									className="bg-base-lavender-600 text-base-sm text-base-neutral-40 dark:bg-base-lavender-400 dark:text-base-neutral-900 flex flex-col place-items-center gap-2 rounded-lg px-4 py-3"
+									className="flex flex-col place-items-center gap-2 rounded-lg bg-base-lavender-600 px-4 py-3 text-base-sm text-base-neutral-40 dark:bg-base-lavender-400 dark:text-base-neutral-900"
 									key="bottom-banner-inner"
 									transition={{
 										delay: 0.25,

@@ -23,7 +23,7 @@ export function ProjectFoldersViewEmpty(props: { readonly projectUuid: string })
 	const canCreateFolders = projectPermissionData?.[0]?.can_create_folders;
 
 	return (
-		<div className="bg-base-lavender-100/38 text-base-neutral-900 dark:bg-base-lavender-800/38 dark:text-base-neutral-40 flex h-[269px] flex-col place-content-center gap-8 rounded-2xl text-center">
+		<div className="flex h-[269px] flex-col place-content-center gap-8 rounded-2xl bg-base-lavender-100/38 text-center text-base-neutral-900 dark:bg-base-lavender-800/38 dark:text-base-neutral-40">
 			<div className="flex flex-col gap-2">
 				<span className="text-base-xl">No folders yet</span>
 				Created folders will appear here.

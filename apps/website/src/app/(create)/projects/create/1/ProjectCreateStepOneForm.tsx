@@ -11,14 +11,15 @@ import { Item } from 'react-stately';
 import { email, parse, pipe, string, type InferInput } from 'valibot';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
-import { Checkbox } from '@/components/ui/Checkbox';
-import { Label } from '@/components/ui/Field';
+import { Checkbox, CheckboxLabel } from '@/components/ui/Checkbox';
+import { FieldError, Label } from '@/components/ui/Field';
+import { Input, InputGroup } from '@/components/ui/Input';
 import {
 	Select,
 	SelectLabel,
-	SelectList,
-	SelectOption,
-	SelectOptionDescription,
+	SelectContent,
+	SelectItem,
+	SelectDescription,
 	SelectSection,
 	SelectTrigger,
 } from '@/components/ui/Select';
@@ -33,6 +34,8 @@ import {
 	projectMembersAtom,
 	stepAtom,
 } from '@/stores/createProject';
+import { cx } from '@/styles/cva';
+import { logger, LogCategory } from '@/util/logger';
 
 type ProjectCreateStepOneInput = InferInput<typeof ProjectStepOneSchema>;
 
@@ -83,6 +86,7 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 		setStep(1);
 
 		try {
+			logger.debug(LogCategory.Project, 'Proceeding to step 2', { projectName: input.name });
 			router.push('/projects/create/2');
 		} catch (error) {
 			const err = error as Error;
@@ -97,7 +101,7 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 		});
 	}
 
-	function onProjectMemberPermissionChange(member: string, val: string) {
+	function onProjectMemberPermissionChange(member: string, val: 'admin' | 'member') {
 		setProject((draft) => {
 			draft.project.memberPermission[member] = val;
 
@@ -114,9 +118,7 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 
 	function onProjectMemberExtendedPermissionChange(member: string, permission: string, value: boolean) {
 		setProject((draft) => {
-			if (!draft.project.extendedMemberPermissions[member]) {
-				draft.project.extendedMemberPermissions[member] = {};
-			}
+			draft.project.extendedMemberPermissions[member] ??= {};
 
 			draft.project.extendedMemberPermissions[member]![permission] = value;
 		});
@@ -169,19 +171,31 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 								control={control}
 								name="name"
 								render={({ field, fieldState }) => (
-									<TextField
-										autoComplete="off"
-										errorMessage={fieldState.error?.message}
-										isClearable
-										isDisabled={field.disabled ?? false}
-										isInvalid={fieldState.invalid}
-										label="Project name"
-										onBlur={field.onBlur}
-										onChange={field.onChange}
-										placeholder="Name your project"
-										type="text"
-										value={field.value}
-									/>
+									<TextField isDisabled={field.disabled ?? false} isInvalid={fieldState.invalid}>
+										<Label>Project name</Label>
+										<InputGroup>
+											<Input
+												autoComplete="off"
+												disabled={field.disabled ?? false}
+												onBlur={field.onBlur}
+												onChange={field.onChange}
+												placeholder="Name your project"
+												type="text"
+												value={field.value ?? ''}
+											/>
+											{field.value && !field.disabled && (
+												<Button
+													aria-label="Clear project name"
+													onPress={() => field.onChange('')}
+													size="icon"
+													variant="unset"
+												>
+													<XCircleIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+												</Button>
+											)}
+										</InputGroup>
+										{fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+									</TextField>
 								)}
 							/>
 						</div>
@@ -195,7 +209,7 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 							{currentUserData ? (
 								<>
 									<Label className="text-base-md">Project creator</Label>
-									<div className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-5 md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px]">
+									<div className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-5 text-base-md md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700">
 										<span
 											className="col-span-2 max-w-[25ch] justify-self-start truncate"
 											title={currentUserData?.email}
@@ -228,11 +242,11 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 
 							{[...projectMembers.values()].map((member: string, idx: number) => (
 								<div
-									className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-3 md:grid-cols-5 md:grid-rows-none md:gap-[58px]"
+									className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-3 text-base-md md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700"
 									key={`${member}-${idx}`}
 								>
 									<span
-										className="col-span-2 max-w-[20ch] place-self-start justify-self-start truncate pt-[10px]"
+										className="col-span-2 max-w-[20ch] place-self-start justify-self-start truncate pt-2.5"
 										title={member}
 									>
 										{member}
@@ -241,11 +255,11 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 										<div className="flex gap-[23px]">
 											<Select
 												aria-label="Project permissions"
-												onSelectionChange={async (val) => onProjectMemberPermissionChange(member, val as string)}
-												selectedKey={selectedMemberPermission(member)}
+												onChange={async (val) => onProjectMemberPermissionChange(member, val as 'admin' | 'member')}
+												value={selectedMemberPermission(member)}
 											>
 												<SelectTrigger />
-												<SelectList>
+												<SelectContent popover={{ className: 'max-w-(--trigger-width)' }}>
 													<SelectSection title="Project permissions">
 														{[
 															{
@@ -259,15 +273,13 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 																description: 'No access to files unless defined in folders',
 															},
 														].map((item) => (
-															<SelectOption id={item.id} key={item.id} textValue={item.name}>
+															<SelectItem id={item.id} key={item.id} textValue={item.name}>
 																<SelectLabel>{item.name}</SelectLabel>
-																<SelectOptionDescription className="line-clamp-none">
-																	{item.description}
-																</SelectOptionDescription>
-															</SelectOption>
+																<SelectDescription className="line-clamp-none">{item.description}</SelectDescription>
+															</SelectItem>
 														))}
 													</SelectSection>
-												</SelectList>
+												</SelectContent>
 											</Select>
 											<Button
 												aria-label="Remove member"
@@ -284,7 +296,7 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 												<AccordionTrigger
 													prepend={
 														numSelectedMemberExtendedPermissions(member) ? (
-															<span className="bg-base-lavender-200 text-base-neutral-900 dark:bg-base-lavender-600 h-4 w-[14px] rounded-full">
+															<span className="h-4 w-3.5 rounded-full bg-base-lavender-200 text-base-neutral-900 dark:bg-base-lavender-600">
 																{numSelectedMemberExtendedPermissions(member)}
 															</span>
 														) : null
@@ -294,22 +306,30 @@ export function ProjectCreateStepOneForm(props: ComponentProps<'form'>) {
 												</AccordionTrigger>
 												<AccordionContent className="flex flex-col gap-2">
 													<Checkbox
-														className="text-base-sm"
-														classNames={{ boxContainer: 'flex-row-reverse place-content-between w-full' }}
+														className={cx(
+															'*:data-[slot=checkbox]:grid-cols-[1fr_1rem]',
+															'**:data-[slot=indicator]:col-start-2',
+															'**:data-[slot=label]:col-start-1',
+															'**:[[slot=description]]:col-start-1',
+														)}
 														isSelected={selectedMemberExtendedPermissionCreateFolders(member)}
 														onChange={async (val) => onProjectMemberExtendedPermissionChange(member, 'folders', val)}
 													>
-														Can create folders
+														<CheckboxLabel className="text-base-sm">Can create folders</CheckboxLabel>
 													</Checkbox>
 													<Checkbox
-														className="text-base-sm"
-														classNames={{ boxContainer: 'flex-row-reverse place-content-between w-full' }}
+														className={cx(
+															'*:data-[slot=checkbox]:grid-cols-[1fr_1rem]',
+															'**:data-[slot=indicator]:col-start-2',
+															'**:data-[slot=label]:col-start-1',
+															'**:[[slot=description]]:col-start-1',
+														)}
 														isSelected={selectedMemberExtendedPermissionCreateMetadataTemplates(member)}
 														onChange={async (val) =>
 															onProjectMemberExtendedPermissionChange(member, 'metadataTemplates', val)
 														}
 													>
-														Can create metadata templates
+														<CheckboxLabel className="text-base-sm">Can create metadata templates</CheckboxLabel>
 													</Checkbox>
 												</AccordionContent>
 											</AccordionItem>

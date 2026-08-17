@@ -1,16 +1,48 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  commitlint-config-jira: true
+  esbuild: true
+  msw: true
+  sharp: true
+  unrs-resolver: true
+
+overrides:
+  brace-expansion@1: ^1.1.16
+  js-yaml@4: ^4.3.0
+  sharp@0.34: ^0.35.3
+
+minimumReleaseAgeExclude:
+  - eslint-config-neon@0.5.4
+  - '@typescript-eslint/eslint-plugin@8.62.0'
+  - '@typescript-eslint/parser@8.62.0'
+  - '@typescript-eslint/project-service@8.62.0'
+  - '@typescript-eslint/scope-manager@8.62.0'
+  - '@typescript-eslint/tsconfig-utils@8.62.0'
+  - '@typescript-eslint/type-utils@8.62.0'
+  - '@typescript-eslint/types@8.62.0'
+  - '@typescript-eslint/typescript-estree@8.62.0'
+  - '@typescript-eslint/utils@8.62.0'
+  - '@typescript-eslint/visitor-keys@8.62.0'
+  - eslint-config-neon@0.5.3
+  - eslint-plugin-import-x@4.17.0
+  - globals@17.7.0
+  - typescript-eslint@8.62.0
 
 patchedDependencies:
   '@benrbray/prosemirror-math': patches/@benrbray__prosemirror-math.patch
 
-ignoredBuiltDependencies:
-  - commitlint-config-jira
-  - unrs-resolver
+peerDependencyRules:
+  allowAny:
+    - '*'
+  ignoreMissing:
+    - '*'
 
-onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
-  - esbuild
-  - msw
-  - sharp
+publicHoistPattern:
+  - '*eslint*'
+  - '*prettier*'
+  - '*oxlint*'
+  - '*oxfmt*'
+  - '*jju*'

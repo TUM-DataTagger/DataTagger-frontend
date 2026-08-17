@@ -1,9 +1,8 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { FileIcon } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FileCreationDates, FileHeading, FileMetadata, FileThumbnail, FileUpdate } from '@/components/File';
-import { VersionHistoryCheck } from '@/components/VersionHistory';
+import { FileVersionHistoryCheck } from '@/components/FileVersionHistory';
 import { Separator } from '@/components/ui/Separator';
 import { $api, openAPIClient } from '@/util/fetch';
 import { getQueryClient } from '@/util/getQueryClient';
@@ -22,24 +21,27 @@ export default async function Page({ params }: { readonly params: Promise<{ read
 		params: { path: { id: fileUuid } },
 	});
 
-	if (response.status === 404 || !datasetData?.latest_version) {
+	if (response.status === 404) {
 		notFound();
 	}
 
 	const queryClient = getQueryClient();
 
-	await Promise.all([
-		queryClient.prefetchQuery(
-			$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/', {
-				params: { path: { id: fileUuid } },
-			}),
-		),
-		queryClient.prefetchQuery(
+	queryClient.setQueryData(
+		$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/', {
+			params: { path: { id: fileUuid } },
+		}).queryKey,
+		datasetData,
+	);
+
+	// Only prefetch the version data which we don't have yet
+	if (datasetData?.latest_version?.pk) {
+		await queryClient.prefetchQuery(
 			$api.queryOptions('get', '/api/v1/uploads-version/{id}/', {
 				params: { path: { id: datasetData.latest_version.pk } },
 			}),
-		),
-	]);
+		);
+	}
 
 	return (
 		<div className="flex flex-col-reverse place-content-center gap-6 2xl:flex-row">
@@ -52,10 +54,7 @@ export default async function Page({ params }: { readonly params: Promise<{ read
 
 					<div className="flex flex-col gap-3 2xl:col-span-1 2xl:col-start-2">
 						<DraftBadges fileUuid={fileUuid} />
-						<div className="flex place-items-center gap-3">
-							<FileIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
-							<FileHeading fileUuid={fileUuid} />
-						</div>
+						<FileHeading fileUuid={fileUuid} isDraft />
 					</div>
 
 					<div className="flex flex-col-reverse gap-6 2xl:col-span-2 2xl:col-start-2 2xl:inline-grid 2xl:grid-cols-[816px_396px]">
@@ -72,12 +71,12 @@ export default async function Page({ params }: { readonly params: Promise<{ read
 							<div className="flex break-after-page flex-col gap-6">
 								<FileCreationDates fileUuid={fileUuid} />
 							</div>
-							<Separator className="md:hidden print:hidden" />
+							<Separator className="2xl:hidden print:hidden" />
 						</div>
 					</div>
 				</div>
 			</HydrationBoundary>
-			<VersionHistoryCheck />
+			<FileVersionHistoryCheck />
 		</div>
 	);
 }

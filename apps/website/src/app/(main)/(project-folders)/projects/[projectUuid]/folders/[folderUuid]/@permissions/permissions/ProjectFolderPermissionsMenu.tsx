@@ -12,7 +12,7 @@ export function ProjectFolderPermissionsMenu(props: { readonly folderUuid: strin
 			<ProjectFolderEdit
 				folderUuid={props.folderUuid}
 				href={`/projects/${props.projectUuid}/folders/${props.folderUuid}/permissions/edit`}
-				onClick={(isLocked) => setIsEditLockOpen(isLocked as boolean)}
+				onClick={(isLocked) => setIsEditLockOpen(Boolean(isLocked))}
 			/>
 			<FolderEditLockDialog folderUuid={props.folderUuid} isOpen={isEditLockOpen} onOpenChange={setIsEditLockOpen} />
 		</>

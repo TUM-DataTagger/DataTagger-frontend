@@ -13,7 +13,7 @@ export function ProjectsViewFilterEmpty() {
 
 	return (
 		<div className="flex h-[292px] flex-col place-content-center rounded-xl p-px">
-			<div className="bg-base-neutral-60 dark:bg-base-neutral-700/38 h-full w-full place-content-center place-items-center rounded-xl text-center">
+			<div className="h-full w-full place-content-center place-items-center rounded-xl bg-base-neutral-60 text-center dark:bg-base-neutral-700/38">
 				<div className="flex flex-col place-items-center gap-4">
 					<NoResults />
 					<div className="flex flex-col gap-2">

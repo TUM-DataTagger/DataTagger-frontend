@@ -1,78 +1,61 @@
 'use client';
 
 import { XIcon } from 'lucide-react';
-import { useEffect, useRef, type ComponentProps, type ComponentPropsWithoutRef, type Ref } from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
 import type { HeadingProps as RACHeadingProps } from 'react-aria-components';
 import { Dialog as RACDialog, Heading as RACHeading, Text as RACText } from 'react-aria-components';
-import { useMediaQuery } from 'usehooks-ts';
 import { Button, type ButtonProps } from '@/components/ui/Button';
 import { cx } from '@/styles/cva';
 
-export function Dialog(props: ComponentProps<typeof RACDialog>) {
+export function Dialog({ role = 'dialog', ...props }: ComponentProps<typeof RACDialog>) {
 	return (
 		<RACDialog
 			{...props}
 			className={cx(
-				'peer/dialog group/dialog relative flex max-h-[inherit] flex-col overflow-hidden outline-hidden [scrollbar-width:thin]',
+				'peer/dialog group/dialog relative flex max-h-[calc(var(--visual-viewport-height)-var(--visual-viewport-vertical-padding))] [scrollbar-width:thin] flex-col overflow-hidden outline-hidden [--dialog-gutter:--spacing(6)]',
 				props.className,
 			)}
-			role={props.role!}
+			data-slot="dialog"
+			role={role}
 		/>
 	);
 }
 
-export type DialogHeaderProps = ComponentPropsWithoutRef<'div'> & {
+export type DialogHeaderProps = Omit<ComponentPropsWithoutRef<'div'>, 'title'> & {
 	readonly description?: string;
 	readonly hasBorder?: boolean;
 	readonly title?: string;
 };
 
 export function DialogHeader({ hasBorder = false, ...props }: DialogHeaderProps) {
-	const headerRef = useRef<HTMLHeadingElement>(null);
-
-	useEffect(() => {
-		const header = headerRef.current;
-		if (!header) {
-			return;
-		}
-
-		const observer = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				header.parentElement?.style.setProperty('--dialog-header-height', `${entry.target.clientHeight}px`);
-			}
-		});
-
-		observer.observe(header);
-		return () => observer.unobserve(header);
-	}, []);
-
 	return (
 		<div
 			className={cx(
-				'relative flex flex-col gap-1 p-6 pb-4 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0',
+				'relative flex flex-col gap-1 p-(--dialog-gutter) pb-[calc(var(--dialog-gutter)---spacing(2))]',
 				hasBorder &&
-					'border-base-neutral-100 dark:border-base-neutral-700 border-b [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:border-b',
+					'border-b border-base-neutral-100 dark:border-base-neutral-700 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:border-0',
 				props.className,
 			)}
 			data-slot="dialog-header"
-			ref={headerRef}
 		>
 			{props.title && <DialogTitle>{props.title}</DialogTitle>}
 			{props.description && <DialogDescription>{props.description}</DialogDescription>}
-			{!props.title && typeof props.children === 'string' ? <DialogTitle {...props} /> : props.children}
+			{!props.title && typeof props.children === 'string' ? (
+				<DialogTitle>{props.children}</DialogTitle>
+			) : (
+				props.children
+			)}
 		</div>
 	);
 }
 
-export type DialogTitleProps = RACHeadingProps & {
-	readonly ref?: Ref<HTMLHeadingElement>;
-};
+export type DialogTitleProps = RACHeadingProps;
 
 export function DialogTitle({ level = 2, ...props }: DialogTitleProps) {
 	return (
 		<RACHeading
 			{...props}
-			className={cx('text-base-label-md flex flex-1 place-items-center', props.className)}
+			className={cx('flex flex-1 place-items-center text-base-label-md text-balance', props.className)}
 			level={level}
 			slot="title"
 		/>
@@ -82,7 +65,7 @@ export function DialogTitle({ level = 2, ...props }: DialogTitleProps) {
 export type DialogDescriptionProps = ComponentProps<'div'>;
 
 export function DialogDescription(props: DialogDescriptionProps) {
-	return <RACText {...props} className={cx('text-sm', props.className)} slot="description" />;
+	return <RACText {...props} className={cx('text-sm text-pretty', props.className)} slot="description" />;
 }
 
 export type DialogBodyProps = ComponentProps<'div'>;
@@ -92,7 +75,7 @@ export function DialogBody(props: DialogBodyProps) {
 		<div
 			{...props}
 			className={cx(
-				'isolate flex max-h-[calc(var(--visual-viewport-height)-var(--visual-viewport-vertical-padding)-var(--dialog-header-height,0px)-var(--dialog-footer-height,0px))] flex-1 flex-col gap-6 overflow-auto px-6 py-1',
+				'isolate flex min-h-0 flex-1 flex-col overflow-auto px-(--dialog-gutter) py-[calc(var(--dialog-gutter)---spacing(2))] **:data-[slot=dialog-footer]:px-0 **:data-[slot=dialog-footer]:pt-0',
 				props.className,
 			)}
 			data-slot="dialog-body"
@@ -105,37 +88,15 @@ export type DialogFooterProps = ComponentProps<'div'> & {
 };
 
 export function DialogFooter({ hasBorder = false, ...props }: DialogFooterProps) {
-	const footerRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const footer = footerRef.current;
-
-		if (!footer) {
-			return;
-		}
-
-		const observer = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				footer.parentElement?.style.setProperty('--dialog-footer-height', `${entry.target.clientHeight}px`);
-			}
-		});
-
-		observer.observe(footer);
-		return () => {
-			observer.unobserve(footer);
-		};
-	}, []);
-
 	return (
 		<div
 			{...props}
 			className={cx(
-				'isolate mt-auto flex flex-col-reverse place-content-between gap-3 p-6 sm:flex-row sm:place-content-end sm:place-items-center',
-				hasBorder && 'border-base-neutral-100 dark:border-base-neutral-700 border-t',
+				'isolate mt-auto flex flex-col-reverse place-content-between gap-2 p-(--dialog-gutter) group-not-has-data-[slot=dialog-body]/dialog:pt-0 group-not-has-data-[slot=dialog-body]/popover:pt-0 sm:flex-row sm:place-content-end sm:place-items-center',
+				hasBorder && 'border-t border-base-neutral-100 dark:border-base-neutral-700',
 				props.className,
 			)}
 			data-slot="dialog-footer"
-			ref={footerRef}
 		/>
 	);
 }
@@ -146,28 +107,25 @@ export function DialogClose(props: DialogCloseProps) {
 	return <Button {...props} slot="close" />;
 }
 
-export type CloseButtonIndicatorProps = Omit<ButtonProps, 'children'> & {
+export type DialogCloseIconProps = Omit<ButtonProps, 'children'> & {
 	readonly className?: string;
 	readonly isDismissable?: boolean | undefined;
 };
 
-export function DialogCloseIndicator(props: CloseButtonIndicatorProps) {
-	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
-
+export function DialogCloseIcon(props: DialogCloseIconProps) {
 	return props.isDismissable ? (
 		<Button
 			{...props}
-			{...(isMobile ? { autoFocus: true } : {})}
 			aria-label="Close"
 			className={cx(
-				'close text-base-neutral-500 hover:text-base-neutral-700 focus-visible:text-base-neutral-700 pressed:text-base-neutral-900 dark:text-base-neutral-400 dark:hover:text-base-neutral-200 dark:focus-visible:text-base-neutral-200 dark:pressed:text-base-neutral-500 disabled:text-base-neutral-300 dark:disabled:text-base-neutral-300 absolute top-3 right-4 z-50 rounded-full',
+				'close absolute top-3 right-4 z-50 grid place-content-center rounded-full text-base-neutral-600 hover:text-base-neutral-700 focus-visible:text-base-neutral-700 disabled:text-base-neutral-300 dark:text-base-neutral-300 dark:hover:text-base-neutral-200 dark:focus-visible:text-base-neutral-200 dark:disabled:text-base-neutral-300 pressed:text-base-neutral-900 dark:pressed:text-base-neutral-500',
 				props.className,
 			)}
 			size="icon-xs"
 			slot="close"
 			variant="unset"
 		>
-			<XIcon aria-hidden className="size-4.5 stroke-[1.5]" />
+			<XIcon aria-hidden size={18} strokeWidth={1.5} />
 		</Button>
 	) : null;
 }

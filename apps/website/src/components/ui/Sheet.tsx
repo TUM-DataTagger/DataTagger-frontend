@@ -1,7 +1,5 @@
 'use client';
 
-import type { VariantProps } from 'cva';
-import type { ComponentProps } from 'react';
 import type {
 	DialogProps as RACDialogProps,
 	DialogTriggerProps as RACDialogTriggerProps,
@@ -13,23 +11,8 @@ import {
 	ModalOverlay as RACModalOverlay,
 	composeRenderProps,
 } from 'react-aria-components';
-import { Dialog, DialogCloseIndicator } from '@/components/ui/Dialog';
+import { Dialog, DialogCloseIcon } from '@/components/ui/Dialog';
 import { cva } from '@/styles/cva';
-
-const sheetOverlayStyles = cva({
-	base: 'bg-base-neutral-900/72 fixed top-0 left-0 isolate z-50 flex h-(--visual-viewport-height) w-dvw place-content-end place-items-end p-4',
-	variants: {
-		isBlurred: {
-			true: 'supports-backdrop-filter:backdrop-blur',
-		},
-		isEntering: {
-			true: 'fade-in animate-in duration-300 ease-out',
-		},
-		isExiting: {
-			true: 'fade-out animate-out duration-200 ease-in',
-		},
-	},
-});
 
 type Sides = 'bottom' | 'left' | 'right' | 'top';
 const generateCompoundVariants = (sides: Sides[]) =>
@@ -47,7 +30,7 @@ const generateCompoundVariants = (sides: Sides[]) =>
 	}));
 
 const sheetContentStyles = cva({
-	base: 'shadow-base-xl bg-base-neutral-0 dark:bg-base-neutral-800 fixed z-50 grid gap-4 rounded-lg text-left align-middle transition ease-in-out',
+	base: 'fixed z-50 grid transform-gpu gap-4 rounded-lg border-base-neutral-200 bg-base-neutral-0 text-left align-middle shadow-base-xl transition ease-in-out will-change-transform dark:border-base-neutral-600 dark:bg-base-neutral-800',
 	variants: {
 		isEntering: {
 			true: 'animate-in duration-300',
@@ -56,15 +39,15 @@ const sheetContentStyles = cva({
 			true: 'animate-out duration-200',
 		},
 		side: {
-			top: 'entering:slide-in-from-top exiting:slide-out-to-top inset-x-0 top-0 border-b',
-			bottom: 'entering:slide-in-from-bottom exiting:slide-out-to-bottom inset-x-0 bottom-0 border-t',
-			left: 'entering:slide-in-from-left exiting:slide-out-to-left inset-y-0 left-0 h-auto w-full max-w-xs overflow-y-auto border-r',
+			top: 'inset-x-0 top-0 border-b entering:slide-in-from-top exiting:slide-out-to-top',
+			bottom: 'inset-x-0 bottom-0 border-t entering:slide-in-from-bottom exiting:slide-out-to-bottom',
+			left: 'inset-y-0 left-0 h-auto w-full max-w-xs overflow-y-auto border-r entering:slide-in-from-left exiting:slide-out-to-left',
 			right:
-				'entering:slide-in-from-right exiting:slide-out-to-right border-base-neutral-200 dark:border-base-neutral-600 inset-y-0 right-0 h-auto w-full max-w-xs overflow-y-auto border-l',
+				'inset-y-0 right-0 h-auto w-full max-w-xs overflow-y-auto border-l entering:slide-in-from-right exiting:slide-out-to-right',
 		},
 		isFloat: {
-			true: '',
-			false: '',
+			true: null,
+			false: null,
 		},
 	},
 	compoundVariants: generateCompoundVariants(['top', 'bottom', 'left', 'right']),
@@ -76,48 +59,57 @@ export function Sheet(props: SheetProps) {
 	return <RACDialogTrigger {...props} />;
 }
 
-export type SheetContentProps = Omit<ComponentProps<typeof RACModal>, 'children' | 'className'> &
-	Omit<RACModalOverlayProps, 'className'> &
-	VariantProps<typeof sheetOverlayStyles> & {
-		readonly 'aria-label'?: RACDialogProps['aria-label'];
-		readonly 'aria-labelledby'?: RACDialogProps['aria-labelledby'];
-		readonly classNames?: {
-			content?: RACModalOverlayProps['className'];
-			overlay?: RACModalOverlayProps['className'];
-		};
+const sheetOverlayStyles = cva({
+	base: 'fixed top-0 left-0 isolate z-50 flex h-(--visual-viewport-height) w-dvw place-content-end place-items-end bg-base-neutral-900/72 p-4',
+	variants: {
+		isBlurred: {
+			true: 'supports-backdrop-filter:backdrop-blur-md',
+		},
+		isEntering: {
+			true: 'animate-in duration-300 ease-out fade-in',
+		},
+		isExiting: {
+			true: 'animate-out duration-200 ease-in fade-out',
+		},
+	},
+});
+
+export type SheetContentProps = Pick<RACDialogProps, 'aria-label' | 'aria-labelledby' | 'role'> &
+	RACModalOverlayProps & {
 		readonly closeButton?: boolean;
 		readonly isBlurred?: boolean;
 		readonly isFloat?: boolean;
-		readonly role?: RACDialogProps['role'];
+		readonly overlay?: Omit<RACModalOverlayProps, 'children'>;
 		readonly side?: Sides;
 	};
 
 export function SheetContent({
 	isBlurred = false,
-	isDismissable = true,
+	isDismissable: isDismissableInternal,
 	side = 'right',
 	role = 'dialog',
 	closeButton = true,
 	isFloat = true,
+	overlay,
 	...props
 }: SheetContentProps) {
-	const _isDismissable = role === 'alertdialog' ? false : isDismissable;
+	const isDismissable = isDismissableInternal ?? role !== 'alertdialog';
 
 	return (
 		<RACModalOverlay
 			{...props}
-			className={composeRenderProps(props.classNames?.overlay, (className, renderProps) =>
+			className={composeRenderProps(overlay?.className, (className, renderProps) =>
 				sheetOverlayStyles({
 					...renderProps,
 					isBlurred,
 					className,
 				}),
 			)}
-			isDismissable={_isDismissable}
+			data-slot="sheet-overlay"
+			isDismissable={isDismissable}
 		>
 			<RACModal
-				{...props}
-				className={composeRenderProps(props.classNames?.content, (className, renderProps) =>
+				className={composeRenderProps(props.className, (className, renderProps) =>
 					sheetContentStyles({
 						...renderProps,
 						side,
@@ -125,12 +117,13 @@ export function SheetContent({
 						className,
 					}),
 				)}
+				data-slot="sheet-content"
 			>
 				{(values) => (
-					<Dialog aria-label={props['aria-label'] ?? undefined!} className="h-full" role={role}>
+					<Dialog aria-label={props['aria-label']!} role={role}>
 						<>
 							{typeof props.children === 'function' ? props.children(values) : props.children}
-							{closeButton && <DialogCloseIndicator className="top-2.5 right-2.5" isDismissable={_isDismissable} />}
+							{closeButton && <DialogCloseIcon className="top-2.5 right-2.5" isDismissable={isDismissable} />}
 						</>
 					</Dialog>
 				)}

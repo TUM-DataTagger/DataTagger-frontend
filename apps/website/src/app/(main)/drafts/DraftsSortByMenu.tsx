@@ -1,17 +1,16 @@
 'use client';
 
-import { SortByMenu, useSortByState } from '@/components/SortByMenu';
+import { SortByMenu, useSortByState } from '@/components/query-controls/SortByMenu';
+import { DRAFT_SORT_OPTIONS, type DraftSort } from '@/util/userSettingsOptions';
 
-const sortOptions = {
-	'-creation_date': 'Created last',
-	creation_date: 'Created first',
-	display_name: 'Name A-Z',
-	'-display_name': 'Name Z-A',
-	'-expiry_date': 'Closer to auto-delete',
-};
+export function DraftsSortByMenu({
+	defaultSort = '-creation_date',
+	isDisabled = false,
+}: {
+	readonly defaultSort?: DraftSort;
+	readonly isDisabled?: boolean;
+}) {
+	const sortState = useSortByState({ defaultSort });
 
-export function DraftsSortByMenu({ isDisabled = false }: { readonly isDisabled?: boolean }) {
-	const sortState = useSortByState({ defaultSort: '-creation_date' });
-
-	return <SortByMenu isDisabled={isDisabled} options={sortOptions} sortState={sortState} />;
+	return <SortByMenu isDisabled={isDisabled} options={DRAFT_SORT_OPTIONS} sortState={sortState} />;
 }

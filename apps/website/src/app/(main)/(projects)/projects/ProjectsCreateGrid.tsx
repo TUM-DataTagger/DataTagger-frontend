@@ -27,7 +27,7 @@ export function ProjectsCreateGrid({
 				className={gridCardStyles({
 					variant,
 					className: cx(
-						'relative h-[132px] w-full min-w-64 cursor-pointer flex-row place-content-center place-items-center gap-2 border-transparent md:w-auto dark:border-transparent',
+						'relative h-[132px] w-full min-w-64 cursor-pointer flex-row place-content-center place-items-center gap-2 border-transparent md:max-w-64 dark:border-transparent',
 						props.className,
 					),
 				})}

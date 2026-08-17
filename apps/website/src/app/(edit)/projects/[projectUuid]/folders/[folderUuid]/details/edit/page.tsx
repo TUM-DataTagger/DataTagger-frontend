@@ -28,7 +28,7 @@ export default async function Page({
 			<div className="mx-auto flex w-full max-w-[536px] grow flex-col gap-4 px-4 py-12 md:px-0">
 				<ProjectFolderDetailsEditForm data={folderData} folderUuid={folderUuid} projectUuid={projectUuid} />
 			</div>
-			<ProjectFolderDetailsEditFooter folderUuid={folderUuid} />
+			<ProjectFolderDetailsEditFooter folderUuid={folderUuid} projectUuid={projectUuid} />
 		</>
 	);
 }

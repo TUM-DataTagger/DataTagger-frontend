@@ -31,7 +31,7 @@ export function ProjectMembersTable(props: { readonly data?: ProjectMembership[]
 									<TooltipTrigger variant="tooltip">
 										<HelpCircleIcon aria-hidden size={18} strokeWidth={1.5} />
 									</TooltipTrigger>
-									<TooltipContent showArrow={false} variant="rich">
+									<TooltipContent arrow={false} variant="rich">
 										{item.is_project_admin
 											? 'Full access to project including folders and files within'
 											: 'No access to files unless defined in folders'}
@@ -41,13 +41,22 @@ export function ProjectMembersTable(props: { readonly data?: ProjectMembership[]
 						</TableCell>
 						<TableCell style={{ width: '100px' }} textValue={item.can_create_folders ? 'Can create folders' : ''}>
 							{item.is_project_admin ? null : (
-								<span className="text-base-sm text-neutral-500 dark:text-neutral-300">
-									{item.can_create_folders ? '+ Can create folders' : ''}
-								</span>
+								<div className="flex flex-col gap-1">
+									{item.can_create_folders ? (
+										<span className="text-base-sm text-neutral-500 dark:text-neutral-300">+ Can create folders</span>
+									) : null}
+									{item.is_metadata_template_admin ? (
+										<span className="text-base-sm text-neutral-500 dark:text-neutral-300">
+											+ Can create metadata templates
+										</span>
+									) : null}
+								</div>
 							)}
 						</TableCell>
 						<TableCell style={{ width: '300px' }} textValue={item.member.email}>
-							<span className="max-w-[30ch] truncate">{item.member.email}</span>
+							<span className="max-w-[30ch] truncate" title={item.member.email}>
+								{item.member.email}
+							</span>
 						</TableCell>
 					</TableRow>
 				)}

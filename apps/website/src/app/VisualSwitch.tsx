@@ -1,31 +1,31 @@
 'use client';
 
 import { Laptop2Icon, MoonIcon, SmartphoneIcon, SunIcon } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import { Radio, RadioGroup } from '@/components/ui/RadioGroup';
 import { cx } from '@/styles/cva';
 
-export function VisualSwitch(props: { readonly className?: string }) {
+export function VisualSwitch(props: { readonly className?: string; onThemeChange?(theme: string): void }) {
 	const { theme, setTheme } = useTheme();
 
 	return (
 		<RadioGroup
 			aria-label="Visual switch"
 			className={cx(
-				'border-base-neutral-300 dark:border-base-neutral-500 rounded-[20px] border p-[6px]',
+				'flex rounded-[20px] border border-base-neutral-300 p-1.5 dark:border-base-neutral-500 orientation-horizontal:space-x-1.5',
 				props.className,
 			)}
-			classNames={{
-				content: 'group-orientation-horizontal:gap-2 group-orientation-horizontal:flex-nowrap',
+			onChange={(newTheme) => {
+				setTheme(newTheme);
+				props.onThemeChange?.(newTheme);
 			}}
-			onChange={async (newTheme) => setTheme(newTheme)}
 			orientation="horizontal"
 			value={theme ?? 'system'}
 		>
 			<Radio
 				aria-label="Light mode"
-				className="hover:bg-base-neutral-80 focus-visible:bg-base-neutral-80 focus-visible:outline-base-lavender-400 pressed:bg-base-neutral-200 selected:bg-base-neutral-100 dark:outline-base-lavender-600 dark:hover:bg-base-neutral-700 dark:pressed:bg-base-neutral-600 dark:selected:bg-base-neutral-700 rounded-full p-[5px] outline-0 outline-offset-2 focus-visible:outline-2 forced-colors:outline-[Highlight]"
+				className="rounded-full p-[5px] outline-0 outline-offset-2 hover:bg-base-neutral-80 focus-visible:bg-base-neutral-80 focus-visible:outline-2 focus-visible:outline-base-lavender-400 dark:outline-base-lavender-600 dark:hover:bg-base-neutral-700 forced-colors:outline-[Highlight] pressed:bg-base-neutral-200 dark:pressed:bg-base-neutral-600 selected:bg-base-neutral-100 dark:selected:bg-base-neutral-700"
 				showIndicator={false}
 				value="light"
 			>
@@ -33,7 +33,7 @@ export function VisualSwitch(props: { readonly className?: string }) {
 			</Radio>
 			<Radio
 				aria-label="Dark mode"
-				className="hover:bg-base-neutral-80 focus-visible:bg-base-neutral-80 focus-visible:outline-base-lavender-400 pressed:bg-base-neutral-200 selected:bg-base-neutral-100 dark:outline-base-lavender-600 dark:hover:bg-base-neutral-700 dark:pressed:bg-base-neutral-600 dark:selected:bg-base-neutral-700 rounded-full p-[5px] outline-0 outline-offset-2 focus-visible:outline-2 forced-colors:outline-[Highlight]"
+				className="rounded-full p-[5px] outline-0 outline-offset-2 hover:bg-base-neutral-80 focus-visible:bg-base-neutral-80 focus-visible:outline-2 focus-visible:outline-base-lavender-400 dark:outline-base-lavender-600 dark:hover:bg-base-neutral-700 forced-colors:outline-[Highlight] pressed:bg-base-neutral-200 dark:pressed:bg-base-neutral-600 selected:bg-base-neutral-100 dark:selected:bg-base-neutral-700"
 				showIndicator={false}
 				value="dark"
 			>
@@ -41,7 +41,7 @@ export function VisualSwitch(props: { readonly className?: string }) {
 			</Radio>
 			<Radio
 				aria-label="System mode"
-				className="hover:bg-base-neutral-80 focus-visible:bg-base-neutral-80 focus-visible:outline-base-lavender-400 pressed:bg-base-neutral-200 selected:bg-base-neutral-100 dark:outline-base-lavender-600 dark:hover:bg-base-neutral-700 dark:pressed:bg-base-neutral-600 dark:selected:bg-base-neutral-700 rounded-full p-[5px] outline-0 outline-offset-2 focus-visible:outline-2 forced-colors:outline-[Highlight]"
+				className="rounded-full p-[5px] outline-0 outline-offset-2 hover:bg-base-neutral-80 focus-visible:bg-base-neutral-80 focus-visible:outline-2 focus-visible:outline-base-lavender-400 dark:outline-base-lavender-600 dark:hover:bg-base-neutral-700 forced-colors:outline-[Highlight] pressed:bg-base-neutral-200 dark:pressed:bg-base-neutral-600 selected:bg-base-neutral-100 dark:selected:bg-base-neutral-700"
 				showIndicator={false}
 				value="system"
 			>

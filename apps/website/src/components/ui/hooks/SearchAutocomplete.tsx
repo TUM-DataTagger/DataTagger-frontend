@@ -9,31 +9,25 @@ import type { Node } from '@react-types/shared';
 import { use, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { DismissButton, /* useButton,  */ useFilter } from 'react-aria';
 import type { AriaComboBoxProps, AriaListBoxProps, AriaPopoverProps } from 'react-aria';
-import { FormValidationContext, type ListState, type OverlayTriggerState } from 'react-stately';
+import { FormValidationContext, type OverlayTriggerState } from 'react-stately';
 import { inputStyles } from '@/styles/ui/input';
 import { itemStyles } from '@/styles/ui/listbox';
 import { popoverStyles } from '@/styles/ui/popover';
 
 type ListBoxProps = Omit<AriaListBoxProps<object>, 'children'> & {
 	readonly className?: string;
-	readonly listBoxRef: RefObject<HTMLElement>;
-	readonly state: ListState<object>;
+	readonly listBoxRef: RefObject<HTMLUListElement | null>;
+	readonly state: Parameters<typeof useListBox<object>>[1];
 	readonly style?: CSSProperties;
 };
 
 function ListBox(props: ListBoxProps) {
-	const ref = useRef(null);
-	const { listBoxRef = ref, state } = props;
+	const { listBoxRef, state } = props;
 
 	const { listBoxProps } = useListBox(props, state, listBoxRef);
 
 	return (
-		<ul
-			{...listBoxProps}
-			className={props.className}
-			ref={listBoxRef as RefObject<HTMLUListElement>}
-			style={props.style}
-		>
+		<ul {...listBoxProps} className={props.className} ref={listBoxRef} style={props.style}>
 			{[...state.collection].map((item) => (
 				<Option item={item} key={item.key} state={state} />
 			))}
@@ -41,7 +35,13 @@ function ListBox(props: ListBoxProps) {
 	);
 }
 
-function Option({ item, state }: { readonly item: Node<object>; readonly state: ListState<object> }) {
+function Option({
+	item,
+	state,
+}: {
+	readonly item: Node<object>;
+	readonly state: Parameters<typeof useListBox<object>>[1];
+}) {
 	const ref = useRef(null);
 
 	const { optionProps, isSelected, isFocusVisible, isDisabled } = useOption({ key: item.key }, state, ref);
@@ -56,6 +56,7 @@ function Option({ item, state }: { readonly item: Node<object>; readonly state: 
 
 type PopoverProps = AriaPopoverProps & {
 	readonly children: ReactNode;
+	readonly popoverRef?: RefObject<HTMLDivElement | null>;
 	readonly state: OverlayTriggerState;
 };
 
@@ -64,7 +65,7 @@ function Popover({ children, state, ...props }: PopoverProps) {
 
 	return (
 		<Overlay>
-			<div {...popoverProps} className={popoverStyles()} ref={props.popoverRef as RefObject<HTMLDivElement>}>
+			<div {...popoverProps} className={popoverStyles()} ref={props.popoverRef}>
 				{children}
 				<DismissButton onDismiss={state.close} />
 			</div>
@@ -115,15 +116,15 @@ export function SearchAutocomplete(props: SearchAutocompleteProps) {
 	});
 
 	const errors = use(FormValidationContext);
-	const error = errors?.[props.name as string] ?? (props.errorMessage as string);
+	const formError = typeof props.name === 'string' ? errors?.[props.name] : undefined;
+	const fallbackErrorMessage = typeof props.errorMessage === 'function' ? undefined : props.errorMessage;
+	const error = formError ?? fallbackErrorMessage;
+	const listBoxStyle: CSSProperties & { '--trigger-width'?: string } = { '--trigger-width': menuWidth ?? undefined };
 
 	return (
 		<div className="flex flex-col gap-3">
 			{props.label && (
-				<label
-					{...labelProps}
-					className="text-base-md w-fit cursor-default transition-colors group-disabled:opacity-38"
-				>
+				<label {...labelProps} className="cursor-default text-base-md transition-colors group-disabled:opacity-38">
 					{props.label}
 				</label>
 			)}
@@ -145,7 +146,7 @@ export function SearchAutocomplete(props: SearchAutocompleteProps) {
 				{isInvalid && (
 					<div
 						{...errorMessageProps}
-						className="text-base-sm text-base-sunset-500 flex place-items-center gap-[6px] forced-colors:text-[Mark]"
+						className="flex place-items-center gap-1.5 text-base-sm text-base-sunset-500 forced-colors:text-[Mark]"
 					>
 						{error}
 					</div>
@@ -154,14 +155,10 @@ export function SearchAutocomplete(props: SearchAutocompleteProps) {
 					<Popover isNonModal placement="bottom start" popoverRef={popoverRef} state={state} triggerRef={inputRef}>
 						<ListBox
 							{...listBoxProps}
-							className="w-[calc(var(--trigger-width)_-_1rem)]"
-							listBoxRef={listBoxRef as RefObject<HTMLElement>}
-							state={state as unknown as ListState<object>}
-							style={
-								{
-									'--trigger-width': menuWidth,
-								} as CSSProperties
-							}
+							className="w-[calc(var(--trigger-width)-1rem)]"
+							listBoxRef={listBoxRef}
+							state={state}
+							style={listBoxStyle}
 						/>
 					</Popover>
 				)}

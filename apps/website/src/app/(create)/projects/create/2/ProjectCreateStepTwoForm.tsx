@@ -8,29 +8,29 @@ import { useRouter } from 'next/navigation';
 import type { ComponentProps } from 'react';
 import { useEffect, useId } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useLocalStorage } from 'usehooks-ts';
 import type { InferInput } from 'valibot';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
-import { ComboBox, ComboBoxInput, ComboBoxList, ComboBoxOption, ComboBoxSection } from '@/components/ui/ComboBox';
-import { Label } from '@/components/ui/Field';
+import { ComboBox, ComboBoxInput, ComboBoxContent, ComboBoxItem, ComboBoxSection } from '@/components/ui/ComboBox';
+import { FieldError, Label } from '@/components/ui/Field';
+import { Input, InputGroup } from '@/components/ui/Input';
 import {
 	Select,
 	SelectLabel,
-	SelectList,
-	SelectOption,
-	SelectOptionDescription,
+	SelectContent,
+	SelectItem,
+	SelectDescription,
 	SelectSection,
 	SelectTrigger,
 } from '@/components/ui/Select';
 import { TextField } from '@/components/ui/TextField';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useFirstTimeFlag } from '@/hooks/useFirstTimeFlag';
 import { ProjectStepTwoSchema } from '@/schemas/ProjectSchema';
 import {
 	folderMemberPermissionAtom,
 	folderMembersSelectionAtom,
 	folderMembersWithoutProjectAdminAtom,
-	initialState,
 	projectAtom,
 	projectMembersAtom,
 	projectMembersWithAdminAtom,
@@ -40,6 +40,7 @@ import {
 } from '@/stores/createProject';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { formatErrorMessage } from '@/util/formatErrorMessage';
+import { logger, LogCategory } from '@/util/logger';
 
 type ProjectCreateStepTwoInput = InferInput<typeof ProjectStepTwoSchema>;
 
@@ -61,7 +62,7 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 	const projectMembersWithPermissionsAndFolderPermissions = useAtomValue(
 		projectMembersWithPermissionsAndFolderPermissionsAtom,
 	);
-	const [_isFirstTime, setIsFirstTime, _removeIsFirstTime] = useLocalStorage('isFirstTimeProject', false);
+	const { markCompleted } = useFirstTimeFlag('project');
 
 	const { currentUserData } = useCurrentUser();
 
@@ -128,13 +129,14 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 			return { data: projectData };
 		},
 		async onSuccess({ data }) {
+			logger.info(LogCategory.Project, 'Project created', { projectId: data.pk });
+
+			router.push(`/projects/${data.pk}`);
+			markCompleted();
+
 			await queryClient.invalidateQueries({
 				queryKey: $api.queryOptions('get', '/api/v1/project/').queryKey,
 			});
-
-			router.push(`/projects/${data.pk}`);
-			setProject(initialState);
-			setIsFirstTime(false);
 		},
 		onError(error) {
 			window.scrollTo({ top: 0, behavior: 'instant' });
@@ -177,7 +179,7 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 		});
 	}
 
-	function onFolderMemberPermissionChange(member: string, val: string) {
+	function onFolderMemberPermissionChange(member: string, val: 'admin' | 'editor' | 'viewer') {
 		setProject((draft) => {
 			draft.folder.memberPermission[member] = val;
 		});
@@ -197,7 +199,7 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 				<div className="flex flex-col gap-8">
 					{methods.formState.errors.root ? (
 						<Alert>
-							<AlertCircleIcon aria-hidden size={24} strokeWidth={1.5} />
+							<AlertCircleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 							{methods.formState.errors.root?.message}
 						</Alert>
 					) : null}
@@ -213,17 +215,28 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 									render={({ field, fieldState }) => (
 										<TextField
 											autoComplete="off"
-											errorMessage={fieldState.error?.message}
-											isClearable
 											isDisabled={field.disabled ?? false}
 											isInvalid={fieldState.invalid}
-											label="Folder name"
 											onBlur={field.onBlur}
 											onChange={field.onChange}
-											placeholder="Name your folder"
-											type="text"
 											value={field.value ?? ''}
-										/>
+										>
+											<Label>Folder name</Label>
+											<InputGroup>
+												<Input placeholder="Name your folder" />
+												{field.value && !field.disabled && (
+													<Button
+														aria-label="Clear folder name"
+														onPress={() => field.onChange('')}
+														size="icon"
+														variant="unset"
+													>
+														<XCircleIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+													</Button>
+												)}
+											</InputGroup>
+											{fieldState.error?.message ? <FieldError>{fieldState.error.message}</FieldError> : null}
+										</TextField>
 									)}
 								/>
 							</div>
@@ -234,23 +247,22 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 									name="storage"
 									render={({ field, fieldState }) => (
 										<Select
-											autoComplete="off"
-											errorMessage={fieldState.error?.message}
 											isDisabled
 											isInvalid={fieldState.invalid}
-											label="Storage"
 											onBlur={field.onBlur}
-											onSelectionChange={field.onChange}
-											selectedKey={field.value ?? ''}
+											onChange={field.onChange}
+											value={field.value ?? ''}
 										>
+											<Label>Storage</Label>
 											<SelectTrigger />
-											<SelectList items={[{ id: 'dss', name: 'DSS' }]}>
+											<SelectContent items={[{ id: 'dss', name: 'DSS' }]}>
 												{(item) => (
-													<SelectOption id={item.id} textValue={item.name}>
+													<SelectItem id={item.id} textValue={item.name}>
 														<SelectLabel>{item.name}</SelectLabel>
-													</SelectOption>
+													</SelectItem>
 												)}
-											</SelectList>
+											</SelectContent>
+											{fieldState.error?.message ? <FieldError>{fieldState.error.message}</FieldError> : null}
 										</Select>
 									)}
 								/>
@@ -265,7 +277,7 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 								{currentUserData ? (
 									<>
 										<Label className="text-base-md">Folder creator</Label>
-										<div className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-5 md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px]">
+										<div className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-5 text-base-md md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700">
 											<span
 												className="col-span-2 max-w-[25ch] justify-self-start truncate"
 												title={currentUserData?.email}
@@ -292,7 +304,7 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 										.sort((a, b) => a.name.localeCompare(b.name))
 										.map((member) => (
 											<div
-												className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-5 md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px]"
+												className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-5 text-base-md md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700"
 												key={member.id}
 											>
 												<span className="col-span-2 justify-self-start">{member.name}</span>
@@ -321,11 +333,10 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 										id={selectMemberInputId}
 										menuTrigger="focus"
 										onSelectionChange={async (val) => onAddFolderMember(val as string)}
-										placeholder="Select member"
 										selectedKey={null}
 									>
-										<ComboBoxInput />
-										<ComboBoxList>
+										<ComboBoxInput placeholder="Select member" />
+										<ComboBoxContent>
 											<ComboBoxSection
 												title={
 													projectMembers.size === 0
@@ -338,12 +349,12 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 												{folderMembersSelection
 													.sort((a, b) => a.name.localeCompare(b.name))
 													.map((member) => (
-														<ComboBoxOption id={member.id} key={member.id} textValue={member.name}>
+														<ComboBoxItem id={member.id} key={member.id} textValue={member.name}>
 															{member.name}
-														</ComboBoxOption>
+														</ComboBoxItem>
 													))}
 											</ComboBoxSection>
-										</ComboBoxList>
+										</ComboBoxContent>
 									</ComboBox>
 									<Button
 										className="shrink-0"
@@ -358,7 +369,7 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 
 							{folderMembersWithoutProjectAdmin.map((member, idx: number) => (
 								<div
-									className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-5 md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px]"
+									className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-5 text-base-md md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700"
 									key={`${member.id}-${idx}`}
 								>
 									<span
@@ -371,11 +382,13 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 										<div className="flex gap-[23px]">
 											<Select
 												aria-label="Folder permission"
-												onSelectionChange={async (val) => onFolderMemberPermissionChange(member.id, val as string)}
-												selectedKey={selectedMemberPermission(member.id)}
+												onChange={async (val) =>
+													onFolderMemberPermissionChange(member.id, val as 'admin' | 'editor' | 'viewer')
+												}
+												value={selectedMemberPermission(member.id)}
 											>
 												<SelectTrigger />
-												<SelectList>
+												<SelectContent popover={{ className: 'max-w-(--trigger-width)' }}>
 													<SelectSection title="Folder permissions">
 														{[
 															{
@@ -394,13 +407,15 @@ export function ProjectCreateStepTwoForm(props: ComponentProps<'form'>) {
 																description: 'Views and downloads files and their metadata',
 															},
 														].map((permission) => (
-															<SelectOption id={permission.id} key={permission.id} textValue={permission.name}>
+															<SelectItem id={permission.id} key={permission.id} textValue={permission.name}>
 																<SelectLabel>{permission.name}</SelectLabel>
-																<SelectOptionDescription>{permission.description}</SelectOptionDescription>
-															</SelectOption>
+																<SelectDescription className="line-clamp-none">
+																	{permission.description}
+																</SelectDescription>
+															</SelectItem>
 														))}
 													</SelectSection>
-												</SelectList>
+												</SelectContent>
 											</Select>
 											<Button
 												aria-label="Remove member"

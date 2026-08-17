@@ -27,9 +27,6 @@ export function ProjectFolderTabs(
 	useEffect(() => {
 		startTransition(() => {
 			switch (pathname.split('/')[5]!) {
-				case 'details':
-					setTab('details');
-					break;
 				case 'permissions':
 					setTab('permissions');
 					break;
@@ -45,16 +42,16 @@ export function ProjectFolderTabs(
 
 	return (
 		<Tabs className="gap-0" selectedKey={tab}>
-			<TabList className="mx-auto md:max-w-[852px]">
+			<TabList className="mx-auto md:max-w-[856px]">
 				<Tab href={`/projects/${props.projectUuid}/folders/${props.folderUuid}/files`} id="files">
 					Files
-					<span className="bg-base-neutral-700 text-base-label-xs text-base-neutral-40 dark:bg-base-neutral-200 dark:text-base-neutral-900 flex h-4 w-3.5 place-content-center place-items-center rounded-2xl tabular-nums">
+					<span className="flex h-4 min-w-3.5 place-content-center place-items-center rounded-2xl bg-base-neutral-700 px-1 text-base-label-xs text-base-neutral-40 tabular-nums dark:bg-base-neutral-200 dark:text-base-neutral-900">
 						{folderData.datasets_count}
 					</span>
 				</Tab>
 				<Tab href={`/projects/${props.projectUuid}/folders/${props.folderUuid}/permissions`} id="permissions">
 					Permissions
-					<span className="bg-base-neutral-700 text-base-label-xs text-base-neutral-40 dark:bg-base-neutral-200 dark:text-base-neutral-900 flex h-4 w-3.5 place-content-center place-items-center rounded-2xl tabular-nums">
+					<span className="flex h-4 min-w-3.5 place-content-center place-items-center rounded-2xl bg-base-neutral-700 px-1 text-base-label-xs text-base-neutral-40 tabular-nums dark:bg-base-neutral-200 dark:text-base-neutral-900">
 						{folderData.members_count}
 					</span>
 				</Tab>
@@ -63,9 +60,6 @@ export function ProjectFolderTabs(
 					id="metadata-templates"
 				>
 					Metadata templates
-				</Tab>
-				<Tab href={`/projects/${props.projectUuid}/folders/${props.folderUuid}/details`} id="details">
-					Details
 				</Tab>
 			</TabList>
 			{props.children}

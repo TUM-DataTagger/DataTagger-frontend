@@ -5,7 +5,7 @@ export const buttonStyles = compose(
 	focusRing,
 	cva({
 		base: [
-			'text-base-label-md relative inline-flex place-content-center place-items-center gap-2 border border-transparent',
+			'relative isolate inline-flex shrink-0 place-content-center place-items-center gap-2 border border-transparent text-base-label-md',
 			'*:data-[slot=icon]:size-4.5 *:data-[slot=icon]:shrink-0 print:hidden',
 		],
 		variants: {
@@ -13,15 +13,15 @@ export const buttonStyles = compose(
 				unset: null,
 				outline: [
 					'h-10 rounded-sm px-4 py-2.5',
-					'border-base-neutral-300 text-base-neutral-800 bg-base-neutral-0 dark:bg-base-neutral-800 dark:border-base-neutral-500 dark:text-base-neutral-100',
-					'hover:bg-base-neutral-700 hover:text-base-neutral-40 dark:hover:bg-base-neutral-100 dark:hover:text-base-neutral-900 hover:border-transparent',
-					'focus-visible:bg-base-neutral-700 focus-visible:text-base-neutral-40 dark:focus-visible:bg-base-neutral-100 dark:focus-visible:text-base-neutral-900 focus-visible:border-transparent',
-					'pressed:bg-base-neutral-800 pressed:text-base-neutral-40 pressed:border-transparent dark:pressed:bg-base-neutral-60 dark:pressed:text-base-neutral-900',
-					'disabled:bg-base-neutral-40 disabled:text-base-neutral-900 disabled:border-base-neutral-300 dark:disabled:bg-base-neutral-800 dark:disabled:text-base-neutral-40',
+					'border-base-neutral-300 bg-base-neutral-0 text-base-neutral-800 dark:border-base-neutral-500 dark:bg-base-neutral-800 dark:text-base-neutral-100',
+					'hover:border-transparent hover:bg-base-neutral-700 hover:text-base-neutral-40 dark:hover:bg-base-neutral-100 dark:hover:text-base-neutral-900',
+					'focus-visible:border-transparent focus-visible:bg-base-neutral-700 focus-visible:text-base-neutral-40 dark:focus-visible:bg-base-neutral-100 dark:focus-visible:text-base-neutral-900',
+					'pressed:border-transparent pressed:bg-base-neutral-800 pressed:text-base-neutral-40 dark:pressed:bg-base-neutral-60 dark:pressed:text-base-neutral-900',
+					'disabled:border-base-neutral-300 disabled:bg-base-neutral-40 disabled:text-base-neutral-900 dark:disabled:bg-base-neutral-800 dark:disabled:text-base-neutral-40',
 				],
 				discreet: [
 					'h-10 rounded-sm px-4 py-2.5',
-					'text-base-neutral-800 dark:text-base-neutral-100 bg-transparent',
+					'bg-transparent text-base-neutral-800 dark:text-base-neutral-100',
 					'hover:bg-base-neutral-100 dark:hover:bg-base-neutral-700',
 					'focus-visible:bg-base-neutral-100 dark:focus-visible:bg-base-neutral-700',
 					'pressed:bg-base-neutral-200 dark:pressed:bg-base-neutral-600',
@@ -45,15 +45,15 @@ export const buttonStyles = compose(
 				],
 				'secondary-outline': [
 					'h-10 rounded-sm px-4 py-2.5',
-					'border-base-lavender-300 text-base-neutral-800 bg-base-neutral-0 dark:bg-base-neutral-800 dark:border-base-lavender-600 dark:text-base-neutral-40',
-					'hover:bg-base-lavender-500 hover:text-base-neutral-900 hover:border-transparent',
-					'focus-visible:bg-base-lavender-500 focus-visible:text-base-neutral-900 focus-visible:border-transparent',
-					'pressed:bg-base-lavender-600 pressed:text-base-neutral-40 pressed:border-transparent dark:pressed:bg-base-lavender-400 dark:pressed:text-base-neutral-900',
-					'disabled:bg-base-neutral-0 disabled:text-base-neutral-900 disabled:border-base-neutral-200 dark:text-base-neutral-40 dark:disabled:bg-base-neutral-800 dark:disabled:border-base-neutral-700',
+					'border-base-lavender-300 bg-base-neutral-0 text-base-neutral-800 dark:border-base-lavender-600 dark:bg-base-neutral-800 dark:text-base-neutral-40',
+					'hover:border-transparent hover:bg-base-lavender-500 hover:text-base-neutral-900',
+					'focus-visible:border-transparent focus-visible:bg-base-lavender-500 focus-visible:text-base-neutral-900',
+					'pressed:border-transparent pressed:bg-base-lavender-600 pressed:text-base-neutral-40 dark:pressed:bg-base-lavender-400 dark:pressed:text-base-neutral-900',
+					'disabled:border-base-neutral-200 disabled:bg-base-neutral-0 disabled:text-base-neutral-900 dark:text-base-neutral-40 dark:disabled:border-base-neutral-700 dark:disabled:bg-base-neutral-800',
 				],
 				'secondary-discreet': [
 					'h-10 rounded-sm px-4 py-2.5',
-					'text-base-lavender-600 dark:text-base-lavender-400 bg-transparent',
+					'bg-transparent text-base-lavender-600 dark:text-base-lavender-400',
 					'hover:bg-base-lavender-100 hover:text-base-lavender-700 dark:hover:bg-base-lavender-800 dark:hover:text-base-lavender-300',
 					'focus-visible:bg-base-lavender-100 focus-visible:text-base-lavender-700 dark:focus-visible:bg-base-lavender-800 dark:focus-visible:text-base-lavender-300',
 					'pressed:bg-base-lavender-200 pressed:text-base-lavender-800 dark:pressed:bg-base-lavender-700 dark:pressed:text-base-lavender-100',
@@ -98,6 +98,7 @@ export const buttonStyles = compose(
 				xs: null,
 				'icon-sm': null,
 				'icon-xs': null,
+				'icon-xxs': null,
 			},
 			isDestructive: {
 				true: null,
@@ -170,7 +171,7 @@ export const buttonStyles = compose(
 				],
 			},
 			{
-				variant: ['filled', 'discreet', 'secondary-tonal', 'crystal-tonal', 'unset'],
+				variant: ['filled', 'discreet', 'tonal', 'secondary-tonal', 'crystal-tonal', 'unset'],
 				size: 'icon-sm',
 				className: 'size-8 shrink-0 rounded-full p-1.5',
 			},
@@ -180,9 +181,14 @@ export const buttonStyles = compose(
 				className: 'size-8 shrink-0 rounded-sm p-1.5',
 			},
 			{
-				variant: ['discreet', 'unset'],
+				variant: ['discreet', 'secondary-discreet', 'unset'],
 				size: 'icon-xs',
 				className: 'size-6 shrink-0 rounded-full p-0.5',
+			},
+			{
+				variant: ['unset'],
+				size: 'icon-xxs',
+				className: 'size-4.5 shrink-0 rounded-full p-0.5',
 			},
 		],
 		defaultVariants: {

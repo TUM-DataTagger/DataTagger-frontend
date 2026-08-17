@@ -4,17 +4,17 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { $api } from '@/util/clientFetch';
 
-export function useMetadataTemplatePermissions(props: { readonly metadataTemplateUuid: string }) {
+export function useMetadataTemplatePermissions(props: { readonly metadataTemplateContainerUuid: string }) {
 	const { currentUserData } = useCurrentUser();
 
-	const { data: metadataTemplateData } = useSuspenseQuery(
-		$api.queryOptions('get', '/api/v1/metadata-template/{id}/', {
-			params: { path: { id: props.metadataTemplateUuid } },
+	const { data: metadataTemplateContainerData } = useSuspenseQuery(
+		$api.queryOptions('get', '/api/v1/metadata-template-container/{id}/', {
+			params: { path: { id: props.metadataTemplateContainerUuid } },
 		}),
 	);
 
-	const isAssignedToProject = metadataTemplateData.assigned_to_content_type === 'projects.project';
-	const isAssignedToFolder = metadataTemplateData.assigned_to_content_type === 'folders.folder';
+	const isAssignedToProject = metadataTemplateContainerData.assigned_to_content_type === 'projects.project';
+	const isAssignedToFolder = metadataTemplateContainerData.assigned_to_content_type === 'folders.folder';
 
 	const { data: projectPermissionData } = useQuery(
 		$api.queryOptions(
@@ -22,7 +22,7 @@ export function useMetadataTemplatePermissions(props: { readonly metadataTemplat
 			'/api/v1/project-membership/',
 			{
 				params: {
-					query: { project: metadataTemplateData.assigned_to_object_id!, member: currentUserData?.pk ?? -1 },
+					query: { project: metadataTemplateContainerData.assigned_to_object_id!, member: currentUserData?.pk ?? -1 },
 				},
 			},
 			{ enabled: Boolean(currentUserData?.pk && isAssignedToProject) },
@@ -36,7 +36,7 @@ export function useMetadataTemplatePermissions(props: { readonly metadataTemplat
 			{
 				params: {
 					query: {
-						folder: metadataTemplateData.assigned_to_object_id!,
+						folder: metadataTemplateContainerData.assigned_to_object_id!,
 						project_membership__member: currentUserData?.pk ?? -1,
 					},
 				},
@@ -46,7 +46,6 @@ export function useMetadataTemplatePermissions(props: { readonly metadataTemplat
 	);
 
 	const isProjectMetadataTemplateAdmin = Boolean(
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
 		projectPermissionData?.[0]?.is_project_admin || projectPermissionData?.[0]?.is_metadata_template_admin,
 	);
 

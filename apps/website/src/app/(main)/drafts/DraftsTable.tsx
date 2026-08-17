@@ -2,13 +2,13 @@
 
 import { format } from '@formkit/tempo';
 import { useSetAtom } from 'jotai';
-import { InfoIcon, Wand2Icon } from 'lucide-react';
-import Link from 'next/link';
+import { FileWarningIcon, InfoIcon, Wand2Icon } from 'lucide-react';
 import { parseAsArrayOf, parseAsBoolean, parseAsString, useQueryStates } from 'nuqs';
 import type { Selection } from 'react-aria-components';
 import { useMediaQuery } from 'usehooks-ts';
 import { FileExpirationBadge } from '@/components/File';
 import { Button } from '@/components/ui/Button';
+import { Link } from '@/components/ui/Link';
 import { useSidebar } from '@/components/ui/Sidebar';
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
 import { globalUploadAssistantOpenAtom } from '@/stores/globalUploadAssistant';
@@ -17,6 +17,7 @@ import { buttonStyles } from '@/styles/ui/button';
 import { convertDataRateLog } from '@/util/convertDataRate';
 import { differenceInDays } from '@/util/differenceInDays';
 import type { components } from '@/util/openapiSchema';
+import { getSelectionStringValues } from '@/util/selection';
 import { DraftsMoreMenu } from './DraftsMoreMenu';
 
 type Draft = components['schemas']['UploadsDatasetList'];
@@ -40,7 +41,10 @@ export function DraftsTable(props: { readonly data?: Draft[] | undefined }) {
 	};
 
 	const handleSelectionChange = async (selectedKeys: Selection) => {
-		const newSelected = Array.from(selectedKeys as Set<string>);
+		const newSelected = getSelectionStringValues(
+			selectedKeys,
+			props.data?.map((item) => item.pk),
+		);
 		await setQueryStates({ selected: newSelected.length ? newSelected : null });
 	};
 
@@ -79,15 +83,26 @@ export function DraftsTable(props: { readonly data?: Draft[] | undefined }) {
 								className={buttonStyles({
 									variant: 'unset',
 									className:
-										'group-hover:text-base-lavender-600 dark:group-hover:text-base-lavender-400 print:inline-flex',
+										'group-hover:text-base-lavender-600 dark:group-hover:text-base-lavender-400 group-pressed:text-base-neutral-900 dark:group-pressed:text-base-neutral-40 print:inline-flex',
 								})}
 								href={`/drafts/${item.pk}`}
+								variant="unset"
 							>
-								<span className="max-w-[30ch] truncate">{item.display_name ?? 'Empty dataset'}</span>
+								<span className="max-w-[30ch] truncate" title={item.display_name ?? 'Empty dataset'}>
+									{item.display_name ?? 'Empty dataset'}
+								</span>
 							</Link>
 						</TableCell>
 						<TableCell style={{ width: '50px' }} textValue={item.display_name ?? 'Empty dataset'}>
-							<div className="text-center">
+							<div className="flex place-items-center gap-2 text-center">
+								{item?.latest_version?.version_file ? null : (
+									<FileWarningIcon
+										aria-hidden
+										className="shrink-0 text-base-tangerine-600 dark:text-base-tangerine-400"
+										size={18}
+										strokeWidth={1.5}
+									/>
+								)}
 								{convertDataRateLog(
 									item?.latest_version?.version_file?.metadata?.find((metadata) => metadata.custom_key === 'FILE_SIZE')
 										?.value as number | undefined,
@@ -95,7 +110,7 @@ export function DraftsTable(props: { readonly data?: Draft[] | undefined }) {
 							</div>
 						</TableCell>
 						<TableCell style={{ width: '150px' }} textValue={item.display_name ?? 'Empty dataset'}>
-							<span className="text-base-sm text-base-neutral-600 dark:text-base-neutral-300 inline-flex h-full place-items-center gap-2">
+							<span className="inline-flex h-full place-items-center gap-2 text-base-sm text-base-neutral-600 dark:text-base-neutral-300">
 								<Wand2Icon aria-hidden size={18} strokeWidth={1.5} />{' '}
 								{format(item.creation_date, 'MMM D, YYYY hh:mm', 'en')}
 							</span>
@@ -119,7 +134,12 @@ export function DraftsTable(props: { readonly data?: Draft[] | undefined }) {
 						</TableCell>
 						<TableCell style={{ width: '35px' }} textValue={item.display_name ?? 'Empty dataset'}>
 							<div className="flex place-content-end">
-								<DraftsMoreMenu fileUuid={item.pk} filename={item.display_name} versionUuid={item.latest_version?.pk} />
+								<DraftsMoreMenu
+									fileUuid={item.pk}
+									filename={item.display_name}
+									hasFile={Boolean(item.latest_version?.version_file)}
+									versionUuid={item.latest_version?.pk}
+								/>
 							</div>
 						</TableCell>
 					</TableRow>

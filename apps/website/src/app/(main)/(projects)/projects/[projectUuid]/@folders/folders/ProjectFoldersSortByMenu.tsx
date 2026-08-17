@@ -1,14 +1,16 @@
 'use client';
 
-import { SortByMenu, useSortByState } from '@/components/SortByMenu';
+import { SortByMenu, useSortByState } from '@/components/query-controls/SortByMenu';
+import { FOLDER_SORT_OPTIONS, type FolderSort } from '@/util/userSettingsOptions';
 
-const sortOptions = {
-	name: 'Name A-Z',
-	'-name': 'Name Z-A',
-};
+export function ProjectFoldersSortByMenu({
+	defaultSort = 'name',
+	isDisabled = false,
+}: {
+	readonly defaultSort?: FolderSort;
+	readonly isDisabled?: boolean;
+}) {
+	const sortState = useSortByState({ defaultSort });
 
-export function ProjectFoldersSortByMenu({ isDisabled = false }: { readonly isDisabled?: boolean }) {
-	const sortState = useSortByState({ defaultSort: 'name' });
-
-	return <SortByMenu isDisabled={isDisabled} options={sortOptions} sortState={sortState} />;
+	return <SortByMenu isDisabled={isDisabled} options={FOLDER_SORT_OPTIONS} sortState={sortState} />;
 }

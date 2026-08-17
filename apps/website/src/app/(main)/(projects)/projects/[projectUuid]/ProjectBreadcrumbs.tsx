@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BreadcrumbItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { BreadcrumbsItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { $api } from '@/util/clientFetch';
 
 export function ProjectBreadcrumbs(props: { readonly projectUuid: string }) {
@@ -14,10 +14,12 @@ export function ProjectBreadcrumbs(props: { readonly projectUuid: string }) {
 	return (
 		<nav aria-label="Project breadcrumbs">
 			<Breadcrumbs separator="slash">
-				<BreadcrumbItem href="/drafts">Home</BreadcrumbItem>
-				<BreadcrumbItem>
-					<span className="max-w-[30ch] truncate sm:max-w-prose">{projectData?.name}</span>
-				</BreadcrumbItem>
+				<BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+				<BreadcrumbsItem>
+					<span className="max-w-[30ch] truncate sm:max-w-prose" title={projectData?.name}>
+						{projectData?.name}
+					</span>
+				</BreadcrumbsItem>
 			</Breadcrumbs>
 		</nav>
 	);

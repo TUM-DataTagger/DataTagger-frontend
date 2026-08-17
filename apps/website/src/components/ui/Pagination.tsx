@@ -31,7 +31,7 @@ export function Pagination(props: {
 					<Button
 						aria-label="Previous page"
 						className={cx(
-							'border-base-lavender-300 hover:bg-base-lavender-100 pressed:bg-base-lavender-200 dark:border-base-lavender-600 dark:hover:bg-base-lavender-800 dark:pressed:bg-base-lavender-700 h-8 w-8 rounded-l-4xl border border-r-0',
+							'h-8 w-8 rounded-l-4xl border border-r-0 border-base-lavender-300 hover:bg-base-lavender-100 dark:border-base-lavender-600 dark:hover:bg-base-lavender-800 pressed:bg-base-lavender-200 dark:pressed:bg-base-lavender-700',
 						)}
 						isDisabled={queryState <= 1}
 						onPress={async () => setQueryState((old) => old - 1)}
@@ -40,14 +40,14 @@ export function Pagination(props: {
 						<ChevronLeftIcon aria-hidden size={18} strokeWidth={1.5} />
 					</Button>
 					<Separator
-						className="bg-base-lavender-300 dark:bg-base-lavender-600 h-8"
+						className="h-8 bg-base-lavender-300 dark:bg-base-lavender-600"
 						isDisabled={queryState <= 1 && queryState === maxPage}
 						orientation="vertical"
 					/>
 					<Button
 						aria-label="Next page"
 						className={cx(
-							'border-base-lavender-300 hover:bg-base-lavender-100 pressed:bg-base-lavender-200 dark:border-base-lavender-600 dark:hover:bg-base-lavender-800 dark:pressed:bg-base-lavender-700 h-8 w-8 rounded-r-4xl border border-l-0',
+							'h-8 w-8 rounded-r-4xl border border-l-0 border-base-lavender-300 hover:bg-base-lavender-100 dark:border-base-lavender-600 dark:hover:bg-base-lavender-800 pressed:bg-base-lavender-200 dark:pressed:bg-base-lavender-700',
 						)}
 						isDisabled={maxPage === 0 || queryState === maxPage}
 						onPress={async () => setQueryState((old) => old + 1)}

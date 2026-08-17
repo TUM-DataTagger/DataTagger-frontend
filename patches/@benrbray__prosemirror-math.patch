@@ -64,7 +64,7 @@ index 0f90e64b00b14eacdb4a2c68a8edefe56921707c..5b5588cba99c3684723ac762cbd38870
  }
  function G(r) {
 -  let e = r.querySelector("math annotation[encoding='application/x-tex'");
-+  let e = r.querySelector("math annotation[encoding='application/x-tex]'");
++  let e = r.querySelector("math annotation[encoding='application/x-tex']");
    return (e == null ? void 0 : e.textContent) ?? !1;
  }
  function k(r) {

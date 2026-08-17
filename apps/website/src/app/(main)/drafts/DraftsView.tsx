@@ -1,28 +1,37 @@
 'use client';
 
 import { keepPreviousData, useSuspenseQuery } from '@tanstack/react-query';
-import { FilePlusIcon, SearchIcon } from 'lucide-react';
+import { SearchIcon, XCircleIcon } from 'lucide-react';
 import { parseAsString, parseAsInteger, useQueryStates } from 'nuqs';
 import { useEffect, useState } from 'react';
 import { useDebounceValue, useMediaQuery } from 'usehooks-ts';
-import { BulkEditAssignToFolderButton, BulkEditMoreButton, BulkEditToolbar } from '@/components/BulkEditToolbar';
-import { UploadTrigger } from '@/components/UploadTrigger';
-import { ViewSwitch } from '@/components/ViewSwitch';
+import {
+	BulkEditAssignToFolderButton,
+	BulkEditMoreButton,
+	BulkEditFilesToolbar,
+} from '@/components/BulkEditFilesToolbar';
+import { ViewSwitch } from '@/components/query-controls/ViewSwitch';
 import { Button } from '@/components/ui/Button';
+import { Input, InputGroup } from '@/components/ui/Input';
 import { Pagination } from '@/components/ui/Pagination';
 import { TextField } from '@/components/ui/TextField';
-import { cx } from '@/styles/cva';
+import { DraftsUploadDropzone } from '@/components/upload-assistant/DraftsUploadDropzone';
+import { useUserSettings } from '@/hooks/useUserSettings';
 import { $api } from '@/util/clientFetch';
+import { resolveViewMode } from '@/util/userSettingsOptions';
 import { DraftsGrid } from './DraftsGrid';
 import { DraftsSortByMenu } from './DraftsSortByMenu';
 import { DraftsTable } from './DraftsTable';
 import { DraftsViewEmpty } from './DraftsViewEmpty';
 
 export function DraftsView(props: { readonly limit: number }) {
+	const { settings } = useUserSettings();
+	const defaultViewMode = resolveViewMode(settings.defaultViewMode, settings.draftsViewMode);
+
 	const [queryStates, setQueryStates] = useQueryStates({
 		page: parseAsInteger.withDefault(1),
-		sort: parseAsString.withDefault('-creation_date'),
-		view: parseAsString.withDefault('grid'),
+		sort: parseAsString.withDefault(settings.draftsSort),
+		view: parseAsString.withDefault(defaultViewMode),
 		// eslint-disable-next-line id-length
 		q: parseAsString.withDefault(''),
 	});
@@ -54,64 +63,47 @@ export function DraftsView(props: { readonly limit: number }) {
 
 	return (
 		<>
-			<div
-				className={cx(
-					'flex h-[124px] flex-col place-content-center rounded-xl p-px md:h-[104px] print:hidden',
-					!isMobile && 'global-dropzone-border',
-					!hasResults && 'hidden',
-				)}
-			>
-				<div className="bg-base-lavender-100/64 text-base-lavender-600 dark:bg-base-lavender-800/64 dark:text-base-lavender-200 h-full w-full place-content-center place-items-center rounded-xl text-center">
-					<div className="flex flex-col gap-3">
-						{isMobile ? (
-							<div className="flex flex-col place-content-center place-items-center gap-4">
-								<span>Select files for use within the tool.</span>
-								<UploadTrigger>
-									<Button variant="filled">
-										<FilePlusIcon aria-hidden size={18} strokeWidth={1.5} />
-										Upload files
-									</Button>
-								</UploadTrigger>
-							</div>
-						) : (
-							<div className="flex flex-col place-content-center place-items-center gap-2">
-								<span>Drag and drop files to upload them or</span>
-								<UploadTrigger>
-									<Button isDark size="sm" variant="filled">
-										Select files
-									</Button>
-								</UploadTrigger>
-							</div>
-						)}
-					</div>
-				</div>
-			</div>
+			<DraftsUploadDropzone className="h-[124px] md:h-[104px]" hidden={!hasResults} showBorderOnMobile={false} />
 
 			<div className="flex place-content-between place-items-center gap-4">
 				<div className="flex grow flex-col place-content-between gap-2 md:flex-row md:place-items-center">
-					<DraftsSortByMenu isDisabled={!hasResults} />
+					<DraftsSortByMenu defaultSort={settings.draftsSort} isDisabled={!hasResults} />
 					<TextField
-						aria-label="Search"
+						aria-label="Search for something"
 						className="md:w-72"
-						isClearable
 						onChange={(value) => {
 							setSearch(value);
 							setDebouncedSearch(value);
 						}}
-						placeholder="Search for something..."
-						prefix={<SearchIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />}
-						type="text"
 						value={search}
-					/>
+					>
+						<InputGroup>
+							<SearchIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
+							<Input aria-label="Search drafts" placeholder="Search for something..." />
+							{search ? (
+								<Button
+									aria-label="Clear search"
+									onPress={() => {
+										setSearch('');
+										setDebouncedSearch('');
+									}}
+									size="icon"
+									variant="unset"
+								>
+									<XCircleIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+								</Button>
+							) : null}
+						</InputGroup>
+					</TextField>
 				</div>
-				<ViewSwitch className="hidden md:flex" isDisabled={!hasResults} />
+				<ViewSwitch className="hidden md:flex" defaultView={defaultViewMode} isDisabled={!hasResults} />
 			</div>
 
 			{hasResults ? (
-				<BulkEditToolbar count={datasetsData.count ?? 0}>
+				<BulkEditFilesToolbar count={datasetsData.count ?? 0}>
 					<BulkEditAssignToFolderButton />
 					<BulkEditMoreButton />
-				</BulkEditToolbar>
+				</BulkEditFilesToolbar>
 			) : null}
 
 			{hasResults ? (

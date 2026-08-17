@@ -4,14 +4,14 @@ import dynamic from 'next/dynamic';
 
 export function TestEnvironmentBanner() {
 	const isProductionEnvironment =
-		typeof window !== 'undefined' && window.location.href.startsWith('https://datatagger.domain.com');
+		typeof window !== 'undefined' && window.location.href.startsWith('https://app.example.com');
 
 	if (isProductionEnvironment) {
 		return null;
 	}
 
 	return (
-		<div className="bg-base-tangerine-500 text-base-md text-base-neutral-900 px-8 py-2 text-center font-medium print:hidden">
+		<div className="bg-base-tangerine-500 px-8 py-2 text-center text-base-md font-medium text-base-neutral-900 print:hidden">
 			You are currently on the test environment.
 		</div>
 	);

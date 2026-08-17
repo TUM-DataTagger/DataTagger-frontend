@@ -9,24 +9,24 @@ import { useEffect, useId } from 'react';
 import { useForm } from 'react-hook-form';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
-import { ComboBox, ComboBoxInput, ComboBoxList, ComboBoxOption, ComboBoxSection } from '@/components/ui/ComboBox';
+import { ComboBox, ComboBoxInput, ComboBoxContent, ComboBoxItem, ComboBoxSection } from '@/components/ui/ComboBox';
 import { Label } from '@/components/ui/Field';
 import { Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
 import {
 	Select,
 	SelectLabel,
-	SelectList,
-	SelectOption,
-	SelectOptionDescription,
+	SelectContent,
+	SelectItem,
+	SelectDescription,
 	SelectSection,
 	SelectTrigger,
 } from '@/components/ui/Select';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import {
+	createInitialState,
 	folderMemberPermissionAtom,
 	folderMembersSelectionAtom,
 	folderMembersWithoutProjectAdminAtom,
-	initialState,
 	projectAtom,
 	projectMembersAtom,
 	projectMembersWithAdminAtom,
@@ -34,6 +34,7 @@ import {
 } from '@/stores/editProjectFolderPermissions';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { formatErrorMessage } from '@/util/formatErrorMessage';
+import { logger, LogCategory } from '@/util/logger';
 import type { components } from '@/util/openapiSchema';
 
 const isAdmin = (toCheck: string) => toCheck === 'admin';
@@ -65,7 +66,7 @@ export function ProjectFoldersPermissionsEditForm({
 	const { currentUserData } = useCurrentUser();
 
 	useEffect(() => {
-		setProject(initialState);
+		setProject(createInitialState());
 		for (const member of projectPermissionsData) {
 			setProject((draft) => {
 				draft.project.members.add(member.member.email);
@@ -97,7 +98,7 @@ export function ProjectFoldersPermissionsEditForm({
 	const selectedMemberPermission = (member: string) => folderMemberPermission[member] ?? 'viewer';
 
 	const { mutate } = useMutation({
-		mutationFn: async (_: any) => {
+		mutationFn: async () => {
 			const { error: folderPermissionError, response: folderPermissionResponse } = await openAPIClient.PUT(
 				'/api/v1/folder/{id}/permissions/',
 				{
@@ -119,6 +120,12 @@ export function ProjectFoldersPermissionsEditForm({
 			}
 		},
 		async onSuccess() {
+			logger.info(LogCategory.Folder, 'Folder permissions updated', {
+				folderUuid,
+				memberCount: folderMembersWithoutProjectAdmin.length,
+				projectUuid,
+			});
+
 			await queryClient.invalidateQueries({
 				queryKey: $api.queryOptions('get', '/api/v1/folder-permission/', {
 					params: { query: { folder: folderUuid, member: currentUserData?.pk ?? -1 } },
@@ -176,7 +183,7 @@ export function ProjectFoldersPermissionsEditForm({
 		});
 	}
 
-	function onFolderMemberPermissionChange(member: string, val: string) {
+	function onFolderMemberPermissionChange(member: string, val: 'admin' | 'editor' | 'viewer') {
 		setProject((draft) => {
 			draft.folder.memberPermission[member] = val;
 		});
@@ -191,11 +198,11 @@ export function ProjectFoldersPermissionsEditForm({
 	}
 
 	return (
-		<form {...props} id="project-folder-permissions-edit" onSubmit={handleSubmit((input) => mutate(input))}>
+		<form {...props} id="project-folder-permissions-edit" onSubmit={handleSubmit(() => mutate())}>
 			<div className="flex flex-col gap-8">
 				{errors.root ? (
 					<Alert>
-						<AlertCircleIcon aria-hidden size={24} strokeWidth={1.5} />
+						<AlertCircleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 						{errors.root?.message}
 					</Alert>
 				) : null}
@@ -210,10 +217,12 @@ export function ProjectFoldersPermissionsEditForm({
 								.sort((a, b) => a.name.localeCompare(b.name))
 								.map((member) => (
 									<div
-										className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-5 md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px]"
+										className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-5 text-base-md md:h-16 md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700"
 										key={member.id}
 									>
-										<span className="col-span-2 max-w-[25ch] justify-self-start truncate">{member.name}</span>
+										<span className="col-span-2 max-w-[25ch] justify-self-start truncate" title={member.name}>
+											{member.name}
+										</span>
 										<Select aria-label="Folder permission" className="col-span-3 pr-16" isDisabled placeholder="Admin">
 											<SelectTrigger />
 										</Select>
@@ -233,11 +242,10 @@ export function ProjectFoldersPermissionsEditForm({
 									id={selectMemberInputId}
 									menuTrigger="focus"
 									onSelectionChange={async (val) => onAddFolderMember(val as string)}
-									placeholder="Select member"
 									selectedKey={null}
 								>
-									<ComboBoxInput />
-									<ComboBoxList>
+									<ComboBoxInput placeholder="Select member" />
+									<ComboBoxContent>
 										<ComboBoxSection
 											title={
 												projectMembers.size === 0
@@ -250,12 +258,12 @@ export function ProjectFoldersPermissionsEditForm({
 											{folderMembersSelection
 												.sort((a, b) => a.name.localeCompare(b.name))
 												.map((member) => (
-													<ComboBoxOption id={member.id} key={member.id} textValue={member.name}>
+													<ComboBoxItem id={member.id} key={member.id} textValue={member.name}>
 														{member.name}
-													</ComboBoxOption>
+													</ComboBoxItem>
 												))}
 										</ComboBoxSection>
-									</ComboBoxList>
+									</ComboBoxContent>
 								</ComboBox>
 								<Button
 									className="shrink-0"
@@ -271,11 +279,11 @@ export function ProjectFoldersPermissionsEditForm({
 						<div className="grid gap-2">
 							{folderMembersWithoutProjectAdmin.map((member, idx) => (
 								<div
-									className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-3 md:grid-cols-5 md:grid-rows-none md:gap-[58px]"
+									className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-3 text-base-md md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700"
 									key={`${member.id}-${idx}`}
 								>
 									<span
-										className="col-span-2 max-w-[20ch] place-self-start justify-self-start truncate pt-[10px]"
+										className="col-span-2 max-w-[20ch] place-self-start justify-self-start truncate pt-2.5"
 										title={member.id}
 									>
 										{member.id}
@@ -284,11 +292,13 @@ export function ProjectFoldersPermissionsEditForm({
 										<div className="flex gap-[23px]">
 											<Select
 												aria-label="Folder permission"
-												onSelectionChange={async (val) => onFolderMemberPermissionChange(member.id, val as string)}
-												selectedKey={selectedMemberPermission(member.id)}
+												onChange={async (val) =>
+													onFolderMemberPermissionChange(member.id, val as 'admin' | 'editor' | 'viewer')
+												}
+												value={selectedMemberPermission(member.id)}
 											>
 												<SelectTrigger />
-												<SelectList>
+												<SelectContent popover={{ className: 'max-w-(--trigger-width)' }}>
 													<SelectSection title="Folder permissions">
 														{[
 															{
@@ -307,13 +317,15 @@ export function ProjectFoldersPermissionsEditForm({
 																description: 'Views and downloads files and their metadata',
 															},
 														].map((permission) => (
-															<SelectOption id={permission.id} key={permission.id} textValue={permission.name}>
+															<SelectItem id={permission.id} key={permission.id} textValue={permission.name}>
 																<SelectLabel>{permission.name}</SelectLabel>
-																<SelectOptionDescription>{permission.description}</SelectOptionDescription>
-															</SelectOption>
+																<SelectDescription className="line-clamp-none">
+																	{permission.description}
+																</SelectDescription>
+															</SelectItem>
 														))}
 													</SelectSection>
-												</SelectList>
+												</SelectContent>
 											</Select>
 											<Modal>
 												<Button aria-label="Remove member" isDestructive size="icon" variant="discreet">
@@ -327,10 +339,10 @@ export function ProjectFoldersPermissionsEditForm({
 													</ModalHeader>
 													<ModalBody>
 														{member.id === currentUserData?.email ? (
-															<div className="bg-base-tangerine-100 flex place-items-center gap-3 rounded-[4px] px-4 py-3">
-																<AlertTriangleIcon aria-hidden className="text-base-tangerine-500" strokeWidth={1.5} />
+															<Alert variant="warning">
+																<AlertTriangleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 																Once the process is completed, you will no longer be able to access this folder.
-															</div>
+															</Alert>
 														) : (
 															'Once the process has been completed, the user will no longer be able to access this folder.'
 														)}

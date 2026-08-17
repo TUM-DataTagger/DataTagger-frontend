@@ -6,13 +6,13 @@ import { PackageOpenIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo } from 'react';
 import type { DropZoneProps } from 'react-aria-components';
+import { DropZone } from '@/components/ui/DropZone';
+import { AnimatePresence, MotionDiv } from '@/components/ui/FramerMotion';
+import { ToastType, globalToastQueue } from '@/components/ui/Toast';
 import { folderDropZoneOpenAtom } from '@/stores/global-dropzone';
 import { droppedFilesAtom, globalUploadAssistantOpenAtom } from '@/stores/upload-assistant';
 import { cn } from '@/util/cn';
 import type { components } from '@/util/schema';
-import { DropZone } from '@/components/ui/DropZone';
-import { AnimatePresence, MotionDiv } from '@/components/ui/FramerMotion';
-import { ToastType, globalToastQueue } from '@/components/ui/Toast';
 import { maxFilesModalOpenAtom } from './MaxFilesModal';
 import { countDroppedItems, useSetPendingFiles } from './useSetPendingFiles';
 
@@ -84,7 +84,7 @@ export const FolderDropZone = (props: DropZoneProps & { readonly folder: compone
 			<AnimatePresence>
 				{folderDropZoneOpen ? (
 					<div key="folder-dropzone" className="global-dropzone-border h-full w-full rounded-xl p-px">
-						<div className="bg-base-lavender-100/64 dark:bg-base-lavender-800/64 relative h-full w-full rounded-xl">
+						<div className="relative h-full w-full rounded-xl bg-base-lavender-100/64 dark:bg-base-lavender-800/64">
 							<MotionDiv
 								animate={{ opacity: 1, x: '-50%', y: 0 }}
 								className="absolute bottom-6 left-1/2 -translate-x-1/2"
@@ -95,7 +95,7 @@ export const FolderDropZone = (props: DropZoneProps & { readonly folder: compone
 							>
 								<MotionDiv
 									animate={{ y: [0, -10] }}
-									className="bg-base-lavender-600 text-base-md text-base-neutral-40 dark:bg-base-lavender-400 dark:text-base-neutral-900 flex items-center gap-2 rounded-lg px-6 py-5"
+									className="flex items-center gap-2 rounded-lg bg-base-lavender-600 px-6 py-5 text-base-md text-base-neutral-40 dark:bg-base-lavender-400 dark:text-base-neutral-900"
 									key="folder-bottom-banner-inner"
 									transition={{
 										delay: 0.25,

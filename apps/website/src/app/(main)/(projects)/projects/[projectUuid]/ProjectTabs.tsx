@@ -26,9 +26,6 @@ export function ProjectTabs(
 	useEffect(() => {
 		startTransition(() => {
 			switch (pathname.split('/')[3]!) {
-				case 'details':
-					setTab('details');
-					break;
 				case 'members':
 					setTab('members');
 					break;
@@ -44,24 +41,21 @@ export function ProjectTabs(
 
 	return (
 		<Tabs className="gap-0" selectedKey={tab}>
-			<TabList className="mx-auto md:max-w-[852px]">
+			<TabList className="mx-auto md:max-w-[856px]">
 				<Tab href={`/projects/${props.projectUuid}/folders`} id="folders">
 					Folders
-					<span className="bg-base-neutral-700 text-base-label-xs text-base-neutral-40 dark:bg-base-neutral-200 dark:text-base-neutral-900 flex h-4 w-3.5 place-content-center place-items-center rounded-2xl tabular-nums">
+					<span className="flex h-4 min-w-3.5 place-content-center place-items-center rounded-2xl bg-base-neutral-700 px-1 text-base-label-xs text-base-neutral-40 tabular-nums dark:bg-base-neutral-200 dark:text-base-neutral-900">
 						{projectData.folders_count}
 					</span>
 				</Tab>
 				<Tab href={`/projects/${props.projectUuid}/members`} id="members">
 					Members
-					<span className="bg-base-neutral-700 text-base-label-xs text-base-neutral-40 dark:bg-base-neutral-200 dark:text-base-neutral-900 flex h-4 w-3.5 place-content-center place-items-center rounded-2xl tabular-nums">
+					<span className="flex h-4 min-w-3.5 place-content-center place-items-center rounded-2xl bg-base-neutral-700 px-1 text-base-label-xs text-base-neutral-40 tabular-nums dark:bg-base-neutral-200 dark:text-base-neutral-900">
 						{projectData.members_count}
 					</span>
 				</Tab>
 				<Tab href={`/projects/${props.projectUuid}/metadata-templates`} id="metadata-templates">
 					Metadata templates
-				</Tab>
-				<Tab href={`/projects/${props.projectUuid}/details`} id="details">
-					Details
 				</Tab>
 			</TabList>
 			{props.children}

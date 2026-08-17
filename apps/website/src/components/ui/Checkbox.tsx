@@ -1,21 +1,18 @@
 'use client';
 
 import { CheckIcon, MinusIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { CheckboxGroup as RACCheckboxGroup, Checkbox as RACCheckbox, composeRenderProps } from 'react-aria-components';
 import type {
 	CheckboxGroupProps as RACCheckboxGroupProps,
 	CheckboxProps as RACCheckboxProps,
-	ValidationResult as RACValidationResult,
 } from 'react-aria-components';
-import { Description, FieldError, Label } from '@/components/ui/Field';
+import { Description, Label } from '@/components/ui/Field';
 import { compose, cva, cx } from '@/styles/cva';
 import { focusRing } from '@/styles/ui/focusRing';
 import { composeTailwindRenderProps } from '@/styles/util';
 
 export type CheckboxGroupProps = RACCheckboxGroupProps & {
 	readonly description?: string;
-	readonly errorMessage?: string | ((validation: RACValidationResult) => string);
 	readonly label?: string;
 };
 
@@ -23,31 +20,16 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 	return (
 		<RACCheckboxGroup
 			{...props}
-			className={composeTailwindRenderProps(props.className, 'flex flex-col gap-2')}
-			isInvalid={Boolean(props.errorMessage)}
-		>
-			{(values) => (
-				<>
-					{props.label && <Label>{props.label}</Label>}
-					{typeof props.children === 'function' ? props.children(values) : props.children}
-					{props.description && <Description className="block">{props.description}</Description>}
-					<FieldError>{props.errorMessage}</FieldError>
-				</>
+			className={composeTailwindRenderProps(
+				props.className,
+				'space-y-2 has-[[slot=description]]:space-y-2 **:[[slot=description]]:block',
 			)}
-		</RACCheckboxGroup>
+			data-slot="control"
+		/>
 	);
 }
 
-const checkboxStyles = cva({
-	base: 'group text-base-label-md flex place-items-center gap-2 transition',
-	variants: {
-		isDisabled: {
-			true: 'opacity-38',
-		},
-	},
-});
-
-const boxStyles = compose(
+export const boxStyles = compose(
 	focusRing,
 	cva({
 		base: 'flex shrink-0 place-content-center place-items-center transition',
@@ -55,8 +37,8 @@ const boxStyles = compose(
 			variant: {
 				unset: null,
 				default: [
-					'size-4 rounded-xs border-[1.5px] *:data-[slot=icon]:size-3.5',
-					'bg-base-neutral-0 border-base-neutral-300 text-base-neutral-40 dark:bg-base-neutral-800 dark:border-base-neutral-300',
+					'size-4 rounded-xs border-[1.5px] *:data-[slot=check-indicator]:size-3.5',
+					'border-base-neutral-300 bg-base-neutral-0 text-base-neutral-40 dark:border-base-neutral-300 dark:bg-base-neutral-800',
 					'group-hover:border-base-neutral-200 dark:group-hover:border-base-neutral-600',
 					'group-focus-visible:border-base-neutral-200 dark:group-focus-visible:border-base-neutral-600',
 					'group-pressed:border-base-neutral-100 dark:group-pressed:border-base-neutral-700',
@@ -68,10 +50,10 @@ const boxStyles = compose(
 			},
 			isSelected: {
 				true: [
-					'bg-base-neutral-700 dark:bg-base-neutral-100 dark:text-base-neutral-900 border-transparent dark:border-transparent',
-					'group-hover:bg-base-neutral-500 dark:group-hover:bg-base-neutral-300 group-hover:border-transparent dark:group-hover:border-transparent',
-					'group-focus-visible:bg-base-neutral-500 dark:group-focus-visible:bg-base-neutral-300 group-focus-visible:border-transparent dark:group-focus-visible:border-transparent',
-					'group-pressed:bg-base-neutral-400 group-pressed:text-base-neutral-800 dark:group-pressed:text-base-neutral-900 dark:group-pressed:bg-base-neutral-400 dark:group-pressed:border-transparent group-pressed:border-transparent',
+					'border-transparent bg-base-neutral-700 dark:border-transparent dark:bg-base-neutral-100 dark:text-base-neutral-900',
+					'group-hover:border-transparent group-hover:bg-base-neutral-500 dark:group-hover:border-transparent dark:group-hover:bg-base-neutral-300',
+					'group-focus-visible:border-transparent group-focus-visible:bg-base-neutral-500 dark:group-focus-visible:border-transparent dark:group-focus-visible:bg-base-neutral-300',
+					'group-pressed:border-transparent group-pressed:bg-base-neutral-400 group-pressed:text-base-neutral-800 dark:group-pressed:border-transparent dark:group-pressed:bg-base-neutral-400 dark:group-pressed:text-base-neutral-900',
 					'group-invalid:bg-base-sunset-500 group-invalid:text-base-neutral-900',
 					'group-invalid:group-hover:bg-base-sunset-200 dark:group-invalid:group-hover:bg-base-sunset-700 dark:group-invalid:group-hover:text-base-neutral-40',
 					'group-invalid:group-focus-visible:bg-base-sunset-200 dark:group-invalid:group-focus-visible:bg-base-sunset-700 dark:group-invalid:group-focus-visible:text-base-neutral-40',
@@ -86,9 +68,6 @@ const boxStyles = compose(
 );
 
 export type CheckboxProps = RACCheckboxProps & {
-	readonly classNames?: {
-		readonly boxContainer?: string;
-	};
 	readonly description?: string;
 	readonly label?: string;
 };
@@ -97,41 +76,57 @@ export function Checkbox(props: CheckboxProps) {
 	return (
 		<RACCheckbox
 			{...props}
-			className={composeRenderProps(props.className, (className, renderProps) =>
-				checkboxStyles({
-					...renderProps,
-					className,
-				}),
-			)}
+			className={composeTailwindRenderProps(props.className, 'group block disabled:opacity-38')}
+			data-slot="control"
 		>
-			{({ isSelected, isIndeterminate, ...renderProps }) => (
-				<div
-					className={cx(
-						'flex gap-2',
-						props.description ? 'place-items-start' : 'place-items-center',
-						props.classNames?.boxContainer,
-					)}
-				>
-					<div className={boxStyles({ ...renderProps, isSelected: isSelected || isIndeterminate })}>
-						{isIndeterminate ? (
-							<MinusIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
-						) : isSelected ? (
-							<CheckIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
-						) : null}
-					</div>
+			{composeRenderProps(props.children, (children, { isSelected, isIndeterminate, ...renderProps }) => {
+				const isStringChild = typeof children === 'string';
+				const hasCustomChildren = typeof children !== 'undefined';
 
-					{props.label || props.children || props.description ? (
-						<div className="flex flex-col place-items-start gap-1">
-							{props.label ? (
-								<Label className={cx('description' in props && 'text-base-label-md/4')}>{props.label}</Label>
-							) : (
-								(props.children as ReactNode)
-							)}
-							{props.description && <Description className="block">{props.description}</Description>}
-						</div>
-					) : null}
-				</div>
-			)}
+				const indicator = isIndeterminate ? (
+					<MinusIcon aria-hidden data-slot="check-indicator" size={18} strokeWidth={1.5} />
+				) : isSelected ? (
+					<CheckIcon aria-hidden data-slot="check-indicator" size={18} strokeWidth={1.5} />
+				) : null;
+
+				const content = hasCustomChildren ? (
+					isStringChild ? (
+						<CheckboxLabel>{children}</CheckboxLabel>
+					) : (
+						children
+					)
+				) : (
+					<>
+						{props.label && <CheckboxLabel>{props.label}</CheckboxLabel>}
+						{props.description && <Description>{props.description}</Description>}
+					</>
+				);
+
+				return (
+					<div
+						className={cx(
+							'grid grid-cols-[1rem_1fr] items-center gap-y-1 has-data-[slot=label]:gap-x-4',
+							'*:data-[slot=indicator]:col-start-1 *:data-[slot=indicator]:row-start-1',
+							'*:data-[slot=label]:col-start-2 *:data-[slot=label]:row-start-1',
+							'*:[[slot=description]]:col-start-2 *:[[slot=description]]:row-start-2',
+							'has-[[slot=description]]:**:data-[slot=label]:text-base-label-md',
+						)}
+						data-slot="checkbox"
+					>
+						<span
+							className={boxStyles({ ...renderProps, isSelected: isSelected || isIndeterminate })}
+							data-slot="indicator"
+						>
+							{indicator}
+						</span>
+						{content}
+					</div>
+				);
+			})}
 		</RACCheckbox>
 	);
+}
+
+export function CheckboxLabel(props: React.ComponentProps<typeof Label>) {
+	return <Label {...props} elementType="span" data-slot="control-label" />;
 }

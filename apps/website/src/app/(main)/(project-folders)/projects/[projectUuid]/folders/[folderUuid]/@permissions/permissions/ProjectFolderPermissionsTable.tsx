@@ -31,7 +31,7 @@ export function ProjectFolderPermissionsTable(props: { readonly data?: FolderPer
 									<TooltipTrigger variant="tooltip">
 										<HelpCircleIcon aria-hidden size={18} strokeWidth={1.5} />
 									</TooltipTrigger>
-									<TooltipContent showArrow={false} variant="rich">
+									<TooltipContent arrow={false} variant="rich">
 										{item.is_folder_admin
 											? 'Full access to folder, files, and metadata within'
 											: item.can_edit
@@ -42,7 +42,9 @@ export function ProjectFolderPermissionsTable(props: { readonly data?: FolderPer
 							</div>
 						</TableCell>
 						<TableCell style={{ width: '300px' }} textValue={item.project_membership.member.email}>
-							<span className="max-w-[30ch] truncate">{item.project_membership.member.email}</span>
+							<span className="max-w-[30ch] truncate" title={item.project_membership.member.email}>
+								{item.project_membership.member.email}
+							</span>
 						</TableCell>
 					</TableRow>
 				)}

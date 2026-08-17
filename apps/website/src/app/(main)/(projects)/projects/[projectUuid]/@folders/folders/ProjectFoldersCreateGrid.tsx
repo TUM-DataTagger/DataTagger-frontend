@@ -41,7 +41,7 @@ export function ProjectFoldersCreateGrid({
 				className={gridCardStyles({
 					variant,
 					className: cx(
-						'relative h-[150px] w-full min-w-64 cursor-pointer flex-row place-content-center place-items-center gap-2 border-transparent md:w-auto dark:border-transparent',
+						'relative h-[150px] w-full cursor-pointer flex-row place-content-center place-items-center gap-2 border-transparent md:max-w-64 md:min-w-64 dark:border-transparent',
 						props.className,
 					),
 				})}

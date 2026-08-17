@@ -2,13 +2,15 @@
 
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useMutation } from '@tanstack/react-query';
-import { AlertCircleIcon, Loader2Icon } from 'lucide-react';
+import { AlertCircleIcon, EyeIcon, EyeOffIcon, Loader2Icon, XCircleIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { ComponentProps } from 'react';
+import { type ComponentProps, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import type { InferInput } from 'valibot';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
+import { FieldError, Label } from '@/components/ui/Field';
+import { Input, InputGroup } from '@/components/ui/Input';
 import { TextField } from '@/components/ui/TextField';
 import { ResetPasswordSchema } from '@/schemas/ResetPasswordSchema';
 import { openAPIClient } from '@/util/clientFetch';
@@ -53,11 +55,13 @@ export function ResetPasswordForm({ code, ...props }: ComponentProps<'form'> & {
 		},
 	});
 
+	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
 	return (
 		<form {...props} className="flex flex-col gap-6" onSubmit={handleSubmit((input) => mutate(input))}>
 			{errors.root ? (
 				<Alert>
-					<AlertCircleIcon aria-hidden size={24} strokeWidth={1.5} />
+					<AlertCircleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 					{errors.root?.message}
 				</Alert>
 			) : null}
@@ -66,25 +70,49 @@ export function ResetPasswordForm({ code, ...props }: ComponentProps<'form'> & {
 				control={control}
 				name="password"
 				render={({ field, fieldState }) => (
-					<TextField
-						autoComplete="new-password"
-						errorMessage={fieldState.error?.message}
-						isClearable
-						isDisabled={field.disabled ?? false}
-						isInvalid={fieldState.invalid}
-						isRevealable
-						label="New password"
-						onBlur={field.onBlur}
-						onChange={field.onChange}
-						placeholder="Enter your new password"
-						type="password"
-						value={field.value ?? ''}
-					/>
+					<TextField isDisabled={field.disabled ?? false} isInvalid={fieldState.invalid}>
+						<Label>New password</Label>
+						<InputGroup className="[--input-gutter-end:--spacing(20)]">
+							<Input
+								autoComplete="new-password"
+								onBlur={field.onBlur}
+								onChange={field.onChange}
+								placeholder="Enter your new password"
+								type={isPasswordVisible ? 'text' : 'password'}
+								value={field.value ?? ''}
+							/>
+							{field.value && !field.disabled && (
+								<Button
+									aria-label="Clear password"
+									className="right-10.5"
+									onPress={() => field.onChange('')}
+									size="icon"
+									variant="unset"
+								>
+									<XCircleIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+								</Button>
+							)}
+							<Button
+								aria-label={isPasswordVisible ? 'Hide password' : 'Show password'}
+								aria-pressed={isPasswordVisible}
+								onPress={() => setIsPasswordVisible((value) => !value)}
+								size="icon"
+								variant="unset"
+							>
+								{isPasswordVisible ? (
+									<EyeIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+								) : (
+									<EyeOffIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+								)}
+							</Button>
+						</InputGroup>
+						{fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+					</TextField>
 				)}
 			/>
 
-			<Button type="submit" variant="secondary-filled">
-				{isPending ? <Loader2Icon aria-hidden className="mr-2 animate-spin" size={18} strokeWidth={1.5} /> : null}
+			<Button isDisabled={isPending} type="submit" variant="secondary-filled">
+				{isPending ? <Loader2Icon aria-hidden className="animate-spin" size={18} strokeWidth={1.5} /> : null}
 				Confirm
 			</Button>
 		</form>

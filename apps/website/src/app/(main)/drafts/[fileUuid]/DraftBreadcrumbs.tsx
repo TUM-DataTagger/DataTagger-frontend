@@ -2,8 +2,8 @@
 
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { VersionHistoryBadge } from '@/components/VersionHistory';
-import { BreadcrumbItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { FileVersionHistoryBadge } from '@/components/FileVersionHistory';
+import { BreadcrumbsItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SideSheetMode, sideSheetSelectedDatasetAtom, sideSheetModeAtom } from '@/stores/sideSheet';
 import { $api } from '@/util/clientFetch';
 
@@ -12,7 +12,7 @@ export function DraftBreadcrumbs(props: { readonly fileUuid: string }) {
 	const sideSheetSelectedDataset = useAtomValue(sideSheetSelectedDatasetAtom);
 
 	const isVersionHistoryModeActive = Boolean(
-		sideSheetMode === SideSheetMode.VersionHistory && sideSheetSelectedDataset,
+		sideSheetMode === SideSheetMode.FileVersionHistory && sideSheetSelectedDataset,
 	);
 
 	const { data: datasetData } = useSuspenseQuery(
@@ -22,14 +22,16 @@ export function DraftBreadcrumbs(props: { readonly fileUuid: string }) {
 	);
 
 	return isVersionHistoryModeActive ? (
-		<VersionHistoryBadge fileUuid={props.fileUuid} />
+		<FileVersionHistoryBadge fileUuid={props.fileUuid} />
 	) : (
 		<nav aria-label="Draft breadcrumbs">
 			<Breadcrumbs separator="slash">
-				<BreadcrumbItem href="/drafts">Home</BreadcrumbItem>
-				<BreadcrumbItem>
-					<span className="max-w-[30ch] truncate sm:max-w-prose">{datasetData.display_name ?? 'Empty dataset'}</span>
-				</BreadcrumbItem>
+				<BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+				<BreadcrumbsItem>
+					<span className="max-w-[30ch] truncate sm:max-w-prose" title={datasetData.display_name ?? 'Empty dataset'}>
+						{datasetData.display_name ?? 'Empty dataset'}
+					</span>
+				</BreadcrumbsItem>
 			</Breadcrumbs>
 		</nav>
 	);

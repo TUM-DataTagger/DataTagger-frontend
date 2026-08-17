@@ -12,7 +12,7 @@ import {
 	Modal as RACModal,
 	composeRenderProps,
 } from 'react-aria-components';
-import { Dialog, DialogCloseIndicator } from '@/components/ui/Dialog';
+import { Dialog, DialogCloseIcon } from '@/components/ui/Dialog';
 import { cva } from '@/styles/cva';
 
 export function Modal(props: RACDialogTriggerProps) {
@@ -20,27 +20,31 @@ export function Modal(props: RACDialogTriggerProps) {
 }
 
 const modalOverlayStyles = cva({
-	base: 'bg-base-neutral-900/72 fixed top-0 left-0 isolate z-50 flex h-(--visual-viewport-height) w-dvw place-content-end place-items-end p-4 text-center [--visual-viewport-vertical-padding:16px] sm:place-content-center sm:place-items-center sm:[--visual-viewport-vertical-padding:32px]',
+	base: 'fixed inset-0 z-50 grid h-(--visual-viewport-height,100vh) grid-rows-[1fr_auto] place-items-center bg-base-neutral-900/72 p-4 sm:grid-rows-[1fr_auto_3fr]',
 	variants: {
 		isBlurred: {
-			true: 'supports-backdrop-filter:backdrop-blur-xs',
+			true: 'supports-backdrop-filter:backdrop-blur-xs supports-backdrop-filter:backdrop-filter',
 		},
 		isEntering: {
-			true: 'fade-in animate-in duration-300 ease-out',
+			true: 'animate-in duration-300 ease-out fade-in',
 		},
 		isExiting: {
-			true: 'fade-out animate-out duration-200 ease-in',
+			true: 'animate-out duration-200 ease-in fade-out',
 		},
 	},
 });
 
 const modalContentStyles = cva({
-	base: 'bg-base-neutral-0 shadow-base-xl dark:bg-base-neutral-800 max-h-full w-full overflow-auto rounded-lg text-left align-middle',
+	base: 'relative row-start-2 max-h-full w-full overflow-hidden rounded-lg bg-base-neutral-0 text-left align-middle shadow-base-xl [--visual-viewport-vertical-padding:16px] sm:[--visual-viewport-vertical-padding:32px] dark:bg-base-neutral-800',
 	variants: {
 		isEntering: {
-			true: 'fade-in slide-in-from-bottom animate-in sm:zoom-in-95 sm:slide-in-from-bottom-0 duration-200 ease-out',
+			true: 'animate-in duration-200 ease-out fade-in slide-in-from-bottom sm:slide-in-from-bottom-0 sm:zoom-in-95',
+		},
+		isExiting: {
+			true: 'animate-out duration-200 ease-in slide-out-to-bottom sm:slide-out-to-bottom-0 sm:zoom-out-95',
 		},
 		size: {
+			'2xs': 'sm:max-w-2xs',
 			xs: 'sm:max-w-xs',
 			sm: 'sm:max-w-sm',
 			md: 'sm:max-w-md',
@@ -50,29 +54,30 @@ const modalContentStyles = cva({
 			'3xl': 'sm:max-w-3xl',
 			'4xl': 'sm:max-w-4xl',
 			'5xl': 'sm:max-w-5xl',
+			fullscreen: 'sm:[--visual-viewport-vertical-padding:16px]',
 		},
 	},
 	defaultVariants: {
-		size: 'lg',
+		size: 'xl',
 	},
 });
 
-type ModalContentProps = Omit<RACModalOverlayProps, 'children' | 'className'> &
+export type ModalContentProps = Omit<RACModalOverlayProps, 'children'> &
 	Pick<RACDialogProps, 'aria-label' | 'aria-labelledby' | 'children' | 'role'> &
 	VariantProps<typeof modalContentStyles> & {
-		readonly classNames?: {
-			readonly content?: RACModalOverlayProps['className'];
-			readonly overlay?: RACModalOverlayProps['className'];
-		};
 		readonly closeButton?: boolean;
 		readonly isBlurred?: boolean;
+		readonly overlay?: Omit<RACModalOverlayProps, 'children'>;
 	};
 
 export function ModalContent({
+	'aria-label': ariaLabel,
+	'aria-labelledby': ariaLabelledBy,
 	isDismissable: isDismissableInternal,
 	isBlurred = false,
 	role = 'dialog',
 	closeButton = true,
+	overlay,
 	...props
 }: ModalContentProps) {
 	const isDismissable = isDismissableInternal ?? role !== 'alertdialog';
@@ -80,31 +85,31 @@ export function ModalContent({
 	return (
 		<RACModalOverlay
 			{...props}
-			className={composeRenderProps(props.classNames?.overlay, (className, renderProps) =>
+			className={composeRenderProps(overlay?.className, (className, renderProps) =>
 				modalOverlayStyles({
 					...renderProps,
 					isBlurred,
 					className,
 				}),
 			)}
+			data-slot="modal-overlay"
 			isDismissable={isDismissable}
 		>
 			<RACModal
-				{...props}
-				className={composeRenderProps(props.classNames?.content, (className, renderProps) =>
+				className={composeRenderProps(props.className, (className, renderProps) =>
 					modalContentStyles({
 						...renderProps,
 						size: props.size,
 						className,
 					}),
 				)}
-				isDismissable={isDismissable}
+				data-slot="modal-content"
 			>
-				<Dialog aria-label={props['aria-label'] ?? 'Dialog'} role={role}>
+				<Dialog aria-label={ariaLabel} aria-labelledby={ariaLabelledBy} role={role}>
 					{(values) => (
 						<>
 							{typeof props.children === 'function' ? props.children(values) : props.children}
-							{closeButton && <DialogCloseIndicator isDismissable={isDismissable} />}
+							{closeButton && <DialogCloseIcon isDismissable={isDismissable} />}
 						</>
 					)}
 				</Dialog>

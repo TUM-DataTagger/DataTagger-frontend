@@ -1,11 +1,13 @@
 import { evaluate, getProviderData, type KeyedFlagDefinitionType } from 'flags/next';
 import { NextResponse } from 'next/server';
+import { developerToolbarFlags } from '@/flags';
 
 export async function GET() {
-	const flags = {};
+	const flags = developerToolbarFlags;
+	const flagDefinitions = Object.values(flags);
 
-	const flagValues = await evaluate(Object.values<any>(flags));
-	const values = Object.fromEntries(Object.values(flags).map((flag: any, index) => [flag.key, flagValues[index]]));
+	const flagValues = await evaluate(flagDefinitions);
+	const values = Object.fromEntries(flagDefinitions.map((flag, index) => [flag.key, flagValues[index]]));
 
 	return NextResponse.json({
 		...getProviderData(flags as Record<string, KeyedFlagDefinitionType | readonly unknown[]>),

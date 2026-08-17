@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BreadcrumbItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { BreadcrumbsItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { $api } from '@/util/clientFetch';
 
 export function ProjectFolderBreadcrumbs(props: { readonly folderUuid: string }) {
@@ -14,13 +14,17 @@ export function ProjectFolderBreadcrumbs(props: { readonly folderUuid: string })
 	return (
 		<nav aria-label="Project folder breadcrumbs">
 			<Breadcrumbs separator="slash">
-				<BreadcrumbItem href="/drafts">Home</BreadcrumbItem>
-				<BreadcrumbItem href={`/projects/${folderData?.project.pk}`}>
-					<span className="max-w-[30ch] truncate sm:max-w-prose">{folderData?.project?.name}</span>
-				</BreadcrumbItem>
-				<BreadcrumbItem>
-					<span className="max-w-[30ch] truncate sm:max-w-prose">{folderData?.name}</span>
-				</BreadcrumbItem>
+				<BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+				<BreadcrumbsItem href={`/projects/${folderData?.project.pk}`}>
+					<span className="max-w-[30ch] truncate sm:max-w-prose" title={folderData?.project?.name}>
+						{folderData?.project?.name}
+					</span>
+				</BreadcrumbsItem>
+				<BreadcrumbsItem>
+					<span className="max-w-[30ch] truncate sm:max-w-prose" title={folderData?.name}>
+						{folderData?.name}
+					</span>
+				</BreadcrumbsItem>
 			</Breadcrumbs>
 		</nav>
 	);

@@ -1,14 +1,14 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { CodeXmlIcon } from 'lucide-react';
 import { Fragment, useState } from 'react';
-import { setFlag } from '@/actions/flags';
-import { Description, Label } from '@/components/ui/Field';
-import { MenuItem, MenuTrigger, Menu, MenuContent } from '@/components/ui/Menu';
-import { ModalClose, ModalBody, ModalFooter, ModalHeader, ModalContent } from '@/components/ui/Modal';
+import { Menu, MenuContent, MenuItem, MenuTrigger } from '@/components/ui/Menu';
+import { ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/ui/Modal';
 import { Separator } from '@/components/ui/Separator';
 import { Switch } from '@/components/ui/Switch';
+import { type FeatureFlagsData, useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { setFlag } from '@/server/actions/flags';
 
 export function DeveloperToolbarFlagsExplorerDialog({
 	isOpen,
@@ -18,56 +18,54 @@ export function DeveloperToolbarFlagsExplorerDialog({
 	onOpenChange(isOpen: boolean): void;
 }) {
 	const queryClient = useQueryClient();
-
-	const { data: flagsData } = useQuery<{
-		definitions: Record<string, { defaultValue?: boolean | number | string; description?: string }>;
-		values: Record<string, boolean | number | string>;
-	}>({
-		queryKey: ['flags'],
-		queryFn: async () => {
-			const res = await fetch('/flags');
-			return res.json();
-		},
-	});
+	const { data: flagsData } = useFeatureFlags();
 
 	return (
-		<ModalContent
-			classNames={{ overlay: 'sm:place-content-start', content: 'sm:ml-14' }}
-			isBlurred
-			isOpen={isOpen}
-			onOpenChange={onOpenChange}
-		>
-			<ModalHeader className="text-base-xl" hasBorder>
-				Flags explorer
+		<ModalContent isBlurred isOpen={isOpen} onOpenChange={onOpenChange}>
+			<ModalHeader className="flex flex-row place-items-center gap-2 text-base-xl" hasBorder>
+				<ModalTitle className="text-base-xl">Flags explorer</ModalTitle>
 			</ModalHeader>
-			<ModalBody className="max-h-[480px] min-h-[480px] py-6">
+			<ModalBody className="max-h-[480px] min-h-[480px] py-0">
 				{Object.entries(flagsData?.definitions ?? {}).map(([key, definition]) => (
 					<Fragment key={key}>
-						<div className="flex flex-col gap-1">
-							<Label>{key}</Label>
-							{definition.description && <Description>{definition.description}</Description>}
+						<div className="flex gap-1 py-4">
 							<Switch
 								isSelected={Boolean(flagsData?.values[key] ?? definition.defaultValue)}
+								className="grow *:data-[slot=indicator]:col-start-2 *:data-[slot=label]:col-start-1 *:data-[slot=label]:row-start-1 *:[[slot=description]]:col-start-1 *:[[slot=description]]:row-start-2"
+								label={key}
+								description={definition.description}
 								onChange={async (isSelected) => {
-									queryClient.setQueryData(['flags'], (oldData: typeof flagsData) => ({
-										...oldData,
-										values: {
-											...oldData?.values,
-											[key]: isSelected,
-										},
-									}));
+									queryClient.setQueryData<FeatureFlagsData | undefined>(['flags'], (oldData) => {
+										if (!oldData) {
+											return oldData;
+										}
 
-									try {
-										await setFlag(key, isSelected ? '1' : '0');
-										await queryClient.invalidateQueries({ queryKey: ['flags'] });
-									} catch {
-										queryClient.setQueryData(['flags'], (oldData: typeof flagsData) => ({
+										return {
 											...oldData,
 											values: {
-												...oldData?.values,
-												[key]: !isSelected,
+												...oldData.values,
+												[key]: isSelected,
 											},
-										}));
+										};
+									});
+
+									const [error] = await setFlag({ key, value: isSelected ? '1' : '0' });
+									if (error) {
+										queryClient.setQueryData<FeatureFlagsData | undefined>(['flags'], (oldData) => {
+											if (!oldData) {
+												return oldData;
+											}
+
+											return {
+												...oldData,
+												values: {
+													...oldData.values,
+													[key]: !isSelected,
+												},
+											};
+										});
+									} else {
+										await queryClient.invalidateQueries({ queryKey: ['flags'] });
 									}
 								}}
 								size="sm"
@@ -89,10 +87,10 @@ export function DeveloperToolbarMenu() {
 	const [isFlagsExplorerOpen, setIsFlagsExplorerOpen] = useState(false);
 
 	return (
-		<Menu respectScreen={false}>
+		<Menu>
 			<MenuTrigger
 				aria-label="Developer toolbar"
-				className="pressed:outline-2 pressed:outline-offset-2 pressed:outline-base-lavender-400 dark:pressed:outline-base-lavender-600 fixed top-1/2 left-5 z-2147483647 -translate-y-1/2"
+				className="fixed top-1/2 left-5 z-2147483647 -translate-y-1/2 pressed:outline-2 pressed:outline-offset-2 pressed:outline-base-lavender-400 dark:pressed:outline-base-lavender-600"
 				size="icon-sm"
 				variant="filled"
 			>

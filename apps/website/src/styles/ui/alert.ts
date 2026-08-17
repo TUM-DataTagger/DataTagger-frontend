@@ -1,7 +1,7 @@
 import { cva } from '@/styles/cva';
 
 export const alertStyles = cva({
-	base: 'text-base-label-md relative inline-flex min-h-12 w-full flex-wrap place-items-center gap-3 rounded-sm px-4 py-3',
+	base: 'relative inline-flex min-h-12 w-full place-items-center gap-3 rounded-sm px-4 py-3 text-base-label-md',
 	variants: {
 		variant: {
 			error:

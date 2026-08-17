@@ -13,19 +13,21 @@ export function ListBox<Type extends object>(props: RACListBoxProps<Type>) {
 			{...props}
 			className={composeRenderProps(props.className, (className) =>
 				cx(
-					[
-						'border-base-neutral-200 dark:border-base-neutral-600 shadow-base-sm flex max-h-96 w-full min-w-40 flex-col gap-x-1 overflow-y-auto overscroll-contain rounded-sm border p-2 outline-hidden [scrollbar-width:thin]',
-						"grid grid-cols-[1fr_auto] overflow-auto *:[[role='group']+[role=group]]:mt-4 *:[[role='group']+[role=separator]]:mt-1",
-					],
+					"grid max-h-96 w-full min-w-56 scroll-py-1 [scrollbar-width:thin] grid-cols-[auto_1fr] gap-x-1 overflow-y-auto overscroll-contain rounded-sm border border-base-neutral-200 p-2 shadow-base-sm outline-hidden has-data-[slot=drag-icon]:grid-cols-[auto_auto_1fr] dark:border-base-neutral-600 *:[[role='group']+[role='group']]:mt-4 *:[[role='group']+[role='separator']]:mt-1",
+
 					className,
 				),
 			)}
+			data-slot="list-box"
 		/>
 	);
 }
 
 export type ListBoxItemProps<Type extends object> = RACListBoxItemProps<Type> & {
 	readonly className?: string;
+	readonly classNames?: {
+		readonly selected?: string;
+	};
 };
 
 export function ListBoxItem<Type extends object>(props: ListBoxItemProps<Type>) {
@@ -37,23 +39,44 @@ export function ListBoxItem<Type extends object>(props: ListBoxItemProps<Type>) 
 			className={composeRenderProps(props.className, (className, renderProps) =>
 				dropdownItemStyles({
 					...renderProps,
-					className,
+					className: cx('href' in props && 'cursor-pointer', className),
 				}),
 			)}
+			data-slot="list-box-item"
 			textValue={textValue!}
 		>
-			{({ allowsDragging, isSelected, isFocused, isDragging }) => (
-				<>
-					{allowsDragging && (
-						<MenuIcon
-							className={cx('size-4 shrink-0 transition', isFocused && '', isDragging && '', isSelected && '')}
-							size={16}
-						/>
-					)}
-					{isSelected && <CheckIcon className="-mx-0.5 mr-2" data-slot="checked-icon" size={16} />}
-					{typeof props.children === 'string' ? <DropdownLabel>{props.children}</DropdownLabel> : props.children}
-				</>
-			)}
+			{(renderProps) => {
+				const { allowsDragging, isSelected, isFocused, isDragging } = renderProps;
+
+				return (
+					<>
+						{allowsDragging && (
+							<MenuIcon
+								className={cx('shrink-0 transition', isFocused && '', isDragging && '', isSelected && '')}
+								size={16}
+							/>
+						)}
+						{typeof props.children === 'function' ? (
+							props.children(renderProps)
+						) : typeof props.children === 'string' ? (
+							<DropdownLabel>{props.children}</DropdownLabel>
+						) : (
+							props.children
+						)}
+						{isSelected && (
+							<div
+								className={cx(
+									'col-start-2 row-start-1 flex size-4.5 shrink-0 place-content-center place-items-center place-self-end rounded-full bg-base-lavender-600 dark:bg-base-lavender-400',
+									props.classNames?.selected,
+								)}
+								data-slot="check-indicator"
+							>
+								<CheckIcon aria-hidden className="text-base-neutral-40 dark:text-base-neutral-900" size={14} />
+							</div>
+						)}
+					</>
+				);
+			}}
 		</RACListBoxItem>
 	);
 }
@@ -64,7 +87,4 @@ export function ListBoxSection(props: ListBoxSectionProps) {
 	return <DropdownSection {...props} className={cx(props.className, 'gap-1')} />;
 }
 
-export {
-	DropdownLabel as ListBoxItemLabel,
-	DropdownDescription as ListBoxItemDescription,
-} from '@/components/ui/Dropdown';
+export { DropdownLabel as ListBoxLabel, DropdownDescription as ListBoxDescription } from '@/components/ui/Dropdown';

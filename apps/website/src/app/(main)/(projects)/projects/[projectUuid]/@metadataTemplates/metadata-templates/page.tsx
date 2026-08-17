@@ -8,17 +8,10 @@ export const metadata: Metadata = {
 	title: 'Project page | Metadata templates',
 };
 
-export default async function Page({
-	params,
-	searchParams,
-}: {
-	readonly params: Promise<{ readonly projectUuid: string }>;
-	readonly searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
-	const { projectUuid } = await params;
-	const { sort: searchParamsSort } = await searchParams;
+const limit = 12;
 
-	const sort = searchParamsSort ?? 'name';
+export default async function Page({ params }: { readonly params: Promise<{ readonly projectUuid: string }> }) {
+	const { projectUuid } = await params;
 
 	const queryClient = getQueryClient();
 
@@ -29,8 +22,8 @@ export default async function Page({
 			}),
 		),
 		queryClient.prefetchQuery(
-			$api.queryOptions('get', '/api/v1/metadata-template/', {
-				params: { query: { assigned_to_object_id: projectUuid, limit: 9_999, ordering: sort } },
+			$api.queryOptions('get', '/api/v1/project/{id}/metadata-template-container-pool/', {
+				params: { path: { id: projectUuid } },
 			}),
 		),
 	]);
@@ -38,7 +31,7 @@ export default async function Page({
 	return (
 		<div className="flex flex-col gap-6">
 			<HydrationBoundary state={dehydrate(queryClient)}>
-				<ProjectMetadataTemplatesView projectUuid={projectUuid} />
+				<ProjectMetadataTemplatesView limit={limit} projectUuid={projectUuid} />
 			</HydrationBoundary>
 		</div>
 	);

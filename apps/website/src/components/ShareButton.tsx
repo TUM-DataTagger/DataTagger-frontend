@@ -52,7 +52,7 @@ export function ShareButton() {
 			<TooltipTrigger aria-label="Share" onPress={async () => copyToClipboard()} size="icon" variant="discreet">
 				<Share2Icon aria-hidden size={18} strokeWidth={1.5} />
 			</TooltipTrigger>
-			<TooltipContent showArrow={false}>{tooltipText}</TooltipContent>
+			<TooltipContent arrow={false}>{tooltipText}</TooltipContent>
 		</Tooltip>
 	);
 }

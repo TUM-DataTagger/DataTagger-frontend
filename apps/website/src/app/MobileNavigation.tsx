@@ -1,17 +1,29 @@
 'use client';
 
-import { BlocksIcon, MoreVerticalIcon, PackageIcon, PackageOpenIcon } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+	// CircleUserRoundIcon,
+	LogOutIcon,
+	MoreVerticalIcon,
+	SettingsIcon,
+} from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Drawer, DrawerBody, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
+import { Drawer, DrawerBody, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
 import { dropdownItemStyles } from '@/components/ui/Dropdown';
 import { Separator } from '@/components/ui/Separator';
-import { LogoutButton } from './LogoutButton';
+import { isFeatureFlagEnabled, useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { logout } from '@/server/actions/auth';
+import { USER_SETTINGS_ENABLED_FLAG } from '@/util/featureFlagKeys';
 import { VisualSwitchNoSSR } from './VisualSwitch';
+import { MAIN_NAVIGATION_ITEMS } from './navigationItems';
 
 export function MobileNavigation() {
+	const queryClient = useQueryClient();
 	const [isOpen, setIsOpen] = useState(false);
+	const { data: flagsData } = useFeatureFlags();
+	const isUserSettingsEnabled = isFeatureFlagEnabled(flagsData, USER_SETTINGS_ENABLED_FLAG);
 
 	return (
 		<div className="md:hidden">
@@ -21,44 +33,58 @@ export function MobileNavigation() {
 				</DrawerTrigger>
 				<DrawerContent aria-label="More menu">
 					<DrawerBody>
-						<Link
-							aria-label="My draft files"
+						{MAIN_NAVIGATION_ITEMS.map((item) => {
+							const Icon = item.icon;
+							return (
+								<Link
+									aria-label={item.label}
+									className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
+									href={item.href}
+									key={item.id}
+									onClick={() => setIsOpen(false)}
+								>
+									<Icon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} /> {item.label}
+								</Link>
+							);
+						})}
+						<Separator />
+						{/* TODO: User Profile */}
+						{/* <Link
+							aria-label="My profile"
 							className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
-							href="/drafts"
+							href="/my-profile"
 							onClick={() => setIsOpen(false)}
 						>
-							<PackageOpenIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} /> My draft files
-						</Link>
-						<Link
-							aria-label="Projects"
-							className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
-							href="/projects"
-							onClick={() => setIsOpen(false)}
-						>
-							<PackageIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} /> Projects
-						</Link>
-						<Link
-							aria-label="Metadata templates"
-							className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
-							href="/metadata-templates"
-							onClick={() => setIsOpen(false)}
-						>
-							<BlocksIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} /> Metadata templates
-						</Link>
-						<LogoutButton
+							<CircleUserRoundIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> My Profile
+						</Link> */}
+						{isUserSettingsEnabled ? (
+							<Link
+								aria-label="Settings"
+								className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
+								href="/account/settings"
+								onClick={() => setIsOpen(false)}
+							>
+								<SettingsIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> Settings
+							</Link>
+						) : null}
+						<Separator />
+						<DrawerClose
 							className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
-							onClick={() => setIsOpen(false)}
+							onPress={async () => {
+								queryClient.clear();
+								await logout();
+							}}
 							size="default"
 							variant="unset"
 						>
-							Logout
-						</LogoutButton>
+							<LogOutIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> Logout
+						</DrawerClose>
 						<Separator />
 						<div className="mt-2 flex flex-col place-items-center gap-2 place-self-center">
 							<span className="text-base-label-sm text-base-neutral-600 dark:text-base-neutral-300">
 								Visual theming
 							</span>
-							<VisualSwitchNoSSR />
+							<VisualSwitchNoSSR className="flex" />
 						</div>
 					</DrawerBody>
 				</DrawerContent>

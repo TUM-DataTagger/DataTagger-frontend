@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation';
 import type { PropsWithChildren } from 'react';
+import { CreateRouteTopBar } from '@/components/create-route/frame/CreateRouteTopBar';
 import { openAPIClient } from '@/util/fetch';
 import { CloseButton } from './CloseButton';
+import { ResetCreateProjectFolderStateOnMount } from './ResetCreateProjectFolderStateOnMount';
 
 export default async function Layout({
 	params,
@@ -23,10 +25,8 @@ export default async function Layout({
 
 	return (
 		<>
-			<div className="bg-base-neutral-800 text-base-xl text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900 sticky top-0 z-10 flex h-16 place-content-between place-items-center px-4 pt-6 pb-4 md:px-[132px]">
-				<span>Create folder</span>
-				<CloseButton />
-			</div>
+			<ResetCreateProjectFolderStateOnMount />
+			<CreateRouteTopBar closeButton={<CloseButton />} title="Create folder" />
 			{children}
 		</>
 	);

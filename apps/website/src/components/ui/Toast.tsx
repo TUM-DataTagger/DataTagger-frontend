@@ -21,9 +21,9 @@ export type IToast = {
 function getToastTypeIcon(type: ToastType) {
 	switch (type) {
 		case ToastType.Success:
-			return <CheckCircleIcon aria-hidden className="text-base-green-lime-400 shrink-0" size={24} strokeWidth={1.5} />;
+			return <CheckCircleIcon aria-hidden className="shrink-0 text-base-green-lime-400" size={24} strokeWidth={1.5} />;
 		case ToastType.Error:
-			return <AlertCircleIcon aria-hidden className="text-base-sunset-400 shrink-0" size={24} strokeWidth={1.5} />;
+			return <AlertCircleIcon aria-hidden className="shrink-0 text-base-sunset-400" size={24} strokeWidth={1.5} />;
 		case ToastType.TextOnly:
 			return null;
 		default:
@@ -41,7 +41,7 @@ export const Toast = <Type extends ToastProps>(props: Type) => {
 	return (
 		<div
 			{...toastProps}
-			className="text-base-md text-base-neutral-40 data-[animation=entering]:animate-in data-[animation=exiting]:animate-out data-[animation=entering]:fade-in data-[animation=exiting]:fade-out data-[animation=entering]:slide-in-from-bottom-1 data-[animation=exiting]:slide-out-to-bottom-1 dark:text-base-neutral-900 bg-base-neutral-900 dark:bg-base-neutral-40 flex w-lg place-items-center gap-3 rounded-sm p-4 data-[animation=entering]:duration-200 data-[animation=entering]:ease-out data-[animation=exiting]:duration-150 data-[animation=exiting]:ease-in"
+			className="flex w-lg place-items-center gap-3 rounded-sm bg-base-neutral-900 p-4 text-base-md text-base-neutral-40 data-[animation=entering]:animate-in data-[animation=entering]:duration-200 data-[animation=entering]:ease-out data-[animation=entering]:fade-in data-[animation=entering]:slide-in-from-bottom-1 data-[animation=exiting]:animate-out data-[animation=exiting]:duration-150 data-[animation=exiting]:ease-in data-[animation=exiting]:fade-out data-[animation=exiting]:slide-out-to-bottom-1 dark:bg-base-neutral-40 dark:text-base-neutral-900"
 			ref={ref}
 		>
 			{getToastTypeIcon(toast.content.type)}
@@ -59,7 +59,7 @@ export const ToastRegion = <Type extends ToastRegionProps>(props: Type) => {
 	const { regionProps } = useToastRegion(props, state, ref);
 
 	return (
-		<div {...regionProps} className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2" ref={ref}>
+		<div {...regionProps} className="fixed bottom-4 left-1/2 z-99 -translate-x-1/2" ref={ref}>
 			{state.visibleToasts.map((toast) => (
 				<Toast key={toast.key} state={state} toast={toast} />
 			))}

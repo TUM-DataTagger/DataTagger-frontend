@@ -11,7 +11,12 @@ type FolderPermission = components['schemas']['FolderPermission'];
 export function ProjectFolderPermissionsGrid(props: { readonly data?: FolderPermission[] }) {
 	return (
 		<div className="flex flex-wrap gap-6">
-			<GridList aria-label="Folder permissions" className="layout-grid:gap-3.5" items={props.data ?? []} layout="grid">
+			<GridList
+				aria-label="Folder permissions"
+				className="overscroll-auto layout-grid:gap-4"
+				items={props.data ?? []}
+				layout="grid"
+			>
 				{(item) => (
 					<GridListItem
 						className="rounded-xl"
@@ -19,7 +24,7 @@ export function ProjectFolderPermissionsGrid(props: { readonly data?: FolderPerm
 						key={item.pk}
 						textValue={item.project_membership.member.email}
 					>
-						<div className={gridCardStyles({ className: 'h-[128px] w-full min-w-64 gap-6 md:max-w-64' })}>
+						<div className={gridCardStyles({ className: 'h-[150px] w-full min-w-64 gap-6 md:max-w-64' })}>
 							<div className="flex flex-col gap-3">
 								<div className="flex place-items-center gap-2">
 									<span>{item.is_folder_admin ? 'Admin' : item.can_edit ? 'Editor' : 'Viewer'}</span>
@@ -27,7 +32,7 @@ export function ProjectFolderPermissionsGrid(props: { readonly data?: FolderPerm
 										<TooltipTrigger variant="tooltip">
 											<HelpCircleIcon aria-hidden size={18} strokeWidth={1.5} />
 										</TooltipTrigger>
-										<TooltipContent showArrow={false} variant="rich">
+										<TooltipContent arrow={false} variant="rich">
 											{item.is_folder_admin
 												? 'Full access to folder, files, and metadata within'
 												: item.can_edit
@@ -37,7 +42,9 @@ export function ProjectFolderPermissionsGrid(props: { readonly data?: FolderPerm
 									</Tooltip>
 								</div>
 							</div>
-							<span className="max-w-[25ch] truncate">{item.project_membership.member.email}</span>
+							<span className="max-w-[25ch] truncate" title={item.project_membership.member.email}>
+								{item.project_membership.member.email}
+							</span>
 						</div>
 					</GridListItem>
 				)}

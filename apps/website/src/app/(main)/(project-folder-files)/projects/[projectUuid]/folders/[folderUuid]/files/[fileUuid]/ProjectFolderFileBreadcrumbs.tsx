@@ -3,8 +3,8 @@
 import { useSuspenseQueries } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { EllipsisIcon } from 'lucide-react';
-import { VersionHistoryBadge } from '@/components/VersionHistory';
-import { BreadcrumbItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { FileVersionHistoryBadge } from '@/components/FileVersionHistory';
+import { BreadcrumbsItem, Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Menu, MenuContent, MenuItem, MenuTrigger } from '@/components/ui/Menu';
 import { sideSheetSelectedDatasetAtom, sideSheetModeAtom, SideSheetMode } from '@/stores/sideSheet';
 import { linkStyles } from '@/styles/ui/link';
@@ -26,17 +26,17 @@ export function ProjectFolderFileBreadcrumbs(props: { readonly fileUuid: string;
 	});
 
 	const isVersionHistoryModeActive = Boolean(
-		sideSheetMode === SideSheetMode.VersionHistory && sideSheetSelectedDataset,
+		sideSheetMode === SideSheetMode.FileVersionHistory && sideSheetSelectedDataset,
 	);
 
 	return isVersionHistoryModeActive ? (
-		<VersionHistoryBadge fileUuid={props.fileUuid} />
+		<FileVersionHistoryBadge fileUuid={props.fileUuid} />
 	) : (
 		<nav aria-label="File breadcrumbs">
 			<Breadcrumbs separator="slash">
-				<BreadcrumbItem href="/drafts">Home</BreadcrumbItem>
-				<BreadcrumbItem className="print:hidden">
-					<Menu respectScreen={false}>
+				<BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+				<BreadcrumbsItem className="print:hidden">
+					<Menu>
 						<MenuTrigger
 							aria-label="More"
 							className="text-base-neutral-900 dark:text-base-neutral-40"
@@ -60,14 +60,17 @@ export function ProjectFolderFileBreadcrumbs(props: { readonly fileUuid: string;
 							</MenuItem>
 						</MenuContent>
 					</Menu>
-				</BreadcrumbItem>
-				<BreadcrumbItem className="hidden print:flex">{folderData.data.project.name}</BreadcrumbItem>
-				<BreadcrumbItem className="hidden print:flex">{folderData.data.name}</BreadcrumbItem>
-				<BreadcrumbItem>
-					<span className="max-w-[30ch] truncate sm:max-w-prose">
+				</BreadcrumbsItem>
+				<BreadcrumbsItem className="hidden print:flex">{folderData.data.project.name}</BreadcrumbsItem>
+				<BreadcrumbsItem className="hidden print:flex">{folderData.data.name}</BreadcrumbsItem>
+				<BreadcrumbsItem>
+					<span
+						className="max-w-[30ch] truncate sm:max-w-prose"
+						title={datasetData.data.display_name ?? 'Empty dataset'}
+					>
 						{datasetData.data.display_name ?? 'Empty dataset'}
 					</span>
-				</BreadcrumbItem>
+				</BreadcrumbsItem>
 			</Breadcrumbs>
 		</nav>
 	);

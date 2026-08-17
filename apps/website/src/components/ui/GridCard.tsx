@@ -19,6 +19,7 @@ export function GridCard(
 				variant: 'default',
 				className,
 			})}
+			ref={props.ref}
 		/>
 	);
 }
@@ -31,6 +32,7 @@ export function LinkGridCard({
 	VariantProps<typeof gridCardStyles> & {
 		readonly className?: string;
 		readonly isSelected?: boolean | undefined;
+		readonly onPress?: ((event: PressEvent) => void) | undefined;
 	}) {
 	if (!props.href) {
 		return (
@@ -40,7 +42,7 @@ export function LinkGridCard({
 					className: cx('w-full text-left', props.className),
 				})}
 				data-selected={isSelected}
-				onPress={props.onClick as unknown as (e: PressEvent) => void}
+				onPress={props.onPress}
 			>
 				{props.children}
 			</Button>

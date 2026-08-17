@@ -21,7 +21,7 @@ import { Dialog, DialogTrigger, DialogBody, DialogFooter, DialogHeader } from '@
 import { cx } from '@/styles/cva';
 
 const inertiaTransition = {
-	type: 'inertia',
+	type: 'inertia' as const,
 	bounceStiffness: 300,
 	bounceDamping: 60,
 	timeConstant: 300,
@@ -74,7 +74,7 @@ function DrawerContentPrimitive(props: DrawerOverlayPrimitiveProps) {
 	const bgOpacity = useTransform(y, [0, height], [0.15, 0]);
 	const bg = useMotionTemplate`rgba(0, 0, 0, ${bgOpacity})`;
 
-	const root = document.querySelectorAll('body')[0] as HTMLElement;
+	const root = document.body;
 
 	const bodyBorderRadius = useTransform(y, [0, height], [drawerRadius, 0]);
 
@@ -82,11 +82,11 @@ function DrawerContentPrimitive(props: DrawerOverlayPrimitiveProps) {
 		root.style.borderRadius = `${value}px`;
 	});
 
-	const onDragEnd = (_: any, { offset, velocity }: PanInfo) => {
+	const onDragEnd = (_event: unknown, { offset, velocity }: PanInfo) => {
 		if (offset.y > height * 0.4 || velocity.y > 10) {
 			closeDrawer();
 		} else {
-			animate(y, 0 as any, { ...inertiaTransition, min: 0, max: 0 } as any);
+			animate(y, 0, { ...inertiaTransition, min: 0, max: 0 });
 		}
 	};
 
@@ -100,14 +100,14 @@ function DrawerContentPrimitive(props: DrawerOverlayPrimitiveProps) {
 			isOpen
 			onOpenChange={closeDrawer}
 			style={{
-				backgroundColor: bg as any,
+				backgroundColor: bg,
 			}}
 		>
 			<ModalPrimitive
 				{...props}
 				animate={{ y: 0 }}
 				className={cx(
-					'bg-base-neutral-0 dark:bg-base-neutral-800 shadow-base-xl flex max-h-full w-full flex-col overflow-hidden rounded-t-2xl text-left align-middle',
+					'flex max-h-full w-full flex-col overflow-hidden rounded-t-2xl bg-base-neutral-0 text-left align-middle shadow-base-xl dark:bg-base-neutral-800',
 				)}
 				drag="y"
 				dragConstraints={{ top: 0, bottom: height }}
@@ -155,7 +155,7 @@ type DrawerPrimitiveProps = Omit<ComponentProps<typeof RACModal>, 'children'> & 
 	readonly 'aria-label'?: RACDialogProps['aria-label'];
 	// eslint-disable-next-line react/no-unused-prop-types
 	readonly 'aria-labelledby'?: RACDialogProps['aria-labelledby'];
-	readonly children?: RACDialogProps['children'];
+	readonly children?: ReactNode;
 	// eslint-disable-next-line react/no-unused-prop-types
 	readonly role?: RACDialogProps['role'];
 };
@@ -174,7 +174,7 @@ function DrawerPrimitive(props: DrawerPrimitiveProps) {
 				transformOrigin: 'center 0',
 			}}
 		>
-			<AnimatePresence>{isOpen && (props.children as ReactNode)}</AnimatePresence>
+			<AnimatePresence>{isOpen && props.children}</AnimatePresence>
 		</motion.div>
 	);
 }
@@ -224,15 +224,17 @@ export function Drawer({ children, withNotch = true, isOpen: controlledIsOpen, o
 	);
 }
 
-export type DrawerContentProps = ComponentProps<typeof DrawerPrimitive>;
+export type DrawerContentProps = Omit<DrawerOverlayPrimitiveProps, 'children'> & {
+	readonly children?: RACDialogProps['children'];
+};
 
 export function DrawerContent({ children, ...props }: DrawerContentProps) {
 	return (
 		<DrawerPrimitive>
 			<DrawerContentPrimitive {...props}>
 				<Dialog
-					aria-label={props['aria-label'] ?? undefined!}
-					aria-labelledby={props['aria-labelledby'] ?? undefined!}
+					aria-label={props['aria-label']}
+					aria-labelledby={props['aria-labelledby']}
 					className="mx-auto sm:max-w-lg"
 					role={props.role ?? 'dialog'}
 				>

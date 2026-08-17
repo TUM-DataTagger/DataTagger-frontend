@@ -1,78 +1,67 @@
 'use client';
 
-import { useAtomValue, useSetAtom } from 'jotai';
-import { CheckIcon, InfoIcon, MinusIcon, RotateCcwIcon } from 'lucide-react';
+import { useSetAtom } from 'jotai';
+import { AlertCircleIcon, CheckIcon, InfoIcon, MinusIcon, RotateCcwIcon } from 'lucide-react';
 import { useMediaQuery } from 'usehooks-ts';
 import { MetadataAssignModal } from '@/components/Metadata';
 import { FileUploadEmpty } from '@/components/icons/FileUploadEmpty';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { GridList, GridListItem } from '@/components/ui/GridList';
-import { ProgressBar } from '@/components/ui/ProgressBar';
+import { Modal } from '@/components/ui/Modal';
+import { ProgressBar, ProgressBarTrack } from '@/components/ui/ProgressBar';
 import { Scrollbars } from '@/components/ui/Scrollbars';
 import { useSidebar } from '@/components/ui/Sidebar';
-import {
-	globalUploadAssistantOpenAtom,
-	uploadsNoFolderAtom,
-	uploadsNoFolderSelectionAtom,
-	uploadsQueueAtom,
-} from '@/stores/globalUploadAssistant';
+import { globalUploadAssistantOpenAtom } from '@/stores/globalUploadAssistant';
 import { sideSheetSelectedDatasetAtom } from '@/stores/sideSheet';
-import { Modal } from '../ui/Modal';
+import { useUploadIntent } from '@/uploads/useUploadIntent';
 
 export function GlobalUploadAssistantDraftsTab() {
 	const isLarge = useMediaQuery('(min-width: 1024px)', { initializeWithValue: false });
 	const { setOpen: setSidebarOpen } = useSidebar();
-	const draftUploadsQueue = useAtomValue(uploadsNoFolderAtom);
-	const draftUploadsSelection = useAtomValue(uploadsNoFolderSelectionAtom);
-	const setUploadQueue = useSetAtom(uploadsQueueAtom);
+	const {
+		clearFinishedDraftUploads,
+		draftUploads,
+		retryUpload,
+		selectedDraftUploads,
+		setAllDraftUploadsSelected,
+		setDraftUploadSelection,
+	} = useUploadIntent();
 	const setIsGlobalUploadAssistantOpen = useSetAtom(globalUploadAssistantOpenAtom);
 	const setSideSheetSelectedDataset = useSetAtom(sideSheetSelectedDatasetAtom);
+	const selectedDraftUploadKeys = new Set(selectedDraftUploads.map((draft) => draft.uuid));
 
 	return (
 		<>
-			{draftUploadsQueue.length ? (
-				<div className="border-base-neutral-100 bg-base-neutral-60 dark:border-base-neutral-700 dark:bg-base-neutral-700/40 flex h-14 place-content-between place-items-center border-b px-5 py-3">
+			{draftUploads.length ? (
+				<div className="flex h-14 place-content-between place-items-center border-b border-base-neutral-100 bg-base-neutral-60 px-5 py-3 dark:border-base-neutral-700 dark:bg-base-neutral-700/40">
 					<div className="flex gap-2">
 						<Checkbox
 							aria-label="Select all draft files"
 							isIndeterminate={Boolean(
-								draftUploadsSelection.length && draftUploadsSelection.length !== draftUploadsQueue.length,
+								selectedDraftUploads.length && selectedDraftUploads.length !== draftUploads.length,
 							)}
-							isSelected={Boolean(
-								draftUploadsSelection.length && draftUploadsSelection.length === draftUploadsQueue.length,
-							)}
-							onChange={(isSelected) => {
-								setUploadQueue((drafts) => {
-									for (const draft of drafts.filter((draft) => !draft.folderUuid)) {
-										draft.selected = isSelected;
-									}
-								});
-							}}
+							isSelected={Boolean(selectedDraftUploads.length && selectedDraftUploads.length === draftUploads.length)}
+							onChange={setAllDraftUploadsSelected}
 						/>
-						{draftUploadsSelection.length ? (
+						{selectedDraftUploads.length ? (
 							<Modal>
 								<Button variant="secondary-discreet">Add metadata</Button>
 								<MetadataAssignModal
-									selected={draftUploadsSelection.map((draft) => draft.datasetUuid!).filter(Boolean)}
+									selected={selectedDraftUploads.map((draft) => draft.datasetUuid!).filter(Boolean)}
 								/>
 							</Modal>
 						) : null}
 					</div>
-					<Button
-						onPress={() => {
-							setUploadQueue((drafts) => drafts.filter((draft) => !draft.folderUuid && !draft.finished));
-						}}
-						variant="discreet"
-					>
+					<Button onPress={clearFinishedDraftUploads} variant="discreet">
 						Clear
 					</Button>
 				</div>
 			) : null}
 
-			{draftUploadsQueue.length ? (
+			{draftUploads.length ? (
 				<Scrollbars
-					className="h-[calc(100vh_-_10rem)] md:h-[calc(540px_-_7rem)]"
+					className="h-[calc(100vh-10rem)] md:h-[calc(540px-7rem)]"
 					defer
 					options={{
 						overflow: { x: 'hidden' },
@@ -87,19 +76,16 @@ export function GlobalUploadAssistantDraftsTab() {
 					<GridList
 						aria-label="List of files uploaded to the tool"
 						disabledBehavior="selection"
+						className="overscroll-auto"
 						onSelectionChange={(keys) => {
 							if (keys instanceof Set) {
-								setUploadQueue((drafts) => {
-									for (const draft of drafts.filter((draft) => !draft.folderUuid)) {
-										draft.selected = keys.has(draft.uuid);
-									}
-								});
+								setDraftUploadSelection(keys);
 							}
 						}}
-						selectedKeys={new Set(draftUploadsSelection.map((draft) => draft.uuid))}
+						selectedKeys={selectedDraftUploadKeys}
 						selectionMode="multiple"
 					>
-						{draftUploadsQueue.map((upload) => (
+						{draftUploads.map((upload) => (
 							<GridListItem
 								className="min-h-20 px-4 py-3 first:pt-5"
 								id={upload.uuid}
@@ -109,23 +95,38 @@ export function GlobalUploadAssistantDraftsTab() {
 								<div className="flex flex-1 gap-2">
 									<div className="flex-1">
 										<div className="flex max-w-56 flex-col gap-1">
-											<span className="text-base-label-sm truncate">{upload.filename}</span>
-											<span className="text-base-xs text-base-neutral-600 dark:text-base-neutral-300 truncate">
+											<span className="truncate text-base-label-sm" title={upload.filename}>
+												{upload.filename}
+											</span>
+											<span
+												className="truncate text-base-xs text-base-neutral-600 dark:text-base-neutral-300"
+												title={upload.directory ?? '-'}
+											>
 												{upload.directory ?? '-'}
 											</span>
 										</div>
 										{upload.percentComplete && !upload.finished && !upload.error ? (
-											<ProgressBar aria-label="Upload progress" value={upload.percentComplete} />
+											<ProgressBar aria-label="Upload progress" value={upload.percentComplete}>
+												<ProgressBarTrack />
+											</ProgressBar>
 										) : null}
 									</div>
 									<div className="flex place-items-start gap-5">
 										{upload.finished ? (
-											<div className="bg-base-green-lime-500 flex h-[18px] w-[18px] place-content-center items-center rounded-full">
+											<div className="flex h-4.5 w-4.5 place-content-center items-center rounded-full bg-base-green-lime-500">
 												<CheckIcon aria-hidden aria-label="Success" size={12} strokeWidth={3} />
 											</div>
 										) : null}
+										{upload.completionSyncError ? (
+											<AlertCircleIcon
+												aria-label="Upload completed; refresh failed"
+												className="text-amber-700 dark:text-amber-400"
+												size={18}
+												strokeWidth={1.5}
+											/>
+										) : null}
 										{upload.error ? (
-											<div className="bg-base-sunset-500 flex h-[18px] w-[18px] place-content-center items-center rounded-full">
+											<div className="flex h-4.5 w-4.5 place-content-center items-center rounded-full bg-base-sunset-500">
 												<MinusIcon aria-hidden aria-label="Error" size={12} strokeWidth={3} />
 											</div>
 										) : null}
@@ -133,8 +134,10 @@ export function GlobalUploadAssistantDraftsTab() {
 											<Button
 												aria-label="Retry upload"
 												className="rounded-full"
+												onPress={async () => {
+													await retryUpload(upload.uuid);
+												}}
 												variant="unset"
-												// onPress={async () => retryUpload()}
 											>
 												<RotateCcwIcon aria-hidden size={18} strokeWidth={1.5} />
 											</Button>
@@ -203,7 +206,7 @@ export function GlobalUploadAssistantDraftsTab() {
 				</Scrollbars>
 			) : null}
 
-			{draftUploadsQueue.length ? null : (
+			{draftUploads.length ? null : (
 				<div className="flex grow flex-col place-items-center gap-8 p-4 pt-10 md:h-[50vh]">
 					<div className="flex flex-col place-items-center gap-4">
 						<FileUploadEmpty aria-hidden />

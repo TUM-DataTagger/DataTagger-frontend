@@ -4,15 +4,15 @@ import { init, push } from '@socialgouv/matomo-next';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
-const MATOMO_URL = 'https://domain.com/';
-const MATOMO_SITE_ID = '';
+const MATOMO_URL = 'https://analytics.example.com/';
+const MATOMO_SITE_ID = '1';
 
 export function MatomoAnalytics() {
 	const pathname = usePathname();
 	const isInitialLoad = useRef(true);
 
 	const isProductionEnvironment =
-		typeof window !== 'undefined' && window.location.href.startsWith('https://datatagger.domain.com');
+		typeof window !== 'undefined' && window.location.href.startsWith('https://app.example.com');
 
 	useEffect(() => {
 		if (isProductionEnvironment) {

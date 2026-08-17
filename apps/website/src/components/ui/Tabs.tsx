@@ -1,80 +1,112 @@
 'use client';
 
-import { LayoutGroup, motion } from 'motion/react';
-import { useId, type RefObject } from 'react';
+import { createContext, use, useMemo, type ComponentProps } from 'react';
 import type {
 	TabListProps as RACTabListProps,
+	TabPanelsProps as RACTabPanelsProps,
 	TabPanelProps as RACTabPanelProps,
 	TabProps as RACTabProps,
 	TabsProps as RACTabsProps,
 } from 'react-aria-components';
 import {
 	TabList as RACTabList,
+	TabPanels as RACTabPanels,
 	TabPanel as RACTabPanel,
 	Tab as RACTab,
 	Tabs as RACTabs,
 	composeRenderProps,
+	SelectionIndicator as RACSelectionIndicator,
 } from 'react-aria-components';
-import { useMediaQuery } from 'usehooks-ts';
 import { compose, cva, cx } from '@/styles/cva';
 import { focusRing } from '@/styles/ui/focusRing';
 import { composeTailwindRenderProps } from '@/styles/util';
 
 const tabsStyles = cva({
-	base: 'group/tabs flex gap-4 forced-color-adjust-none',
+	base: 'flex gap-4 forced-color-adjust-none',
 	variants: {
 		orientation: {
 			horizontal: 'flex-col',
-			vertical: 'w-[800px] flex-row',
+			vertical: 'w-full flex-row',
 		},
 	},
 });
 
-export type TabsProps = RACTabsProps & {
-	readonly ref?: RefObject<HTMLDivElement>;
-};
+type TabsOrientation = NonNullable<RACTabsProps['orientation']>;
 
-export function Tabs(props: TabsProps) {
+const TabsOrientationContext = createContext<TabsOrientation>('horizontal');
+
+export function Tabs(props: RACTabsProps) {
+	const orientation = props.orientation ?? 'horizontal';
+
 	return (
-		<RACTabs
-			{...props}
-			className={composeRenderProps(props.className, (className, renderProps) =>
-				tabsStyles({
-					...renderProps,
-					className,
-				}),
-			)}
-		/>
+		<TabsOrientationContext value={orientation}>
+			<RACTabs
+				{...props}
+				className={composeRenderProps(props.className, (className, renderProps) =>
+					tabsStyles({
+						...renderProps,
+						className,
+					}),
+				)}
+				data-slot="control"
+			/>
+		</TabsOrientationContext>
 	);
 }
 
 const tabListStyles = cva({
-	base: 'border-base-neutral-100 dark:border-base-neutral-700 flex forced-color-adjust-none',
+	base: 'relative flex border-base-neutral-100 forced-color-adjust-none dark:border-base-neutral-700',
 	variants: {
 		orientation: {
 			horizontal:
-				'h-16 w-full flex-row place-items-center gap-x-4 overflow-x-auto overflow-y-hidden border-b px-4 md:overflow-x-visible md:overflow-y-visible',
-			vertical: 'flex-col place-items-start gap-y-1 border-l',
+				'min-h-16 w-full flex-row place-items-center gap-x-4 overflow-x-auto overflow-y-hidden border-b px-4 md:overflow-x-visible md:overflow-y-visible',
+			vertical: 'min-w-40 flex-col place-items-start gap-y-1 border-r pr-4',
 		},
 	},
 });
 
-export type TabListProps<Type extends object> = RACTabListProps<Type> & {
-	readonly ref?: RefObject<HTMLDivElement>;
+type TabListContextValue = {
+	readonly selectionIndicator?: boolean;
 };
 
-export function TabList<Type extends object>(props: TabListProps<Type>) {
-	const id = useId();
+const TabListContext = createContext<TabListContextValue | undefined>(undefined);
+
+export function useTabListContext() {
+	const context = use(TabListContext);
+	if (context === undefined) {
+		throw new Error('useTabListContext must be used within TabListContext.Provider');
+	}
+
+	return context;
+}
+
+export type TabListProps<Type extends object> = RACTabListProps<Type> & TabListContextValue;
+
+export function TabList<Type extends object>({ selectionIndicator = true, ...props }: TabListProps<Type>) {
+	const contextValue = useMemo(() => ({ selectionIndicator }), [selectionIndicator]);
 
 	return (
-		<LayoutGroup id={id}>
+		<TabListContext value={contextValue}>
 			<RACTabList
 				{...props}
 				className={composeRenderProps(props.className, (className, renderProps) =>
 					tabListStyles({ ...renderProps, className }),
 				)}
+				data-slot="tab-list"
 			/>
-		</LayoutGroup>
+		</TabListContext>
+	);
+}
+
+export function TabScrollArea(props: ComponentProps<'div'>) {
+	return (
+		<div className="relative">
+			<div {...props} className={cx('scrollbar-hidden overflow-x-auto sm:overflow-x-visible', props.className)} />
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-x-0 bottom-0 h-px w-full bg-base-neutral-100 dark:bg-base-neutral-700"
+			/>
+		</div>
 	);
 }
 
@@ -82,8 +114,7 @@ const tabStyles = compose(
 	focusRing,
 	cva({
 		base: [
-			'relative flex cursor-default place-items-center gap-2 rounded-2xl px-3 py-1.5 whitespace-nowrap transition *:data-[slot=icon]:size-4',
-			'group-orientation-vertical/tabs:w-full group-orientation-vertical/tabs:py-0 group-orientation-vertical/tabs:pr-2 group-orientation-vertical/tabs:pl-4',
+			'group/tab relative isolate flex cursor-default place-items-center gap-2 rounded-2xl px-3 py-1.5 whitespace-nowrap transition *:data-[slot=icon]:size-4',
 			'text-base-neutral-800 dark:text-base-neutral-60',
 			'hover:bg-base-neutral-200 dark:hover:bg-base-neutral-600',
 			'focus-visible:bg-base-neutral-200 dark:focus-visible:bg-base-neutral-600',
@@ -94,21 +125,23 @@ const tabStyles = compose(
 			'selected:pressed:bg-base-neutral-500 dark:selected:pressed:bg-base-neutral-300',
 		],
 		variants: {
+			orientation: {
+				horizontal: null,
+				vertical: 'w-full py-0 pr-2 pl-4',
+			},
 			isDisabled: {
-				true: 'forced-colors:selected:bg-[GrayText] forced-colors:selected:text-[HighlightText] forced-colors:text-[GrayText]',
+				true: 'forced-colors:text-[GrayText] forced-colors:selected:bg-[GrayText] forced-colors:selected:text-[HighlightText]',
 				false: null,
 			},
 		},
 	}),
 );
 
-export type TabProps = RACTabProps & {
-	readonly hasIndicator?: boolean;
-	readonly ref?: RefObject<HTMLButtonElement>;
-};
+export type TabProps = RACTabProps;
 
-export function Tab({ hasIndicator = true, ...props }: TabProps) {
-	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
+export function Tab(props: TabProps) {
+	const { selectionIndicator } = useTabListContext();
+	const orientation = use(TabsOrientationContext);
 
 	return (
 		<RACTab
@@ -116,24 +149,22 @@ export function Tab({ hasIndicator = true, ...props }: TabProps) {
 			className={composeRenderProps(props.className, (className, renderProps) =>
 				tabStyles({
 					...renderProps,
+					orientation,
 					className: cx('href' in props && 'cursor-pointer', className),
 				}),
 			)}
+			data-slot="tab"
 		>
-			{({ isSelected }) => (
+			{(values) => (
 				<>
-					{props.children}
-					{isSelected && hasIndicator && (
-						<motion.span
+					{typeof props.children === 'function' ? props.children(values) : props.children}
+					{selectionIndicator && (
+						<RACSelectionIndicator
 							className={cx(
-								'bg-base-neutral-800 dark:bg-base-neutral-60 absolute rounded',
-								'group-orientation-horizontal/tabs:inset-x-0 group-orientation-horizontal/tabs:-bottom-[17px] group-orientation-horizontal/tabs:h-0.5 group-orientation-horizontal/tabs:w-full',
-								'group-orientation-vertical/tabs:left-0 group-orientation-vertical/tabs:h-[calc(100%-10%)] group-orientation-vertical/tabs:w-0.5 group-orientation-vertical/tabs:transform',
-								isMobile && 'group-orientation-horizontal/tabs:-bottom-[15px]',
+								'absolute rounded bg-base-neutral-800 transition-[translate,width,height] duration-200 dark:bg-base-neutral-60',
+								orientation === 'horizontal' ? 'inset-x-0 -bottom-4 h-0.5' : 'inset-y-0 -left-4 w-0.5',
 							)}
 							data-slot="selected-indicator"
-							layoutId="current-selected"
-							transition={{ type: 'spring', stiffness: 500, damping: 40 }}
 						/>
 					)}
 				</>
@@ -142,15 +173,20 @@ export function Tab({ hasIndicator = true, ...props }: TabProps) {
 	);
 }
 
-export type TabPanelProps = RACTabPanelProps & {
-	readonly ref?: RefObject<HTMLDivElement>;
-};
+export type TabPanelsProps<Type extends object> = RACTabPanelsProps<Type>;
+
+export function TabPanels<Type extends object>(props: TabPanelsProps<Type>) {
+	return <RACTabPanels {...props} />;
+}
+
+export type TabPanelProps = RACTabPanelProps;
 
 export function TabPanel(props: TabPanelProps) {
 	return (
 		<RACTabPanel
 			{...props}
 			className={composeTailwindRenderProps(props.className, 'flex-1 focus-visible:outline-hidden')}
+			data-slot="tab-panel"
 		/>
 	);
 }

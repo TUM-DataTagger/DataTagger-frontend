@@ -1,0 +1,78 @@
+diff --git a/dist/private/overlays/calculatePosition.cjs b/dist/private/overlays/calculatePosition.cjs
+index 0000000..0000001 100644
+--- a/dist/private/overlays/calculatePosition.cjs
++++ b/dist/private/overlays/calculatePosition.cjs
+@@ -356,7 +356,7 @@
+     let { top: top, left: left, width: width, height: height } = node.getBoundingClientRect();
+     // Use offsetWidth and offsetHeight if this is an HTML element, so that
+     // the size is not affected by scale transforms.
+-    if (ignoreScale && node instanceof node.ownerDocument.defaultView.HTMLElement) {
++    if (ignoreScale && node.ownerDocument.defaultView && node instanceof node.ownerDocument.defaultView.HTMLElement) {
+         width = node.offsetWidth;
+         height = node.offsetHeight;
+     }
+diff --git a/dist/private/overlays/calculatePosition.mjs b/dist/private/overlays/calculatePosition.mjs
+index 0000000..0000001 100644
+--- a/dist/private/overlays/calculatePosition.mjs
++++ b/dist/private/overlays/calculatePosition.mjs
+@@ -349,7 +349,7 @@
+     let { top: top, left: left, width: width, height: height } = node.getBoundingClientRect();
+     // Use offsetWidth and offsetHeight if this is an HTML element, so that
+     // the size is not affected by scale transforms.
+-    if (ignoreScale && node instanceof node.ownerDocument.defaultView.HTMLElement) {
++    if (ignoreScale && node.ownerDocument.defaultView && node instanceof node.ownerDocument.defaultView.HTMLElement) {
+         width = node.offsetWidth;
+         height = node.offsetHeight;
+     }
+diff --git a/dist/private/overlays/calculatePosition.js b/dist/private/overlays/calculatePosition.js
+index 0000000..0000001 100644
+--- a/dist/private/overlays/calculatePosition.js
++++ b/dist/private/overlays/calculatePosition.js
+@@ -365,7 +365,7 @@
+     let { top: top, left: left, width: width, height: height } = node.getBoundingClientRect();
+     // Use offsetWidth and offsetHeight if this is an HTML element, so that
+     // the size is not affected by scale transforms.
+-    if (ignoreScale && node instanceof node.ownerDocument.defaultView.HTMLElement) {
++    if (ignoreScale && node.ownerDocument.defaultView && node instanceof node.ownerDocument.defaultView.HTMLElement) {
+         width = node.offsetWidth;
+         height = node.offsetHeight;
+     }
+diff --git a/dist/private/utils/isFocusable.js b/dist/private/utils/isFocusable.js
+index 0000000..0000001 100644
+--- a/dist/private/utils/isFocusable.js
++++ b/dist/private/utils/isFocusable.js
+@@ -39,7 +39,7 @@
+ function $ee5e22534121197a$var$isInert(element) {
+     let node = element;
+     while(node != null){
+-        if (node instanceof node.ownerDocument.defaultView.HTMLElement && node.inert) return true;
++        if (node.ownerDocument.defaultView && node instanceof node.ownerDocument.defaultView.HTMLElement && node.inert) return true;
+         node = node.parentElement;
+     }
+     return false;
+diff --git a/dist/private/utils/isFocusable.mjs b/dist/private/utils/isFocusable.mjs
+index 0000000..0000001 100644
+--- a/dist/private/utils/isFocusable.mjs
++++ b/dist/private/utils/isFocusable.mjs
+@@ -39,7 +39,7 @@
+ function $3b8b240c1bf84ab9$var$isInert(element) {
+     let node = element;
+     while(node != null){
+-        if (node instanceof node.ownerDocument.defaultView.HTMLElement && node.inert) return true;
++        if (node.ownerDocument.defaultView && node instanceof node.ownerDocument.defaultView.HTMLElement && node.inert) return true;
+         node = node.parentElement;
+     }
+     return false;
+diff --git a/dist/private/utils/isFocusable.cjs b/dist/private/utils/isFocusable.cjs
+index 0000000..0000001 100644
+--- a/dist/private/utils/isFocusable.cjs
++++ b/dist/private/utils/isFocusable.cjs
+@@ -46,7 +46,7 @@
+ function $48f566b6becd50da$var$isInert(element) {
+     let node = element;
+     while(node != null){
+-        if (node instanceof node.ownerDocument.defaultView.HTMLElement && node.inert) return true;
++        if (node.ownerDocument.defaultView && node instanceof node.ownerDocument.defaultView.HTMLElement && node.inert) return true;
+         node = node.parentElement;
+     }
+     return false;

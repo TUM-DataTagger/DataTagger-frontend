@@ -1,7 +1,7 @@
-import { any, nonEmpty, object, pipe, string, record, nullable, exactOptional } from 'valibot';
+import { any, nonEmpty, object, pipe, string, record, nullish } from 'valibot';
 
 export const ProjectFolderDetailsSchema = object({
 	name: pipe(string('Please name this folder.'), nonEmpty('Please name this folder.')),
-	metadata_template: nullable(string()),
-	description: exactOptional(record(string(), any())),
+	metadata_template: nullish(string()),
+	description: nullish(record(string(), any())),
 });

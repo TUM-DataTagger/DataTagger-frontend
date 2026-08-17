@@ -1,6 +1,6 @@
 'use client';
 
-import { Package2Icon, FileIcon } from 'lucide-react';
+import { FileIcon, DatabaseIcon } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { GridList, GridListItem } from '@/components/ui/GridList';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
@@ -17,7 +17,7 @@ export function ProjectFoldersGrid(props: { readonly data?: ProjectFolder[] | un
 
 	return (
 		<div className="flex flex-wrap gap-6">
-			<GridList aria-label="Folders" className="layout-grid:gap-3.5" layout="grid">
+			<GridList aria-label="Folders" className="overscroll-auto layout-grid:gap-4" layout="grid">
 				<ProjectFoldersCreateGrid
 					href={`/projects/${params.projectUuid}/folders/create`}
 					projectUuid={params.projectUuid}
@@ -32,7 +32,7 @@ export function ProjectFoldersGrid(props: { readonly data?: ProjectFolder[] | un
 						key={item.pk}
 						textValue={item.name}
 					>
-						<div className="relative h-[150px] w-full min-w-64 gap-6 md:w-auto">
+						<div className="relative h-[150px] w-full min-w-64 gap-6 md:max-w-64">
 							<div className="absolute top-2 right-2">
 								<ProjectFoldersMoreMenu
 									folderName={item.name}
@@ -47,19 +47,22 @@ export function ProjectFoldersGrid(props: { readonly data?: ProjectFolder[] | un
 								})}
 							>
 								<div className="flex flex-col gap-3">
-									<span className="group-active:text-base-neutral-900 group-hover:text-base-lavender-600 group-hover:group-active:text-base-neutral-900 group-focus-visible:text-base-lavender-600 dark:group-active:text-base-neutral-40 dark:group-hover:text-base-lavender-400 dark:group-hover:group-active:text-base-neutral-40 dark:group-focus-visible:text-base-lavender-400 line-clamp-2 max-w-[25ch] break-words text-ellipsis">
+									<span
+										className="line-clamp-2 max-w-[25ch] wrap-break-word text-ellipsis group-hover:text-base-lavender-600 group-focus-visible:text-base-lavender-600 group-pressed:text-base-neutral-900 group-hover:group-pressed:text-base-neutral-900 dark:group-hover:text-base-lavender-400 dark:group-focus-visible:text-base-lavender-400 dark:group-pressed:text-base-neutral-40 dark:group-hover:group-pressed:text-base-neutral-40"
+										title={item.name}
+									>
 										{item.name}
 									</span>
 									<Tooltip delay={400}>
 										<TooltipTrigger
 											aria-label="Storage"
-											className="text-base-sm flex place-items-center gap-2 place-self-start text-neutral-500 dark:text-neutral-300 print:inline-flex"
+											className="flex place-items-center gap-2 place-self-start text-base-sm text-neutral-500 dark:text-neutral-300 print:inline-flex"
 											onPress={() => {
 												router.push(`/projects/${params.projectUuid}/folders/${item.pk}`);
 											}}
 											variant="unset"
 										>
-											<Package2Icon
+											<DatabaseIcon
 												aria-hidden
 												className="text-neutral-500 dark:text-neutral-300"
 												size={18}
@@ -72,7 +75,7 @@ export function ProjectFoldersGrid(props: { readonly data?: ProjectFolder[] | un
 								</div>
 								<span
 									aria-label="Files"
-									className="bg-base-neutral-700 text-base-sm text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900 flex place-items-center gap-1 place-self-start rounded-sm px-2 py-1"
+									className="flex place-items-center gap-1 place-self-start rounded-sm bg-base-neutral-700 px-2 py-1 text-base-sm text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900"
 								>
 									<FileIcon aria-hidden size={18} strokeWidth={1.5} /> {item.datasets_count}
 								</span>

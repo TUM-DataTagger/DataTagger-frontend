@@ -3,23 +3,81 @@
 import { useQuery } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
 import { createContext, use, useMemo } from 'react';
-import { useWebSocketConnection } from '@/hooks/useWebSocketConnection';
+import type { MessagesCollection } from '@/hooks/useWebSocketConnection';
+import { useWebSocketConnectionInternal } from '@/hooks/useWebSocketConnection';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { useEnv } from './EnvContext';
 
-type WebSocketContextType = Omit<ReturnType<typeof useWebSocketConnection>, 'reconnectAttempts'> & {
-	send: ((data: ArrayBufferLike | ArrayBufferView | Blob | string) => void) | undefined;
+type WebSocketConnectionReturn = ReturnType<typeof useWebSocketConnectionInternal>;
+
+/**
+ * Stable context for connection state (ready, error, send).
+ * This value changes infrequently and is safe for most consumers.
+ */
+type WebSocketStableContextType = {
+	readonly error: WebSocketConnectionReturn['error'];
+	readonly ready: boolean;
+	readonly send: WebSocketConnectionReturn['send'];
 };
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
+/**
+ * Separate context for messages that changes on every WebSocket message.
+ * Only components that need real-time messages should use this.
+ */
+type WebSocketMessagesContextType = {
+	readonly messages: MessagesCollection;
+};
 
-export function useWebSocket() {
-	const context = use(WebSocketContext);
+const WebSocketStableContext = createContext<WebSocketStableContextType | undefined>(undefined);
+const WebSocketMessagesContext = createContext<WebSocketMessagesContextType | undefined>(undefined);
+
+/**
+ * Hook for WebSocket connection state (ready, error, send).
+ * Use this for components that need connection status or to send messages.
+ * This hook does NOT cause re-renders when messages are received.
+ */
+export function useWebSocketConnection() {
+	const context = use(WebSocketStableContext);
 	if (!context) {
-		throw new Error('useWebSocket must be used within a WebSocketProvider');
+		throw new Error('useWebSocketConnection must be used within a WebSocketProvider');
 	}
 
 	return context;
+}
+
+/**
+ * Hook for WebSocket messages.
+ * Use this only when you need real-time message updates.
+ * WARNING: This will cause re-renders on every WebSocket message received.
+ */
+export function useWebSocketMessages() {
+	const context = use(WebSocketMessagesContext);
+	if (!context) {
+		throw new Error('useWebSocketMessages must be used within a WebSocketProvider');
+	}
+
+	return context.messages;
+}
+
+/**
+ * Combined hook for components that need both connection state AND messages.
+ * Prefer using useWebSocketConnection() when you don't need messages,
+ * or useWebSocketMessages() when you only need messages.
+ */
+export function useWebSocket() {
+	const stable = use(WebSocketStableContext);
+	const messagesCtx = use(WebSocketMessagesContext);
+
+	if (!stable || !messagesCtx) {
+		throw new Error('useWebSocket must be used within a WebSocketProvider');
+	}
+
+	return {
+		ready: stable.ready,
+		error: stable.error,
+		send: stable.send,
+		messages: messagesCtx.messages,
+	};
 }
 
 export function WebSocketProvider({ children }: PropsWithChildren) {
@@ -34,12 +92,20 @@ export function WebSocketProvider({ children }: PropsWithChildren) {
 		},
 	});
 
-	const { ready, messages, error, send } = useWebSocketConnection({
+	const { ready, messages, error, send } = useWebSocketConnectionInternal({
 		url: env.BASE_WS_URL,
 		token: authJwtCookieData?.token,
 	});
 
-	const value = useMemo(() => ({ ready, messages, error, send }), [ready, messages, error, send]);
+	// Stable context value - only changes when connection state changes
+	const stableValue = useMemo<WebSocketStableContextType>(() => ({ ready, error, send }), [ready, error, send]);
 
-	return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
+	// Messages context value - changes on every message
+	const messagesValue = useMemo<WebSocketMessagesContextType>(() => ({ messages }), [messages]);
+
+	return (
+		<WebSocketStableContext.Provider value={stableValue}>
+			<WebSocketMessagesContext.Provider value={messagesValue}>{children}</WebSocketMessagesContext.Provider>
+		</WebSocketStableContext.Provider>
+	);
 }

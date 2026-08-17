@@ -6,6 +6,7 @@ import type { PropsWithChildren } from 'react';
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/Button';
 import { openAPIClient } from '@/util/clientFetch';
+import { logger, LogCategory } from '@/util/logger';
 import { emailAtom } from '../Email';
 
 export function ResendEmail(props: PropsWithChildren) {
@@ -22,7 +23,9 @@ export function ResendEmail(props: PropsWithChildren) {
 				body: { email: userEmail },
 			});
 		} catch (error) {
-			console.error(error);
+			logger.error(LogCategory.Auth, 'Resend email failed', {
+				error: error instanceof Error ? error.message : String(error),
+			});
 		} finally {
 			// eslint-disable-next-line require-atomic-updates
 			timeoutRef.current = setTimeout(() => setIsLoading(false), 2_000);
@@ -31,7 +34,7 @@ export function ResendEmail(props: PropsWithChildren) {
 
 	return (
 		<Button
-			className="text-base-lavender-500 p-0"
+			className="p-0 text-base-lavender-500"
 			isDisabled={isLoading}
 			onPress={async () => onPress()}
 			variant="unset"

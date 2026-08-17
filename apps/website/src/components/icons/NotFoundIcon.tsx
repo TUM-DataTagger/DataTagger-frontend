@@ -1,7 +1,7 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import type { SVGProps } from 'react';
 import { useHover } from 'react-aria';
 import { NotFound, NotFoundDark, NotFoundDarkHover, NotFoundHover } from './NotFound';

@@ -1,35 +1,37 @@
 'use client';
 
-import { FileDownIcon, /* FolderArchiveIcon, */ MoreVerticalIcon, Share2Icon, SplitIcon } from 'lucide-react';
+import { FileDownIcon, FolderArchiveIcon, MoreVerticalIcon, Share2Icon, SplitIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useCopyToClipboard, useMediaQuery } from 'usehooks-ts';
+import { ExportJobDialog } from '@/components/ExportJobDialog';
+import { FileDownloadDialog } from '@/components/File';
 import { Drawer, DrawerBody, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
 import { dropdownItemStyles } from '@/components/ui/Dropdown';
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';
 import { Separator } from '@/components/ui/Separator';
 import { globalToastQueue, ToastType } from '@/components/ui/Toast';
-import { useEnv } from '@/contexts/EnvContext';
 import { cx } from '@/styles/cva';
-// import { ProjectFolderFilesMoreMenuExportDialog } from './ProjectFolderFilesMoreMenuExportDialog';
+import { EXPORT_TYPES } from '@/util/exportJobs';
 
 export function ProjectFolderFilesMoreMenu({
 	projectUuid,
 	folderUuid,
 	fileUuid,
 	versionUuid,
-	// filename,
+	filename,
 	...props
 }: {
 	readonly className?: string;
 	readonly fileUuid: string;
-	// readonly filename: string | null | undefined;
+	readonly filename?: string | null | undefined;
 	readonly folderUuid: string;
 	readonly projectUuid: string;
 	readonly versionUuid: string | undefined;
 }) {
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
-	const env = useEnv();
-	// const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 	const [_, copy] = useCopyToClipboard();
 
 	const copyToClipboard = async () => {
@@ -38,6 +40,14 @@ export function ProjectFolderFilesMoreMenu({
 			{ message: 'Link has been copied to clipboard.', type: ToastType.TextOnly },
 			{ timeout: 2_500 },
 		);
+	};
+
+	const handleOpenDownload = () => {
+		if (!versionUuid) {
+			return;
+		}
+
+		setIsDownloadOpen(true);
 	};
 
 	return (
@@ -61,6 +71,7 @@ export function ProjectFolderFilesMoreMenu({
 								<DrawerClose
 									aria-label="Share detail link"
 									className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+									id="share"
 									onPress={async () => {
 										await navigator.clipboard.writeText(`${window.location.href}/files/${fileUuid}`);
 									}}
@@ -69,23 +80,24 @@ export function ProjectFolderFilesMoreMenu({
 									<Share2Icon aria-hidden size={18} strokeWidth={1.5} /> Share detail link
 								</DrawerClose>
 								<Separator />
-								<a
-									className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
-									href={`${env.BASE_API_URL}/api/v1/uploads-version/${versionUuid}/download/?as_attachment=true`}
-									rel="noreferrer noopener external"
-									target="_blank"
+								<DrawerClose
+									aria-label="Download"
+									className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+									id="download"
+									onPress={handleOpenDownload}
+									variant="unset"
 								>
 									<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
-								</a>
-								{/* <DrawerClose
-								aria-label="Export (zip)"
-								className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
-								id="export"
-								onPress={() => setIsExportOpen(true)}
-								variant="unstyled"
-							>
-								<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-							</DrawerClose> */}
+								</DrawerClose>
+								<DrawerClose
+									aria-label="Export (zip)"
+									className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+									id="export"
+									onPress={() => setIsExportOpen(true)}
+									variant="unset"
+								>
+									<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
+								</DrawerClose>
 							</DrawerBody>
 						</DrawerContent>
 					</Drawer>
@@ -95,7 +107,7 @@ export function ProjectFolderFilesMoreMenu({
 					<MenuTrigger
 						aria-label="More menu"
 						className={cx(
-							'pressed:outline-2 pressed:outline-offset-2 pressed:outline-base-lavender-400 dark:pressed:outline-base-lavender-600 hidden md:flex',
+							'hidden md:flex pressed:outline-2 pressed:outline-offset-2 pressed:outline-base-lavender-400 dark:pressed:outline-base-lavender-600',
 							props.className,
 						)}
 						size="icon-sm"
@@ -103,7 +115,7 @@ export function ProjectFolderFilesMoreMenu({
 					>
 						<MoreVerticalIcon aria-hidden size={18} strokeWidth={1.5} />
 					</MenuTrigger>
-					<MenuContent placement="bottom">
+					<MenuContent placement="bottom" popover={{ arrow: false }}>
 						<MenuItem
 							aria-label="Open in new tab"
 							href={`/projects/${projectUuid}/folders/${folderUuid}/files/${fileUuid}`}
@@ -115,25 +127,34 @@ export function ProjectFolderFilesMoreMenu({
 							<Share2Icon aria-hidden size={18} strokeWidth={1.5} /> Share detail link
 						</MenuItem>
 						<MenuSeparator />
-						<MenuItem
-							href={`${env.BASE_API_URL}/api/v1/uploads-version/${versionUuid}/download/?as_attachment=true`}
-							rel="noreferrer noopener external"
-							target="_blank"
-						>
+						<MenuItem aria-label="Download" id="download" onAction={handleOpenDownload}>
 							<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
 						</MenuItem>
-						{/* <MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
-						<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-					</MenuItem> */}
+						<MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
+							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
+						</MenuItem>
 					</MenuContent>
 				</Menu>
 			)}
-			{/* <ProjectFolderFilesMoreMenuExportDialog
-				filename={filename ?? ''}
+			<ExportJobDialog
+				description={
+					<>
+						Export available data from <span className="text-base-label-md">{filename ?? 'this dataset'}</span> to a zip
+						file.
+					</>
+				}
+				exportType={EXPORT_TYPES.UploadsDataset}
 				isOpen={isExportOpen}
 				onOpenChange={setIsExportOpen}
+				title="Export dataset"
+				uuids={[fileUuid]}
+			/>
+			<FileDownloadDialog
+				filename={filename ?? 'file'}
+				isOpen={isDownloadOpen}
+				onOpenChange={setIsDownloadOpen}
 				versionUuid={versionUuid ?? ''}
-			/> */}
+			/>
 		</>
 	);
 }

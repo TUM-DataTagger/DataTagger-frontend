@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { buttonStyles } from '@/styles/ui/button';
+import { withSafeRedirectQuery } from '@/util/authRedirect';
+import { redirectAuthenticatedUserFromAuthRoute } from '@/util/serverAuth';
 import { Email } from '../Email';
 import { ResendEmail } from './ResendEmail';
 
@@ -9,7 +11,12 @@ export const metadata: Metadata = {
 	description: 'Recover the password to your account',
 };
 
-export default async function Page() {
+export default async function Page({ searchParams }: { readonly searchParams: Promise<{ readonly next?: string }> }) {
+	await redirectAuthenticatedUserFromAuthRoute();
+
+	const { next } = await searchParams;
+	const loginHref = withSafeRedirectQuery('/login', next);
+
 	return (
 		<div className="mx-auto flex w-full max-w-xl grow flex-col gap-4 px-4 pt-48 pb-4">
 			<div className="mb-8 flex flex-col gap-2">
@@ -21,7 +28,7 @@ export default async function Page() {
 			<p className="text-base-md">
 				Didn't receive an email? Check your spam folder or <ResendEmail>send email again</ResendEmail>.
 			</p>
-			<Link className={buttonStyles()} href="/login">
+			<Link className={buttonStyles()} href={loginHref}>
 				Return to Login
 			</Link>
 		</div>

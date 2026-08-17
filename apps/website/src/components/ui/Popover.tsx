@@ -1,25 +1,18 @@
 'use client';
 
-import type { CSSProperties, ReactNode } from 'react';
+import type { Ref } from 'react';
 import type {
-	DialogProps as RACDialogProps,
 	PopoverProps as RACPopoverProps,
-	ModalOverlayProps as RACModalOverlayProps,
 	DialogTriggerProps as RACDialogTriggerProps,
 } from 'react-aria-components';
 import {
-	Modal as RACModal,
-	ModalOverlay as RACModalOverlay,
 	OverlayArrow as RACOverlayArrow,
-	PopoverContext as RACPopoverContext,
 	DialogTrigger as RACDialogTrigger,
 	Popover as RACPopover,
 	composeRenderProps,
-	useSlottedContext,
 } from 'react-aria-components';
-import { useMediaQuery } from 'usehooks-ts';
 import type { DialogBodyProps, DialogFooterProps, DialogHeaderProps, DialogTitleProps } from '@/components/ui/Dialog';
-import { Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
+import { DialogBody, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { cva, cx } from '@/styles/cva';
 
 export function Popover(props: RACDialogTriggerProps) {
@@ -39,86 +32,35 @@ export function PopoverBody(props: DialogBodyProps) {
 }
 
 export function PopoverFooter(props: DialogFooterProps) {
-	return <DialogFooter {...props} className={cx('sm:p-4', props.className)} />;
+	return (
+		<DialogFooter
+			{...props}
+			className={cx('place-content-start has-[button]:place-content-end sm:p-4', props.className)}
+		/>
+	);
 }
 
 const contentStyles = cva({
-	base: 'peer/popover-content border-base-neutral-200 dark:border-base-neutral-600 shadow-base-sm bg-base-neutral-0 dark:bg-base-neutral-800 text-base-md max-w-xs rounded-sm border bg-clip-padding [scrollbar-width:thin] sm:max-w-3xl dark:backdrop-saturate-200 forced-colors:bg-[Canvas]',
+	base: 'group/popover max-w-xs min-w-(--trigger-width) origin-(--trigger-anchor-point) [scrollbar-width:thin] rounded-sm border border-base-neutral-200 bg-base-neutral-0 text-base-md shadow-base-sm transition-transform [--visual-viewport-vertical-padding:16px] sm:[--visual-viewport-vertical-padding:32px] dark:border-base-neutral-600 dark:bg-base-neutral-800 forced-colors:bg-[Canvas]',
 	variants: {
-		isPicker: {
-			true: 'min-w-(--trigger-width)',
-			false: 'min-w-80',
-		},
-		isMenu: {
-			true: '',
-		},
 		isEntering: {
-			true: 'fade-in animate-in placement-left:slide-in-from-right-1 placement-right:slide-in-from-left-1 placement-top:slide-in-from-bottom-1 placement-bottom:slide-in-from-top-1 duration-150 ease-out',
+			true: 'animate-in duration-150 ease-out fade-in placement-left:slide-in-from-right-1 placement-right:slide-in-from-left-1 placement-top:slide-in-from-bottom-1 placement-bottom:slide-in-from-top-1',
 		},
 		isExiting: {
-			true: 'fade-out animate-out placement-left:slide-out-to-right-1 placement-right:slide-out-to-left-1 placement-top:slide-out-to-bottom-1 placement-bottom:slide-out-to-top-1 duration-100 ease-in',
+			true: 'animate-out duration-100 ease-in fade-out placement-left:slide-out-to-right-1 placement-right:slide-out-to-left-1 placement-top:slide-out-to-bottom-1 placement-bottom:slide-out-to-top-1',
 		},
 	},
 });
 
-const drawerStyles = cva({
-	base: 'fixed top-auto bottom-0 z-50 max-h-full w-full max-w-2xl border border-b-transparent bg-neutral-100 outline-hidden dark:bg-neutral-900',
-	variants: {
-		isMenu: {
-			true: 'p-0 [&_[role=dialog]]:*:not-has-[[data-slot=dialog-body]]:px-1',
-			false: '',
-		},
-		isEntering: {
-			true: [
-				'[will-change:transform] [transition:transform_0.5s_cubic-bezier(0.32,_0.72,_0,_1)]',
-				'fade-in-0 slide-in-from-bottom-56 animate-in duration-200',
-				'[transition:translate3d(0,_100%,_0)]',
-				'sm:slide-in-from-bottom-auto sm:slide-in-from-top-[20%]',
-			],
-		},
-		isExiting: {
-			true: 'slide-out-to-bottom-56 animate-out duration-200 ease-in',
-		},
-	},
-});
+export type PopoverContentProps = RACPopoverProps & {
+	readonly arrow?: boolean;
+	readonly ref?: Ref<HTMLDivElement> | undefined;
+};
 
-export type PopoverContentProps = Omit<RACModalOverlayProps, 'className'> &
-	Omit<RACPopoverProps, 'children' | 'className'> &
-	Pick<RACDialogProps, 'aria-label' | 'aria-labelledby'> & {
-		readonly children: ReactNode;
-		readonly className?: string | ((values: { defaultClassName?: string }) => string);
-		readonly respectScreen?: boolean;
-		readonly showArrow?: boolean;
-		readonly style?: CSSProperties;
-	};
+export function PopoverContent({ arrow = true, ...props }: PopoverContentProps) {
+	const offset = props.offset ?? (arrow ? 12 : 8);
 
-export function PopoverContent({ respectScreen = true, showArrow = true, ...props }: PopoverContentProps) {
-	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
-	const popoverContext = useSlottedContext(RACPopoverContext);
-	const isMenuTrigger = popoverContext?.trigger === 'MenuTrigger';
-	const isSubmenuTrigger = popoverContext?.trigger === 'SubmenuTrigger';
-	const isMenu = isMenuTrigger || isSubmenuTrigger;
-	const isComboBoxTrigger = popoverContext?.trigger === 'ComboBox';
-	const offset = props.offset ?? (showArrow ? 6 : 4);
-	const effectiveOffset = isSubmenuTrigger ? offset - 2 : offset;
-
-	return isMobile && respectScreen ? (
-		<RACModalOverlay
-			{...props}
-			className="fixed top-0 left-0 isolate z-50 h-(--visual-viewport-height) w-full [--visual-viewport-vertical-padding:16px]"
-			isDismissable
-		>
-			<RACModal
-				className={composeRenderProps(props.className as string, (className, renderProps) =>
-					drawerStyles({ ...renderProps, isMenu, className }),
-				)}
-			>
-				<Dialog aria-label={props['aria-label'] ?? 'List item'} role="dialog">
-					{props.children}
-				</Dialog>
-			</RACModal>
-		</RACModalOverlay>
-	) : (
+	return (
 		<RACPopover
 			{...props}
 			className={composeRenderProps(props.className as string, (className, renderProps) =>
@@ -127,26 +69,27 @@ export function PopoverContent({ respectScreen = true, showArrow = true, ...prop
 					className,
 				}),
 			)}
-			offset={effectiveOffset}
+			ref={props.ref}
+			offset={offset}
 		>
-			{showArrow && (
-				<RACOverlayArrow className="group">
-					<svg
-						className="fill-base-neutral-0 dark:fill-base-neutral-800 stroke-base-neutral-200 dark:stroke-base-neutral-600 group-placement-bottom:rotate-180 group-placement-left:-rotate-90 group-placement-right:rotate-90 block forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
-						height={12}
-						viewBox="0 0 12 12"
-						width={12}
-					>
-						<path d="M0 0 L6 6 L12 0" />
-					</svg>
-				</RACOverlayArrow>
-			)}
-			{isComboBoxTrigger ? (
-				props.children
-			) : (
-				<Dialog aria-label={props['aria-label'] ?? 'List item'} role="dialog">
-					{props.children}
-				</Dialog>
+			{(values) => (
+				<>
+					{arrow && (
+						<RACOverlayArrow className="group">
+							<svg
+								className="fill-overlay stroke-border block fill-base-neutral-0 stroke-base-neutral-200 group-placement-left:-rotate-90 group-placement-right:rotate-90 group-placement-bottom:rotate-180 dark:fill-base-neutral-800 dark:stroke-base-neutral-600 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
+								height={12}
+								viewBox="0 0 12 12"
+								width={12}
+							>
+								<path d="M0 0 L6 6 L12 0" />
+							</svg>
+						</RACOverlayArrow>
+					)}
+					<div className="max-h-[inherit] overflow-y-auto" data-slot="popover-inner">
+						{typeof props.children === 'function' ? props.children(values) : props.children}
+					</div>
+				</>
 			)}
 		</RACPopover>
 	);

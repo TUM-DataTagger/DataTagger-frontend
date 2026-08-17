@@ -2,14 +2,13 @@
 
 import type { VariantProps } from 'cva';
 import { CheckIcon, ChevronRightIcon } from 'lucide-react';
-import { createContext, use, type ComponentProps, type Ref } from 'react';
+import type { ComponentProps } from 'react';
 import type {
 	MenuItemProps as RACMenuItemProps,
 	MenuProps as RACMenuProps,
 	MenuSectionProps as RACMenuSectionProps,
 	MenuTriggerProps as RACMenuTriggerProps,
 	SubmenuTriggerProps as RACSubmenuTriggerProps,
-	PopoverProps as RACPopoverProps,
 } from 'react-aria-components';
 import {
 	Collection as RACCollection,
@@ -21,28 +20,14 @@ import {
 	SubmenuTrigger as RACSubmenuTrigger,
 	composeRenderProps,
 } from 'react-aria-components';
-import { Button } from '@/components/ui/Button';
+import { Button, type ButtonProps } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { dropdownItemStyles } from '@/components/ui/Dropdown';
-import { PopoverContent } from '@/components/ui/Popover';
+import { PopoverContent, type PopoverContentProps } from '@/components/ui/Popover';
 import { cx } from '@/styles/cva';
 
-type MenuContextProps = {
-	readonly respectScreen: boolean;
-};
-
-const MenuContext = createContext<MenuContextProps>({ respectScreen: true });
-
-type MenuProps = RACMenuTriggerProps & {
-	readonly respectScreen?: boolean;
-};
-
-export function Menu({ respectScreen = true, ...props }: MenuProps) {
-	return (
-		<MenuContext value={{ respectScreen }}>
-			<RACMenuTrigger {...props}>{props.children}</RACMenuTrigger>
-		</MenuContext>
-	);
+export function Menu(props: RACMenuTriggerProps) {
+	return <RACMenuTrigger {...props} />;
 }
 
 export function MenuSubMenu({ delay = 0, ...props }: RACSubmenuTriggerProps) {
@@ -53,59 +38,44 @@ export function MenuSubMenu({ delay = 0, ...props }: RACSubmenuTriggerProps) {
 	);
 }
 
-type MenuTriggerProps = ComponentProps<typeof Button> & {
-	readonly className?: string;
-	readonly ref?: Ref<HTMLButtonElement>;
-};
+type MenuTriggerProps = ButtonProps;
 
 export function MenuTrigger(props: MenuTriggerProps) {
 	return <Button {...props} className={cx('relative', props.className)} data-slot="menu-trigger" />;
 }
 
-type MenuContentProps<Type> = Pick<
-	RACPopoverProps,
-	| 'arrowBoundaryOffset'
-	| 'crossOffset'
-	| 'isOpen'
-	| 'offset'
-	| 'onOpenChange'
-	| 'placement'
-	| 'shouldFlip'
-	| 'triggerRef'
-> &
+type MenuContentProps<Type> = Pick<PopoverContentProps, 'placement'> &
 	RACMenuProps<Type> & {
 		readonly className?: string;
-		readonly classNames?: {
-			readonly popover?: RACPopoverProps['className'];
-		};
-		readonly respectScreen?: boolean;
-		readonly showArrow?: boolean;
+		readonly popover?: Pick<
+			PopoverContentProps,
+			| 'arrow'
+			| 'arrowBoundaryOffset'
+			| 'className'
+			| 'crossOffset'
+			| 'isOpen'
+			| 'offset'
+			| 'onOpenChange'
+			| 'placement'
+			| 'shouldFlip'
+			| 'triggerRef'
+		>;
 	};
 
-export function MenuContent<Type extends object>({ showArrow = false, ...props }: MenuContentProps<Type>) {
-	const { respectScreen: respectScreenContext } = use(MenuContext);
-	const respectScreen = props.respectScreen ?? respectScreenContext;
-
+export function MenuContent<Type extends object>({ popover, ...props }: MenuContentProps<Type>) {
 	return (
 		<PopoverContent
-			arrowBoundaryOffset={props.arrowBoundaryOffset!}
-			className={cx('z-50 min-w-(--trigger-width) p-0 shadow-xs outline-hidden', props.classNames?.popover)}
-			crossOffset={props.crossOffset!}
-			isOpen={props.isOpen!}
-			offset={props.offset!}
-			onOpenChange={props.onOpenChange!}
-			placement={props.placement!}
-			respectScreen={respectScreen}
-			shouldFlip={props.shouldFlip!}
-			showArrow={showArrow}
-			triggerRef={props.triggerRef!}
+			{...popover}
+			className={cx('min-w-(--trigger-width) *:data-[slot=popover-inner]:overflow-hidden', popover?.className)}
+			placement={props.placement ?? 'bottom'}
 		>
 			<RACMenu
 				{...props}
 				className={cx(
-					'grid max-h-[calc(var(--visual-viewport-height)-10rem)] grid-cols-[auto_1fr] gap-x-2 overflow-auto p-2 outline-hidden sm:max-h-[inherit] *:[[role="group"]+[role="group"]]:mt-4 *:[[role="group"]+[role="separator"]]:mt-1',
+					"grid max-h-[inherit] grid-cols-[auto_1fr] gap-x-2 overflow-x-hidden overflow-y-auto overscroll-contain p-2 outline-hidden *:[[role='group']+[role='group']]:mt-2 *:[[role='group']+[role='separator']]:mt-1",
 					props.className,
 				)}
+				data-slot="menu-content"
 			/>
 		</PopoverContent>
 	);
@@ -116,9 +86,10 @@ export function StandaloneMenuContent<Type extends object>(props: RACMenuProps<T
 		<RACMenu
 			{...props}
 			className={cx(
-				'grid max-h-[calc(var(--visual-viewport-height)-10rem)] grid-cols-[auto_1fr] gap-x-2 overflow-auto p-2 outline-hidden sm:max-h-[inherit] *:[[role="group"]+[role="group"]]:mt-4 *:[[role="group"]+[role="separator"]]:mt-1',
+				"grid max-h-[inherit] grid-cols-[auto_1fr] gap-x-2 overflow-x-hidden overflow-y-auto overscroll-contain p-2 outline-hidden *:[[role='group']+[role='group']]:mt-2 *:[[role='group']+[role='separator']]:mt-1",
 				props.className,
 			)}
+			data-slot="menu-content"
 		/>
 	);
 }
@@ -148,6 +119,7 @@ export function MenuItem({ isDestructive = false, ...props }: MenuItemProps) {
 				}),
 			)}
 			data-destructive={isDestructive ? 'true' : undefined}
+			data-slot="menu-item"
 			textValue={textValue!}
 		>
 			{(values) => (
@@ -162,12 +134,12 @@ export function MenuItem({ isDestructive = false, ...props }: MenuItemProps) {
 						<>
 							{values.selectionMode === 'single' && (
 								<div
-									className="bg-base-lavender-600 dark:bg-base-lavender-400 flex size-[18px] place-content-center place-items-center place-self-end self-center rounded-full"
+									className="flex size-4.5 place-content-center place-items-center place-self-end self-center rounded-full bg-base-lavender-600 dark:bg-base-lavender-400"
 									data-slot="checked-icon"
 								>
 									<CheckIcon
 										aria-hidden
-										className="text-base-neutral-40 dark:text-base-neutral-900 size-3.5 shrink-0"
+										className="size-3.5 shrink-0 text-base-neutral-40 dark:text-base-neutral-900"
 									/>
 								</div>
 							)}
@@ -175,7 +147,7 @@ export function MenuItem({ isDestructive = false, ...props }: MenuItemProps) {
 					)}
 
 					{values.hasSubmenu && (
-						<ChevronRightIcon aria-hidden className="absolute right-2 size-3.5" data-slot="chevron" />
+						<ChevronRightIcon aria-hidden className="absolute right-2 size-4" data-slot="chevron" />
 					)}
 				</>
 			)}
@@ -192,8 +164,8 @@ export function MenuHeader({ className, separator = false, ...props }: MenuHeade
 		<RACHeader
 			{...props}
 			className={cx(
-				'text-base-label-sm col-span-full px-2.5 py-2',
-				separator && '-mx-1 mb-1 border-b sm:px-3 sm:pb-[0.625rem]',
+				'col-span-full bg-base-neutral-40 p-4 dark:bg-base-neutral-700/40',
+				separator && '-mx-2 border-b border-base-neutral-100 dark:border-base-neutral-700',
 				className,
 			)}
 		/>
@@ -201,14 +173,17 @@ export function MenuHeader({ className, separator = false, ...props }: MenuHeade
 }
 
 type MenuSectionProps<Type> = RACMenuSectionProps<Type> & {
-	readonly ref?: Ref<HTMLDivElement>;
-	readonly title?: string;
+	readonly label?: string;
 };
 
 export function MenuSection<Type extends object>(props: MenuSectionProps<Type>) {
 	return (
-		<RACMenuSection {...props} className={cx('col-span-full grid grid-cols-[auto_1fr]', props.className)}>
-			{props.title && <RACHeader className="text-base-label-sm col-span-full px-2.5 py-1">{props.title}</RACHeader>}
+		<RACMenuSection
+			{...props}
+			className={cx('col-span-full grid grid-cols-[auto_1fr]', props.className)}
+			data-slot="menu-section"
+		>
+			{props.label && <RACHeader className="col-span-full px-2.5 py-1 text-base-label-sm">{props.label}</RACHeader>}
 			<RACCollection items={props.items!}>{props.children}</RACCollection>
 		</RACMenuSection>
 	);
@@ -216,7 +191,7 @@ export function MenuSection<Type extends object>(props: MenuSectionProps<Type>) 
 
 export {
 	DropdownSeparator as MenuSeparator,
-	DropdownDescription as MenuItemDescription,
-	DropdownKeyboard as MenuItemKeyboard,
-	DropdownLabel as MenuItemLabel,
+	DropdownDescription as MenuDescription,
+	DropdownKeyboard as MenuShortcut,
+	DropdownLabel as MenuLabel,
 } from '@/components/ui/Dropdown';

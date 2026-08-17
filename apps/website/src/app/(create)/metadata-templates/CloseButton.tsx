@@ -14,7 +14,7 @@ export function CloseButton() {
 	return (
 		<Button
 			aria-label="Close"
-			className="close dark:text-base-neutral-500 dark:hover:text-base-neutral-700 dark:focus-visible:text-base-neutral-700 dark:pressed:text-base-neutral-900 text-base-neutral-400 hover:text-base-neutral-200 focus-visible:text-base-neutral-200 pressed:text-base-neutral-500 dark:disabled:text-base-neutral-300 disabled:text-base-neutral-300"
+			className="close text-base-neutral-400 hover:text-base-neutral-200 focus-visible:text-base-neutral-200 disabled:text-base-neutral-300 dark:text-base-neutral-500 dark:hover:text-base-neutral-700 dark:focus-visible:text-base-neutral-700 dark:disabled:text-base-neutral-300 pressed:text-base-neutral-500 dark:pressed:text-base-neutral-900"
 			onPress={async () => onPress()}
 			size="icon-xs"
 			slot="close"

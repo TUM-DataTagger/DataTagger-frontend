@@ -1,44 +1,48 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { PropsWithChildren } from 'react';
-import { SideSheet } from '@/components/SideSheet';
+import { SideSheetNoSSR } from '@/components/SideSheet';
 import { TestEnvironmentBannerNoSSR } from '@/components/TestEnvironmentBanner';
 import {
 	SidebarInset,
 	// SidebarInsetAnchor,
 } from '@/components/ui/Sidebar';
 import { GlobalToastRegion } from '@/components/ui/Toast';
-import { GlobalUploadAssistant } from '@/components/upload-assistant/GlobalUploadAssistant';
+import { GlobalUploadAssistantNoSSR } from '@/components/upload-assistant/GlobalUploadAssistant';
 import { ENV } from '@/util/env';
-import { $api } from '@/util/fetch';
+import { $api, openAPIClient } from '@/util/fetch';
 import { getQueryClient } from '@/util/getQueryClient';
-import { CmdK } from '../CmdK';
+import { notificationBannerQueryOptions } from '@/util/notificationBanner';
+import { requireCurrentUserOrRedirect } from '@/util/serverAuth';
 import { Navigation } from '../Navigation';
 import { GlobalDropZone } from './GlobalDropZone';
+import { MainNotificationBanner } from './MainNotificationBanner';
 import { Providers } from './providers';
 
 export default async function Layout({ children }: PropsWithChildren) {
 	const queryClient = getQueryClient();
+	const currentUserData = await requireCurrentUserOrRedirect();
 
-	await queryClient.prefetchQuery($api.queryOptions('get', '/api/v1/user/me/'));
+	queryClient.setQueryData($api.queryOptions('get', '/api/v1/user/me/').queryKey, currentUserData);
+	await queryClient.prefetchQuery(notificationBannerQueryOptions(openAPIClient));
 
 	return (
 		<Providers env={ENV}>
 			<HydrationBoundary state={dehydrate(queryClient)}>
 				{/* <SidebarInsetAnchor intent="inset" side="right" /> */}
 				<SidebarInset>
-					<div className="bg-base-neutral-0 dark:bg-base-neutral-800 flex grow flex-col">
-						<div className="sticky top-0 z-10">
+					<div className="flex grow flex-col bg-base-neutral-0 dark:bg-base-neutral-800">
+						<div className="sticky top-0 z-20">
 							<TestEnvironmentBannerNoSSR />
 							<Navigation />
 						</div>
+						<MainNotificationBanner />
 						{children}
 					</div>
-					<GlobalUploadAssistant />
+					<GlobalUploadAssistantNoSSR />
 					<GlobalDropZone />
 					<GlobalToastRegion />
-					<CmdK />
 				</SidebarInset>
-				<SideSheet />
+				<SideSheetNoSSR />
 			</HydrationBoundary>
 		</Providers>
 	);

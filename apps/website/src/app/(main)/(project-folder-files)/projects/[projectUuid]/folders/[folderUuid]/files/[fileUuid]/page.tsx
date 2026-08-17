@@ -1,5 +1,4 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { FileIcon } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import {
 	FileCreationDates,
@@ -7,11 +6,12 @@ import {
 	FileInformation,
 	FileLockAlert,
 	FileMetadata,
+	FileMetadataTemplate,
 	FileThumbnail,
 	FileUpdate,
 } from '@/components/File';
+import { FileVersionHistoryCheck } from '@/components/FileVersionHistory';
 import { ShareButton } from '@/components/ShareButton';
-import { VersionHistoryCheck } from '@/components/VersionHistory';
 import { Separator } from '@/components/ui/Separator';
 import { $api, openAPIClient } from '@/util/fetch';
 import { getQueryClient } from '@/util/getQueryClient';
@@ -37,37 +37,54 @@ export default async function Page({
 
 	const queryClient = getQueryClient();
 
-	await Promise.all(
-		[
-			queryClient.prefetchQuery(
-				$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/status/', {
-					params: { path: { id: fileUuid } },
-				}),
-			),
-			queryClient.prefetchQuery(
-				$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/', {
-					params: { path: { id: fileUuid } },
-				}),
-			),
-			queryClient.prefetchQuery(
-				$api.queryOptions('get', '/api/v1/uploads-version/{id}/', {
-					params: { path: { id: datasetData.latest_version.pk } },
-				}),
-			),
-			queryClient.prefetchQuery(
-				$api.queryOptions('get', '/api/v1/folder/{id}/', {
-					params: { path: { id: folderUuid } },
-				}),
-			),
-			currentUserData
-				? queryClient.prefetchQuery(
-						$api.queryOptions('get', '/api/v1/folder-permission/', {
-							params: { query: { folder: folderUuid, project_membership__member: currentUserData.pk } },
-						}),
-					)
-				: null,
-		].filter(Boolean),
+	queryClient.setQueryData(
+		$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/', {
+			params: { path: { id: fileUuid } },
+		}).queryKey,
+		datasetData,
 	);
+
+	await Promise.all([
+		queryClient.prefetchQuery(
+			$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/status/', {
+				params: { path: { id: fileUuid } },
+			}),
+		),
+		queryClient.prefetchQuery(
+			$api.queryOptions('get', '/api/v1/uploads-version/{id}/', {
+				params: { path: { id: datasetData.latest_version.pk } },
+			}),
+		),
+		queryClient.prefetchQuery(
+			$api.queryOptions('get', '/api/v1/project/{id}/', {
+				params: { path: { id: projectUuid } },
+			}),
+		),
+		queryClient.prefetchQuery(
+			$api.queryOptions('get', '/api/v1/folder/{id}/', {
+				params: { path: { id: folderUuid } },
+			}),
+		),
+		queryClient.prefetchQuery(
+			$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/metadata-template-container-pool/', {
+				params: { path: { id: fileUuid } },
+			}),
+		),
+		currentUserData
+			? queryClient.prefetchQuery(
+					$api.queryOptions('get', '/api/v1/project-membership/', {
+						params: { query: { member: currentUserData.pk, project: projectUuid } },
+					}),
+				)
+			: Promise.resolve(),
+		currentUserData
+			? queryClient.prefetchQuery(
+					$api.queryOptions('get', '/api/v1/folder-permission/', {
+						params: { query: { folder: folderUuid, project_membership__member: currentUserData.pk } },
+					}),
+				)
+			: Promise.resolve(),
+	]);
 
 	return (
 		<div className="flex flex-col-reverse place-content-center gap-6 2xl:flex-row">
@@ -82,8 +99,7 @@ export default async function Page({
 						</div>
 					</div>
 
-					<div className="flex place-items-center gap-3 2xl:col-span-1 2xl:col-start-2">
-						<FileIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
+					<div className="flex flex-col gap-3 2xl:col-span-1 2xl:col-start-2">
 						<FileHeading fileUuid={fileUuid} />
 					</div>
 
@@ -102,12 +118,15 @@ export default async function Page({
 							<div className="flex flex-col gap-6">
 								<FileCreationDates fileUuid={fileUuid} />
 							</div>
-							<Separator className="md:hidden print:hidden" />
+							<div className="flex flex-col gap-6">
+								<FileMetadataTemplate fileUuid={fileUuid} folderUuid={folderUuid} projectUuid={projectUuid} />
+							</div>
+							<Separator className="2xl:hidden print:hidden" />
 						</div>
 					</div>
 				</div>
 			</HydrationBoundary>
-			<VersionHistoryCheck />
+			<FileVersionHistoryCheck />
 		</div>
 	);
 }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { /* FolderArchiveIcon, */ MoreVerticalIcon, Share2Icon, SplitIcon, TrashIcon } from 'lucide-react';
+import { FolderArchiveIcon, MoreVerticalIcon, Share2Icon, SplitIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCopyToClipboard, useMediaQuery } from 'usehooks-ts';
+import { ExportJobDialog } from '@/components/ExportJobDialog';
 import { ProjectDeleteDialog } from '@/components/Project';
 import { Drawer, DrawerBody, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
 import { dropdownItemStyles } from '@/components/ui/Dropdown';
@@ -14,7 +15,7 @@ import { globalToastQueue, ToastType } from '@/components/ui/Toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cx } from '@/styles/cva';
 import { $api } from '@/util/clientFetch';
-// import { DraftsMoreMenuExportDialog } from './DraftsMoreMenuExportDialog';
+import { EXPORT_TYPES } from '@/util/exportJobs';
 
 export function ProjectsMoreMenu({
 	isDeletable = false,
@@ -28,7 +29,7 @@ export function ProjectsMoreMenu({
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
 	const [isOpen, setIsOpen] = useState(false);
 	const [, copy] = useCopyToClipboard();
-	// const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isExportOpen, setIsExportOpen] = useState(false);
 	const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
 	const { currentUserData } = useCurrentUser();
@@ -81,18 +82,19 @@ export function ProjectsMoreMenu({
 								>
 									<Share2Icon aria-hidden size={18} strokeWidth={1.5} /> Share detail link
 								</DrawerClose>
+								<Separator />
+								<DrawerClose
+									aria-label="Export (zip)"
+									className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+									id="export"
+									onPress={() => setIsExportOpen(true)}
+									variant="unset"
+								>
+									<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
+								</DrawerClose>
 								{isProjectAdmin && isDeletable ? (
 									<>
 										<Separator />
-										{/* <Button
-											aria-label="Export (zip)"
-											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
-											id="export"
-											onPress={() => setIsExportOpen(true)}
-											variant="unset"
-										>
-											<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-										</Button> */}
 										<DrawerClose
 											aria-label="Delete"
 											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
@@ -122,19 +124,20 @@ export function ProjectsMoreMenu({
 					>
 						<MoreVerticalIcon aria-hidden size={18} strokeWidth={1.5} />
 					</MenuTrigger>
-					<MenuContent placement="bottom">
+					<MenuContent placement="bottom" popover={{ arrow: false }}>
 						<MenuItem aria-label="Open in new tab" href={`/projects/${props.projectUuid}`} target="_blank">
 							<SplitIcon aria-hidden size={18} strokeWidth={1.5} /> Open in new tab
 						</MenuItem>
 						<MenuItem aria-label="Share detail link" id="share" onAction={copyToClipboard}>
 							<Share2Icon aria-hidden size={18} strokeWidth={1.5} /> Share detail link
 						</MenuItem>
+						<MenuSeparator />
+						<MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
+							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
+						</MenuItem>
 						{isProjectAdmin && isDeletable ? (
 							<>
 								<MenuSeparator />
-								{/* <MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
-									<FolderArchive aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-								</MenuItem> */}
 								<MenuItem
 									aria-label="Delete"
 									id="delete"
@@ -148,12 +151,19 @@ export function ProjectsMoreMenu({
 					</MenuContent>
 				</Menu>
 			)}
-			{/* <ProjectsMoreMenuExportDialog
-				projectName={projectName ?? ''}
+			<ExportJobDialog
+				description={
+					<>
+						Export available data from <span className="text-base-label-md">{props.projectName ?? 'this project'}</span>{' '}
+						to a zip file.
+					</>
+				}
+				exportType={EXPORT_TYPES.Project}
 				isOpen={isExportOpen}
 				onOpenChange={setIsExportOpen}
-				uuid={projectUuid ?? ''}
-			/> */}
+				title="Export project"
+				uuids={[props.projectUuid]}
+			/>
 			<ProjectDeleteDialog
 				isOpen={isDeleteConfirmOpen}
 				onOpenChange={setIsDeleteConfirmOpen}

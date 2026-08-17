@@ -20,6 +20,7 @@ export function ProjectFolderFilesUploadGrid({
 }: VariantProps<typeof gridCardStyles> & {
 	readonly className?: string | undefined;
 	readonly folderUuid: string;
+	readonly isDisabled?: boolean;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -48,18 +49,21 @@ export function ProjectFolderFilesUploadGrid({
 
 	return canUploadFiles ? (
 		<GridListItem
-			aria-label="Upload or assign from draft files"
-			className="gap-px rounded-xl md:w-auto md:min-w-66 print:hidden"
+			aria-label="Upload or add from draft files"
+			className="min-w-66 gap-px rounded-xl md:max-w-66 print:hidden"
+			hasCheckbox={false}
+			isDisabled={props.isDisabled}
 		>
 			<UploadTrigger folderName={folderData?.name} folderUuid={props.folderUuid} projectUuid={folderData?.project.pk}>
 				<Button
 					className={gridCardStyles({
 						variant,
 						className: cx(
-							'relative h-[150px] w-full shrink! grow flex-row place-content-center place-items-center gap-2 rounded-r-none focus-visible:z-10 focus-visible:outline-2 md:w-auto',
+							'relative h-[182px] w-full shrink! grow flex-row place-content-center place-items-center gap-2 rounded-r-none focus-visible:z-10 focus-visible:outline-2',
 							props.className,
 						),
 					})}
+					isDisabled={props.isDisabled}
 					variant="unset"
 				>
 					<FilePlusIcon aria-hidden size={18} strokeWidth={1.5} />
@@ -71,20 +75,17 @@ export function ProjectFolderFilesUploadGrid({
 					className={gridCardStyles({
 						variant,
 						className: cx(
-							'relative h-[150px] w-full shrink! grow flex-row place-content-center place-items-center gap-2 rounded-l-none focus-visible:outline-2 md:w-auto',
+							'relative h-[182px] w-full shrink! grow flex-row place-content-center place-items-center gap-2 rounded-l-none focus-visible:outline-2',
 							props.className,
 						),
 					})}
+					isDisabled={props.isDisabled}
 					variant="unset"
 				>
 					<PackageOpenIcon aria-hidden size={18} strokeWidth={1.5} />
-					Assign
+					Add
 				</Button>
-				<ProjectFolderFilesDraftFilesAssignDialog
-					folderUuid={props.folderUuid}
-					isOpen={isOpen}
-					onOpenChange={setIsOpen}
-				/>
+				<ProjectFolderFilesDraftFilesAssignDialog folderUuid={props.folderUuid} />
 			</Modal>
 		</GridListItem>
 	) : null;

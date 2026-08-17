@@ -1,43 +1,75 @@
 'use client';
 
-import { parseAsString, useQueryState } from 'nuqs';
-import { ErrorBoundary } from 'react-error-boundary';
+import { keepPreviousData, useSuspenseQuery } from '@tanstack/react-query';
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { useMediaQuery } from 'usehooks-ts';
-import { GenericComponentErrorBoundary } from '@/components/ErrorBoundary';
 import { ShareButton } from '@/components/ShareButton';
-import { ViewSwitch } from '@/components/ViewSwitch';
-import type { components } from '@/util/openapiSchema';
+import { MainRouteListFrame } from '@/components/main-route/frame/MainRouteListFrame';
+import { ViewSwitch } from '@/components/query-controls/ViewSwitch';
+import { useUserSettings } from '@/hooks/useUserSettings';
+import { $api } from '@/util/clientFetch';
 import { ProjectMembersGrid } from './ProjectMembersGrid';
 import { ProjectMembersMenu } from './ProjectMembersMenu';
 import { ProjectMembersTable } from './ProjectMembersTable';
 
-export function ProjectMembersView({
-	data = [],
-	...props
-}: {
-	readonly data?: components['schemas']['ProjectMembership'][] | undefined;
-	readonly projectUuid: string;
-}) {
-	const [queryState] = useQueryState('view', parseAsString.withDefault('grid'));
+export function ProjectMembersView(props: { readonly limit: number; readonly projectUuid: string }) {
+	const { settings } = useUserSettings();
+
+	const [queryStates] = useQueryStates({
+		page: parseAsInteger.withDefault(1),
+		view: parseAsString.withDefault(settings.defaultViewMode ?? 'grid'),
+	});
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
 
-	const hasResults = data?.length;
+	const offset = (queryStates.page - 1) * props.limit;
+
+	const { data } = useSuspenseQuery(
+		$api.queryOptions(
+			'get',
+			'/api/v1/project-membership/',
+			{
+				params: { query: { project: props.projectUuid, ordering: '-is_project_admin,member__email' } },
+			},
+			{
+				placeholderData: keepPreviousData,
+			},
+		),
+	);
+
+	// Client-side pagination until backend supports limit/offset
+	const paginatedData = data?.slice(offset, offset + props.limit) ?? [];
+	const totalCount = data?.length ?? 0;
+
+	const hasResults = paginatedData.length;
 
 	return (
-		<ErrorBoundary FallbackComponent={GenericComponentErrorBoundary}>
-			<div className="flex place-content-end place-items-center gap-2">
-				<ShareButton />
-				<ProjectMembersMenu projectUuid={props.projectUuid} />
-				<ViewSwitch className="hidden md:flex" isDisabled={!data.length} />
-			</div>
-
-			{hasResults ? (
-				queryState === 'grid' || isMobile ? (
-					<ProjectMembersGrid data={data} />
+		<MainRouteListFrame
+			controls={
+				<div className="flex place-content-end place-items-center gap-2">
+					<ShareButton />
+					<ProjectMembersMenu projectUuid={props.projectUuid} />
+					<ViewSwitch className="hidden md:flex" defaultView={settings.defaultViewMode} isDisabled={!totalCount} />
+				</div>
+			}
+			hasResults={Boolean(hasResults)}
+			layout={queryStates.view === 'grid' || isMobile ? 'grid' : 'table'}
+			list={
+				queryStates.view === 'grid' || isMobile ? (
+					<ProjectMembersGrid data={paginatedData} />
 				) : (
-					<ProjectMembersTable data={data} />
+					<ProjectMembersTable data={paginatedData} />
 				)
-			) : null}
-		</ErrorBoundary>
+			}
+			pagination={
+				totalCount
+					? {
+							count: totalCount,
+							length: paginatedData.length,
+							limit: props.limit,
+							offset,
+						}
+					: undefined
+			}
+		/>
 	);
 }

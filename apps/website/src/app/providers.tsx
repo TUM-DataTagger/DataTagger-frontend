@@ -1,23 +1,31 @@
 'use client';
 
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Provider as JotaiProvider } from 'jotai';
+import { ThemeProvider } from 'next-themes';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Suspense, useEffect, useState, type PropsWithChildren } from 'react';
-import { RouterProvider } from 'react-aria-components';
+import { I18nProvider, RouterProvider } from 'react-aria-components';
 import { TusClientProvider } from 'use-tus';
 import { getQueryClient } from '@/util/getQueryClient';
 
-const ReactQueryDevtoolsProduction = dynamic(async () =>
-	// eslint-disable-next-line promise/prefer-await-to-then
-	import('@tanstack/react-query-devtools/production').then((module) => ({
-		default: module.ReactQueryDevtools,
-	})),
-);
+const ReactQueryDevtoolsProduction = dynamic(async () => {
+	const mod = await import('@tanstack/react-query-devtools/production');
+
+	return {
+		default: mod.ReactQueryDevtools,
+	};
+});
+
+const ReactQueryDevtoolsDevelopment = dynamic(async () => {
+	const mod = await import('@tanstack/react-query-devtools');
+
+	return {
+		default: mod.ReactQueryDevtools,
+	};
+});
 
 export function Providers(props: PropsWithChildren) {
 	const router = useRouter();
@@ -25,20 +33,32 @@ export function Providers(props: PropsWithChildren) {
 	const [showDevtools, setShowDevtools] = useState(false);
 
 	useEffect(() => {
-		// @ts-expect-error: window.toggleDevtools is not typed
 		window.toggleDevtools = () => setShowDevtools((old) => !old);
+		return () => {
+			delete window.toggleDevtools;
+		};
 	}, []);
 
 	return (
 		<NuqsAdapter>
 			<ThemeProvider attribute="class" storageKey="visual-mode">
 				<QueryClientProvider client={queryClient}>
-					<RouterProvider navigate={router.push}>
-						<JotaiProvider>
-							<TusClientProvider>{props.children}</TusClientProvider>
-						</JotaiProvider>
-					</RouterProvider>
-					<ReactQueryDevtools client={queryClient} />
+					<I18nProvider locale="en-US">
+						<RouterProvider
+							navigate={(href, options) => {
+								router.push(href, options as Parameters<typeof router.push>[1]);
+							}}
+						>
+							<JotaiProvider>
+								<TusClientProvider>{props.children}</TusClientProvider>
+							</JotaiProvider>
+						</RouterProvider>
+					</I18nProvider>
+					{process.env.NODE_ENV !== 'production' && (
+						<Suspense fallback={null}>
+							<ReactQueryDevtoolsDevelopment client={queryClient} />
+						</Suspense>
+					)}
 					{showDevtools && (
 						<Suspense fallback={null}>
 							<ReactQueryDevtoolsProduction />

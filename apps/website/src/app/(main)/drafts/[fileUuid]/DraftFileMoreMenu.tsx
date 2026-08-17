@@ -1,11 +1,13 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import {
 	FileDownIcon,
+	FolderArchiveIcon,
+	FolderInputIcon,
 	HistoryIcon,
-	/* FolderArchiveIcon, */ MoreVerticalIcon,
+	MoreVerticalIcon,
 	PanelRightOpenIcon,
 	PencilIcon,
 	TrashIcon,
@@ -15,41 +17,51 @@ import Link from 'next/link';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useState } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
-import { FileDeleteDialog } from '@/components/File';
-import { VersionHistoryExitDialog, VersionHistoryCloseIndicator } from '@/components/VersionHistory';
+import { FileDeleteDialog, FileDownloadDialog, FileExportDialog, FileImportDialog } from '@/components/File';
+import { FileVersionHistoryExitDialog, FileVersionHistoryCloseIndicator } from '@/components/FileVersionHistory';
 import { Button } from '@/components/ui/Button';
 import { Drawer, DrawerBody, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
 import { dropdownItemStyles } from '@/components/ui/Dropdown';
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';
 import { Separator } from '@/components/ui/Separator';
 import { useSidebar } from '@/components/ui/Sidebar';
-import { useEnv } from '@/contexts/EnvContext';
 import { SideSheetMode, sideSheetModeAtom, sideSheetSelectedDatasetAtom } from '@/stores/sideSheet';
 import { cx } from '@/styles/cva';
 import { $api } from '@/util/clientFetch';
 import { DraftFileMoreMenuEditFilenameDialog } from './DraftFileMoreMenuEditFilenameDialog';
-// import { DraftFileMoreMenuExportDialog } from './DraftFileMoreMenuExportDialog';
 
 export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?: string; readonly fileUuid: string }) {
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
-	const env = useEnv();
 	const [queryState] = useQueryState('version', parseAsString);
 	const [sideSheetMode, setSideSheetMode] = useAtom(sideSheetModeAtom);
 	const [sideSheetSelectedDataset, setSideSheetSelectedDataset] = useAtom(sideSheetSelectedDatasetAtom);
 	const { setOpen } = useSidebar();
 	const [isEditNameOpen, setIsEditNameOpen] = useState(false);
-	// const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isImportOpen, setIsImportOpen] = useState(false);
+	const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 	const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 	const [isVersionHistoryExitDialogOpen, setIsVersionHistoryExitDialogOpen] = useState(false);
 
 	const isVersionHistoryModeActive = Boolean(
-		sideSheetMode === SideSheetMode.VersionHistory && sideSheetSelectedDataset,
+		sideSheetMode === SideSheetMode.FileVersionHistory && sideSheetSelectedDataset,
 	);
 
 	const { data: datasetData } = useSuspenseQuery(
 		$api.queryOptions('get', '/api/v1/uploads-dataset/{id}/', {
 			params: { path: { id: fileUuid } },
 		}),
+	);
+
+	const { data: datasetVersionData } = useQuery(
+		$api.queryOptions(
+			'get',
+			'/api/v1/uploads-version/{id}/',
+			{
+				params: { path: { id: datasetData.latest_version?.pk ?? '' } },
+			},
+			{ enabled: Boolean(datasetData.latest_version) },
+		),
 	);
 
 	const isLatestVersionSelected = Boolean(!queryState || queryState === datasetData.latest_version?.pk);
@@ -74,6 +86,7 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 										<DrawerClose
 											aria-label="Exit version history"
 											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+											id="exit-version-history"
 											onPress={() => setIsVersionHistoryExitDialogOpen(true)}
 											variant="unset"
 										>
@@ -85,7 +98,7 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
 											id="show-version-history"
 											onPress={() => {
-												setSideSheetMode(SideSheetMode.VersionHistory);
+												setSideSheetMode(SideSheetMode.FileVersionHistory);
 												setSideSheetSelectedDataset(fileUuid);
 												setOpen(true);
 											}}
@@ -95,12 +108,12 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 										</DrawerClose>
 									)}
 									<Separator />
-									{queryState ? null : (
+									{isLatestVersionSelected ? (
 										<>
 											<DrawerClose
 												aria-label="Edit filename"
 												className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
-												id="edit"
+												id="edit-filename"
 												onPress={() => setIsEditNameOpen(true)}
 												variant="unset"
 											>
@@ -115,34 +128,52 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 												<PencilIcon aria-hidden size={18} strokeWidth={1.5} /> Edit metadata
 											</Link>
 										</>
-									)}
-									<a
-										className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
-										href={`${env.BASE_API_URL}/api/v1/uploads-version/${queryState ?? datasetData.latest_version?.pk}/download/?as_attachment=true`}
-										rel="noreferrer noopener external"
-										target="_blank"
-									>
-										<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
-									</a>
-									{/* <Button
+									) : null}
+									<Separator />
+									{isLatestVersionSelected ? (
+										<DrawerClose
+											aria-label="Import file metadata"
+											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+											id="import"
+											onPress={() => setIsImportOpen(true)}
+											variant="unset"
+										>
+											<FolderInputIcon aria-hidden size={18} strokeWidth={1.5} /> Import
+										</DrawerClose>
+									) : null}
+									<DrawerClose
 										aria-label="Export (zip)"
 										className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
 										id="export"
 										onPress={() => setIsExportOpen(true)}
 										variant="unset"
 									>
-										<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-									</Button> */}
-									<DrawerClose
-										aria-label="Delete"
-										className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
-										data-destructive="true"
-										id="delete"
-										onPress={() => setIsDeleteConfirmOpen(true)}
-										variant="unset"
-									>
-										<TrashIcon aria-hidden size={18} strokeWidth={1.5} /> Delete item
+										<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
 									</DrawerClose>
+									<Separator />
+									{datasetVersionData?.version_file ? (
+										<DrawerClose
+											aria-label="Download"
+											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+											id="download"
+											onPress={() => setIsDownloadOpen(true)}
+											variant="unset"
+										>
+											<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
+										</DrawerClose>
+									) : null}
+									{isLatestVersionSelected ? (
+										<DrawerClose
+											aria-label="Delete"
+											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+											data-destructive="true"
+											id="delete"
+											onPress={() => setIsDeleteConfirmOpen(true)}
+											variant="unset"
+										>
+											<TrashIcon aria-hidden size={18} strokeWidth={1.5} /> Delete item
+										</DrawerClose>
+									) : null}
 								</DrawerBody>
 							</DrawerContent>
 						</Drawer>
@@ -157,11 +188,11 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 							props.className,
 						)}
 						size="icon"
-						variant="outline"
+						variant="filled"
 					>
 						<MoreVerticalIcon aria-hidden size={18} strokeWidth={1.5} />
 					</MenuTrigger>
-					<MenuContent placement="bottom">
+					<MenuContent popover={{ arrow: false }}>
 						{isVersionHistoryModeActive ? (
 							<MenuItem
 								aria-label="Exit version history"
@@ -179,7 +210,7 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 								id="show-version-history"
 								key="show-version-history"
 								onAction={() => {
-									setSideSheetMode(SideSheetMode.VersionHistory);
+									setSideSheetMode(SideSheetMode.FileVersionHistory);
 									setSideSheetSelectedDataset(fileUuid);
 									setOpen(true);
 								}}
@@ -188,29 +219,41 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 							</MenuItem>
 						)}
 						<MenuSeparator />
-						{queryState ? null : (
+						{isLatestVersionSelected ? (
 							<>
-								<MenuItem aria-label="Edit filename" id="edit" onAction={() => setIsEditNameOpen(true)}>
+								<MenuItem aria-label="Edit filename" id="edit-filename" onAction={() => setIsEditNameOpen(true)}>
 									<PencilIcon aria-hidden size={18} strokeWidth={1.5} /> Edit filename
 								</MenuItem>
 								<MenuItem aria-label="Edit metadata" href={`/drafts/${fileUuid}/edit-metadata`} id="edit-metadata">
 									<PencilIcon aria-hidden size={18} strokeWidth={1.5} /> Edit metadata
 								</MenuItem>
 							</>
-						)}
-						<MenuItem
-							href={`${env.BASE_API_URL}/api/v1/uploads-version/${queryState ?? datasetData.latest_version?.pk}/download/?as_attachment=true`}
-							rel="noreferrer noopener external"
-							target="_blank"
-						>
-							<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
+						) : null}
+						<MenuSeparator />
+						{isLatestVersionSelected ? (
+							<MenuItem aria-label="Import file metadata" id="import" onAction={() => setIsImportOpen(true)}>
+								<FolderInputIcon aria-hidden size={18} strokeWidth={1.5} /> Import
+							</MenuItem>
+						) : null}
+						<MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
+							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
 						</MenuItem>
-						{/* <MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
-							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-						</MenuItem> */}
-						<MenuItem aria-label="Delete" id="delete" isDestructive onAction={async () => setIsDeleteConfirmOpen(true)}>
-							<TrashIcon aria-hidden size={18} strokeWidth={1.5} /> Delete item
-						</MenuItem>
+						<MenuSeparator />
+						{datasetVersionData?.version_file ? (
+							<MenuItem aria-label="Download" id="download" onAction={() => setIsDownloadOpen(true)}>
+								<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
+							</MenuItem>
+						) : null}
+						{isLatestVersionSelected ? (
+							<MenuItem
+								aria-label="Delete"
+								id="delete"
+								isDestructive
+								onAction={async () => setIsDeleteConfirmOpen(true)}
+							>
+								<TrashIcon aria-hidden size={18} strokeWidth={1.5} /> Delete item
+							</MenuItem>
+						) : null}
 					</MenuContent>
 				</Menu>
 			) : (
@@ -220,7 +263,7 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 							<PanelRightOpenIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
 						</Button>
 					) : null}
-					<VersionHistoryCloseIndicator />
+					<FileVersionHistoryCloseIndicator />
 				</div>
 			)}
 			<DraftFileMoreMenuEditFilenameDialog
@@ -229,12 +272,19 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 				isOpen={isEditNameOpen}
 				onOpenChange={setIsEditNameOpen}
 			/>
-			{/* <DraftFileMoreMenuExportDialog
-				filename={filename}
+			<FileImportDialog fileUuid={fileUuid} isOpen={isImportOpen} onOpenChange={setIsImportOpen} />
+			<FileExportDialog
+				filename={datasetData.display_name ?? ''}
 				isOpen={isExportOpen}
 				onOpenChange={setIsExportOpen}
-				versionUuid={datasetData.latest_version?.pk}
-			/> */}
+				versionUuid={queryState ?? datasetData.latest_version?.pk ?? ''}
+			/>
+			<FileDownloadDialog
+				filename={datasetData.display_name ?? ''}
+				isOpen={isDownloadOpen}
+				onOpenChange={setIsDownloadOpen}
+				versionUuid={queryState ?? datasetData.latest_version?.pk ?? ''}
+			/>
 			<FileDeleteDialog
 				fileUuid={fileUuid}
 				filename={datasetData.display_name ?? ''}
@@ -242,7 +292,7 @@ export function DraftFileMoreMenu({ fileUuid, ...props }: { readonly className?:
 				onOpenChange={setIsDeleteConfirmOpen}
 				redirectUrl="/drafts"
 			/>
-			<VersionHistoryExitDialog
+			<FileVersionHistoryExitDialog
 				isOpen={isVersionHistoryExitDialogOpen}
 				onOpenChange={setIsVersionHistoryExitDialogOpen}
 			/>

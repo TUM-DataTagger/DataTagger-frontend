@@ -29,7 +29,7 @@ export default async function Page({ params }: { readonly params: Promise<{ read
 				<span className="text-base-sm text-base-neutral-600 dark:text-base-neutral-300">
 					Project: {projectData?.name}
 				</span>
-				<div className="border-base-crystal-300 bg-base-crystal-100/48 text-base-md dark:border-base-crystal-500 dark:bg-base-crystal-500/48 rounded-sm border px-4 py-3">
+				<div className="rounded-sm border border-base-crystal-300 bg-base-crystal-100/48 px-4 py-3 text-base-md dark:border-base-crystal-500 dark:bg-base-crystal-500/48">
 					Changing the permission "Project admin" is only possible if at least one other member is a TUM member and
 					holds this permission.
 				</div>

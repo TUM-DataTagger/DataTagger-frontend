@@ -20,6 +20,7 @@ export function Keyboard(props: KeyboardProps) {
 				'hidden group-disabled:opacity-50 lg:inline-flex forced-colors:group-focus:text-[HighlightText]',
 				props.classNames?.base,
 			)}
+			data-slot="keyboard"
 		>
 			{(Array.isArray(props.keys) ? props.keys : props.keys.split('')).map((char, idx) => (
 				<kbd

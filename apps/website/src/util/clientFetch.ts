@@ -1,6 +1,12 @@
 import createClient from 'openapi-fetch';
 import createReactQueryClient from 'openapi-react-query';
+import { logger, LogCategory } from '@/util/logger';
 import type { paths } from '@/util/openapiSchema';
+import { recordRecentActivity } from '@/util/recentActivity';
+import { classifyRecentMutation, shouldInspectRecentMutation } from '@/util/recentActivityMatcher';
+import { createRateLimitHandler } from '@/util/retryWithBackoff';
+import { handleSessionExpiry } from '@/util/sessionExpiry';
+import { shouldTriggerSessionExpiryRedirect } from '@/util/sessionExpiryPolicy';
 
 const openAPIClient = createClient<paths>({
 	baseUrl: process.env.NEXT_PUBLIC_BASE_API_URL ?? '',
@@ -8,42 +14,89 @@ const openAPIClient = createClient<paths>({
 });
 
 openAPIClient.use({
+	onResponse: createRateLimitHandler(),
+});
+
+openAPIClient.use({
 	async onResponse({ request, response }) {
-		if (response.status === 429) {
-			console.log('Rate limiting detected');
+		if (response.status !== 401) {
+			return response;
+		}
 
-			const retryAfter = Number.parseInt(response.headers.get('Retry-After') ?? '1', 10);
-			const maxRetries = 5;
-			let retryCount = 0;
+		let pathname = '';
+		try {
+			pathname = new URL(request.url).pathname;
+		} catch {
+			return response;
+		}
 
-			console.log('Retry count:', retryCount);
+		const currentPathname = typeof window === 'undefined' ? undefined : window.location.pathname;
+		if (
+			!shouldTriggerSessionExpiryRedirect({ requestPathname: pathname, currentPathname, source: 'openapi_client_401' })
+		) {
+			return response;
+		}
 
-			const retryWithBackoff = async () => {
-				if (retryCount >= maxRetries) {
-					throw new Error('Max retries reached for rate limiting');
-				}
+		handleSessionExpiry({
+			source: 'openapi_client_401',
+			requestUrl: request.url,
+			status: response.status,
+		});
 
-				// Max delay of 30 seconds
-				const delay = Math.min(2 ** retryCount * 1_000, 30_000);
-				await new Promise<void>((resolve) => {
-					setTimeout(resolve, Math.max(retryAfter * 1_000, delay));
-				});
+		return response;
+	},
+});
 
-				retryCount++;
-				const retryResponse = await fetch(request.url, {
-					method: request.method,
-					headers: request.headers,
-					body: request.body,
-				});
+openAPIClient.use({
+	async onResponse({ request, response }) {
+		if (typeof window === 'undefined') {
+			return response;
+		}
 
-				if (retryResponse.status === 429) {
-					return retryWithBackoff();
-				}
+		if (!response.ok) {
+			return response;
+		}
 
-				return retryResponse;
-			};
+		const method = request.method.toUpperCase();
+		if (!['POST', 'PATCH', 'PUT', 'DELETE'].includes(method)) {
+			return response;
+		}
 
-			return retryWithBackoff();
+		let pathname = '';
+		try {
+			pathname = new URL(request.url).pathname;
+		} catch {
+			return response;
+		}
+
+		if (!shouldInspectRecentMutation(pathname, method)) {
+			return response;
+		}
+
+		let responseData: unknown = null;
+		if (response.headers.get('content-type')?.includes('application/json')) {
+			try {
+				responseData = await response.clone().json();
+			} catch {
+				responseData = null;
+			}
+		}
+
+		try {
+			const activityEvent = classifyRecentMutation({
+				request,
+				responseData,
+			});
+
+			if (activityEvent) {
+				recordRecentActivity(activityEvent);
+			}
+		} catch (error) {
+			logger.warn(LogCategory.Project, 'Failed to process recent activity mutation tracking middleware', {
+				error: error instanceof Error ? error.message : String(error),
+				method,
+				pathname,
+			});
 		}
 
 		return response;

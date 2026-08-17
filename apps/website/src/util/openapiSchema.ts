@@ -11,10 +11,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description OpenApi3 schema for this API. Format can be selected via content negotiation.
+        /**
+         * @description OpenApi3 schema for this API. Format can be selected via content negotiation.
          *
          *     - YAML: application/vnd.oai.openapi
-         *     - JSON: application/vnd.oai.openapi+json */
+         *     - JSON: application/vnd.oai.openapi+json
+         */
         get: operations["schema_retrieve"];
         put?: never;
         post?: never;
@@ -81,6 +83,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * @description Obtain a JWT access token by providing email and password.
+         *     Returns {"token": "<access_token>", "user": {...}}.
+         */
         post: operations["v1_auth_create"];
         delete?: never;
         options?: never;
@@ -113,6 +119,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * @description Refresh a JWT token. Accepts {"token": "<access_token>"} for backward
+         *     compatibility, internally maps to simplejwt's refresh flow.
+         */
         post: operations["v1_authrefresh_create"];
         delete?: never;
         options?: never;
@@ -129,6 +139,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /**
+         * @description Verify a JWT token. Accepts {"token": "<access_token>"}.
+         *     Returns the user data if the token is valid.
+         */
         post: operations["v1_authverify_create"];
         delete?: never;
         options?: never;
@@ -176,6 +190,70 @@ export interface paths {
             cookie?: never;
         };
         get: operations["v1_cms_slugs_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_dashboard_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_export_list"];
+        put?: never;
+        post: operations["v1_export_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/export/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/export/{id}/download/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_export_download_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -240,6 +318,54 @@ export interface paths {
             cookie?: never;
         };
         get: operations["v1_faq_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/file-parser-configuration/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_file_parser_configuration_list"];
+        put?: never;
+        post: operations["v1_file_parser_configuration_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/file-parser-configuration/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_file_parser_configuration_retrieve"];
+        put: operations["v1_file_parser_configuration_update"];
+        post?: never;
+        delete: operations["v1_file_parser_configuration_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["v1_file_parser_configuration_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/file-parser-configuration/available-types/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_file_parser_configuration_available_types_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -322,6 +448,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["v1_folder_lock_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/folder/{id}/metadata-template-container/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_folder_metadata_template_container_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/folder/{id}/metadata-template-container-pool/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_folder_metadata_template_container_pool_list"];
+        put: operations["v1_folder_metadata_template_container_pool_update"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -415,8 +573,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_field_list"];
         put?: never;
         post?: never;
@@ -433,9 +593,43 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_field_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-tag/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_metadata_tag_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-tag/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_metadata_tag_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -451,13 +645,253 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_template_list"];
         put?: never;
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
-        post: operations["v1_metadata_template_create"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        get: operations["v1_metadata_template_container_list"];
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        get: operations["v1_metadata_template_container_retrieve"];
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        put: operations["v1_metadata_template_container_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        patch: operations["v1_metadata_template_container_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/clone/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_clone_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/lock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_lock_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/restore/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_restore_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        get: operations["v1_metadata_template_container_status_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/unlock/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_unlock_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/{id}/version/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_version_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-container/import/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        post: operations["v1_metadata_template_container_import_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_metadata_template_export_list"];
+        put?: never;
+        post: operations["v1_metadata_template_export_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-export/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_metadata_template_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/metadata-template-export/{id}/download/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_metadata_template_export_download_retrieve"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -471,8 +905,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_template_field_list"];
         put?: never;
         post?: never;
@@ -489,8 +925,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_template_field_retrieve"];
         put?: never;
         post?: never;
@@ -507,19 +945,45 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_template_retrieve"];
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         put: operations["v1_metadata_template_update"];
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         patch: operations["v1_metadata_template_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/metadata-template/{id}/diff/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
+        get: operations["v1_metadata_template_diff_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/metadata-template/{id}/lock/": {
@@ -531,8 +995,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         post: operations["v1_metadata_template_lock_create"];
         delete?: never;
         options?: never;
@@ -547,8 +1013,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         get: operations["v1_metadata_template_status_retrieve"];
         put?: never;
         post?: never;
@@ -567,8 +1035,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Checks that as switch is active, or 404. Operates like the FBV decorator
-         *     waffle_switch. */
+        /**
+         * @description Checks that as switch is active, or 404. Operates like the FBV decorator
+         *     waffle_switch.
+         */
         post: operations["v1_metadata_template_unlock_create"];
         delete?: never;
         options?: never;
@@ -722,6 +1192,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/project/{id}/metadata-template-container/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_project_metadata_template_container_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/project/{id}/metadata-template-container-pool/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_project_metadata_template_container_pool_list"];
+        put: operations["v1_project_metadata_template_container_pool_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/project/{id}/metadata-templates/": {
         parameters: {
             query?: never;
@@ -795,9 +1297,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description An Api View which provides a method to request a password reset token based on an e-mail address
+        /**
+         * @description An Api View which provides a method to request a password reset token based on an e-mail address
          *
-         *     Sends a signal reset_password_token_created when a reset token was created */
+         *     Sends a signal reset_password_token_created when a reset token was created
+         */
         post: operations["v1_reset_password_create"];
         delete?: never;
         options?: never;
@@ -846,7 +1350,63 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["v1_search_global_retrieve"];
+        get?: never;
+        put?: never;
+        /**
+         * @description Structured global search across projects, folders, datasets, dataset versions, files, templates, and template versions.
+         *
+         *     Use `search_text` for broad text search, `group` for Airtable-style structured filters, or both together. The response is one unified paginated list where each result contains `result_type` plus the serialized entity under `item`. Pagination uses opaque cursors.
+         */
+        post: operations["v1_search_global_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search/global/schema/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return the searchable field/operator schema for the global search endpoint. */
+        get: operations["v1_search_global_schema_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search/metadata-choice-options/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return configured options for bounded metadata keys and one choice field type. Scopes are optional and use the same permission semantics as metadata-key autocomplete. */
+        get: operations["v1_search_metadata_choice_options_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/search/metadata-keys/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Return autocomplete-ready metadata keys for the active metadata template on the given projects, folders, or datasets and their ancestors, or for explicitly-named metadata template containers via `template_id`. At least one of `project_id`, `folder_id`, `dataset_id`, `template_id` is required; each may be repeated and any combination is allowed. When `template_id` is supplied, those templates' fields are the authoritative key universe; entity-scope rows are kept only when their key also appears on a supplied template (the same key may therefore appear twice — once tagged `template`, once tagged with its entity source). */
+        get: operations["v1_search_metadata_keys_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1049,6 +1609,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/uploads-dataset/{id}/metadata-template-container/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_uploads_dataset_metadata_template_container_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/{id}/metadata-template-container-pool/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_uploads_dataset_metadata_template_container_pool_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/{id}/metadata-templates/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_uploads_dataset_metadata_templates_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uploads-dataset/{id}/publish/": {
         parameters: {
             query?: never;
@@ -1076,6 +1684,22 @@ export interface paths {
         put?: never;
         /** @description Create a reference to an existing file on the storage without uploading it. */
         post: operations["v1_uploads_dataset_reference_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/{id}/resolve-upgrade-metadata-conflict/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_uploads_dataset_resolve_upgrade_metadata_conflict_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1130,6 +1754,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/uploads-dataset/{id}/upgrade-metadata/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_uploads_dataset_upgrade_metadata_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/{id}/upgrade-metadata-payload/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_uploads_dataset_upgrade_metadata_payload_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/{id}/upgrade-metadata-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_uploads_dataset_upgrade_metadata_status_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uploads-dataset/{id}/version/": {
         parameters: {
             query?: never;
@@ -1163,6 +1835,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/uploads-dataset/bulk-fill-metadata-template-fields/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Returns inherited metadata template fields for bulk filling across uploads datasets. */
+        post: operations["v1_uploads_dataset_bulk_fill_metadata_template_fields_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/bulk-fill-metadata-template-fields-submit/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Applies inherited metadata template field values in bulk to uploads datasets. */
+        post: operations["v1_uploads_dataset_bulk_fill_metadata_template_fields_submit_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uploads-dataset/bulk-publish/": {
         parameters: {
             query?: never;
@@ -1174,6 +1880,23 @@ export interface paths {
         put?: never;
         /** @description Publishes multiple uploads datasets in bulk into a folder. */
         post: operations["v1_uploads_dataset_bulk_publish_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-dataset/bulk-upgrade-metadata/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Triggers multiple metadata upgrade processes for uploads datasets in bulk. */
+        post: operations["v1_uploads_dataset_bulk_upgrade_metadata_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1206,6 +1929,38 @@ export interface paths {
         get: operations["v1_uploads_version_file_retrieve"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-version-file/{id}/parser-processing/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_uploads_version_file_parser_processing_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads-version-file/{id}/retrigger-parser-processing/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_uploads_version_file_retrigger_parser_processing_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1322,7 +2077,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["v1_user_me_partial_update"];
         trace?: never;
     };
 }
@@ -1330,12 +2085,11 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         ApprovalQueue: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
-            content_type: number;
             /** Format: date-time */
-            approved_at?: string | null;
+            readonly last_modification_date: string;
+            /** Format: uuid */
+            object_id: string;
             approved_by?: number | null;
             /**
              * Id
@@ -1344,17 +2098,116 @@ export interface components {
             readonly pk: string;
             content_object: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
+            approved_at?: string | null;
+            /** Format: date-time */
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
-            /** Format: uuid */
-            object_id: string;
+            content_type: number;
         };
+        /** @enum {string} */
+        AssignedToContentTypeDf0Enum: "folders.folder" | "projects.project" | "uploads.uploadsdataset";
         /**
          * @description * `APPLICATION` - Application
          *     * `SHIBBOLETH` - Shibboleth
          * @enum {string}
          */
         AuthenticationProviderEnum: "APPLICATION" | "SHIBBOLETH";
+        CompactDatasetItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            display_name: string;
+            is_published: boolean;
+            metadata_is_complete: boolean | null;
+            has_upgradeable_metadata_templates: boolean;
+            has_file: boolean;
+            folder: components["schemas"]["CompactFolderItem"];
+            /** @description Nested {pk, name, version_file: {pk, name}} */
+            latest_version: {
+                [key: string]: unknown;
+            } | null;
+        };
+        CompactDatasetVersionItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            is_published: boolean;
+            metadata_is_complete: boolean;
+            has_file: boolean;
+            /** @description Nested {pk, name, display_name} */
+            dataset: {
+                [key: string]: unknown;
+            };
+            version_file: components["schemas"]["CompactNestedPkName"] | null;
+        };
+        CompactFileItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            is_published: boolean;
+            uploads_versions: components["schemas"]["CompactFileVersion"][];
+        };
+        CompactFileVersion: {
+            /** Format: uuid */
+            pk: string;
+            name: string | null;
+            dataset: components["schemas"]["CompactFileVersionDataset"] | null;
+        };
+        CompactFileVersionDataset: {
+            /** Format: uuid */
+            pk: string;
+            name: string | null;
+        };
+        CompactFolderItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            project: components["schemas"]["CompactNestedPkName"];
+        };
+        CompactNestedPkName: {
+            /** Format: uuid */
+            pk: string;
+            name: string | null;
+        };
+        CompactProjectItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+        };
+        /** @description Compact mode response schema. Included via postprocessing hook for TypeScript codegen. */
+        CompactSearchResponse: {
+            count: number;
+            next_cursor: string | null;
+            previous_cursor: string | null;
+            results: components["schemas"]["CompactSearchResult"][];
+        };
+        CompactSearchResult: {
+            result_type: components["schemas"]["ResultTypeEnum"];
+            readonly item: components["schemas"]["CompactSearchResultItem"];
+        };
+        CompactSearchResultItem: components["schemas"]["CompactProjectItem"] | components["schemas"]["CompactFolderItem"] | components["schemas"]["CompactDatasetItem"] | components["schemas"]["CompactDatasetVersionItem"] | components["schemas"]["CompactFileItem"] | components["schemas"]["CompactTemplateItem"] | components["schemas"]["CompactTemplateVersionItem"];
+        CompactTemplateItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            template_type: string;
+            field_count: number;
+            assigned_to: {
+                [key: string]: unknown;
+            } | null;
+            latest_template: components["schemas"]["CompactNestedPkName"] | null;
+        };
+        CompactTemplateVersionItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            template_type: string;
+            field_count: number;
+            assigned_to: {
+                [key: string]: unknown;
+            } | null;
+            template: components["schemas"]["CompactNestedPkName"];
+        };
         Content: {
             /** Name of the content */
             name: string;
@@ -1375,6 +2228,31 @@ export interface components {
         ContentPageList: {
             slugs: string[];
         };
+        /**
+         * @description * `next` - next
+         *     * `previous` - previous
+         * @enum {string}
+         */
+        CursorDirectionEnum: "next" | "previous";
+        DashboardResourceCounts: {
+            draft_datasets: number;
+            project_datasets: number;
+            created_projects: number;
+            collaborating_projects: number;
+            datasets_missing_files: number;
+        };
+        DashboardSnapshot: {
+            /** Format: date-time */
+            generated_at: string;
+            resource_counts: components["schemas"]["DashboardResourceCounts"];
+            upcoming_auto_deletion: components["schemas"]["UpcomingAutoDeletion"];
+        };
+        /**
+         * @description * `asc` - asc
+         *     * `desc` - desc
+         * @enum {string}
+         */
+        DirectionEnum: "asc" | "desc";
         Email: {
             /** Format: email */
             email: string;
@@ -1383,6 +2261,43 @@ export interface components {
             /** Format: email */
             email: string;
         };
+        ExportJob: {
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly include_uploads_version_file: boolean;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly export_type: string;
+            readonly metadata_format: components["schemas"]["MetadataFormatEnum"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            /** Format: date-time */
+            readonly finished_at: string | null;
+            readonly include_uploads_version_file_metadata: boolean;
+            readonly download_url: string;
+            readonly object_ids: unknown;
+            readonly error_message: string | null;
+            /** Format: date-time */
+            readonly creation_date: string;
+            readonly status: components["schemas"]["Status024Enum"];
+            readonly created_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly expires_at: string | null;
+        };
+        ExportJobCreateRequest: {
+            export_type: components["schemas"]["ExportTypeEnum"];
+            uuids: string[];
+            /** @default json */
+            metadata_format: components["schemas"]["MetadataFormatEnum"];
+            /** @default true */
+            include_uploads_version_file: boolean;
+            /** @default true */
+            include_uploads_version_file_metadata: boolean;
+        };
+        /** @enum {string} */
+        ExportTypeEnum: "projects.project" | "folders.folder" | "uploads.uploadsdataset" | "uploads.uploadsversion";
         ExtendedResetPasswordValidate: {
             status: string;
             username: string;
@@ -1398,6 +2313,7 @@ export interface components {
             question: string;
             slug?: string;
             answer?: string | null;
+            readonly answer_html: string;
             readonly category: components["schemas"]["FAQCategoryMinimal"] | null;
             order?: number;
         };
@@ -1422,6 +2338,13 @@ export interface components {
             slug?: string;
         };
         /**
+         * @description * `relevance` - relevance
+         *     * `updated_at` - updated_at
+         *     * `created_at` - created_at
+         * @enum {string}
+         */
+        FieldEnum: "relevance" | "updated_at" | "created_at";
+        /**
          * @description * `INTEGER` - Integer
          *     * `DECIMAL` - Decimal
          *     * `DATETIME` - Date & Time
@@ -1430,31 +2353,59 @@ export interface components {
          *     * `TEXT` - Text
          *     * `WYSIWYG` - WYSIWYG editor
          *     * `SELECTION` - Selection
+         *     * `MULTI_SELECTION` - Multi selection
+         *     * `TAG` - Tag
          * @enum {string}
          */
-        FieldTypeEnum: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-        Folder: {
+        FieldTypeEnum: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+        FileParserConfiguration: {
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            /** Format: uuid */
+            assigned_to_object_id: string;
+            config?: unknown;
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            assigned_to_content_type: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "blacklist.blacklistedtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "file_parser.fileparser" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "metadata.metadatatag" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparserconfiguration") | number;
+            parser_type: components["schemas"]["ParserTypeEnum"];
             /** Format: date-time */
             readonly creation_date: string;
+            enabled?: boolean;
+            readonly created_by: components["schemas"]["MinimalUser"];
+        };
+        FileParserConfigurationRequest: {
+            /** Format: uuid */
+            assigned_to_object_id: string;
+            config?: unknown;
+            assigned_to_content_type: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "blacklist.blacklistedtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "file_parser.fileparser" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "metadata.metadatatag" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparserconfiguration") | number;
+            parser_type: components["schemas"]["ParserTypeEnum"];
+            enabled?: boolean;
+        };
+        Folder: {
             readonly last_modified_by: components["schemas"]["MinimalUser"];
-            readonly metadata_templates_count: number;
             readonly datasets_count: number;
-            metadata?: components["schemas"]["MinimalMetadata"][];
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            storage: components["schemas"]["Storage"];
+            readonly metadata_templates_count: number;
             project: components["schemas"]["MinimalProjectSearch"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: uuid */
-            storage?: string | null;
             metadata_template?: components["schemas"]["MetadataTemplate"] | null;
-            readonly members_count: number;
             description?: unknown;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
+            metadata?: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly members_count: number;
         };
         FolderCreatePayloadRequest: {
             name: string;
@@ -1469,13 +2420,13 @@ export interface components {
                     field?: {
                         key: string;
                         /** @enum {string} */
-                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                         read_only?: boolean;
                     };
                     custom_key?: string | null;
                     /** @enum {string} */
-                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                    value?: (string | null) | (Record<string, unknown> | null);
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                     mandatory?: boolean;
                 }[];
             } | null;
@@ -1483,37 +2434,41 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
             folder_users?: components["schemas"]["FolderUsersRequest"][];
         };
         FolderList: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
-            metadata_templates_count?: number;
             datasets_count?: number;
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            storage?: components["schemas"]["Storage"] | null;
+            metadata_templates_count?: number;
             project: components["schemas"]["MinimalProjectSearch"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            storage?: components["schemas"]["Storage"] | null;
-            metadata_template?: components["schemas"]["MetadataTemplateMinimal"] | null;
-            members_count?: number;
+            metadata_template?: components["schemas"]["MinimalMetadataTemplate"] | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            members_count?: number;
+        };
+        FolderMetadataTemplateContainerPoolActionRequest: {
+            metadata_template_container: string[];
         };
         FolderPermission: {
             /**
@@ -1545,19 +2500,19 @@ export interface components {
             folder_users: components["schemas"]["FolderUsersRequest"][];
         };
         FolderSearch: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            storage: components["schemas"]["Storage"];
             project: components["schemas"]["MinimalProjectSearch"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            storage: components["schemas"]["Storage"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         FolderUpdatePayloadRequest: {
@@ -1571,13 +2526,13 @@ export interface components {
                     field?: {
                         key: string;
                         /** @enum {string} */
-                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                         read_only?: boolean;
                     };
                     custom_key?: string | null;
                     /** @enum {string} */
-                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                    value?: (string | null) | (Record<string, unknown> | null);
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                     mandatory?: boolean;
                 }[];
             } | null;
@@ -1585,15 +2540,16 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
         };
         FolderUsersRequest: {
@@ -1607,15 +2563,6 @@ export interface components {
             /** ID */
             readonly pk: number;
             name: string;
-        };
-        /** @description Serializer class used to validate a username and password.
-         *
-         *     'username' is identified by the custom UserModel.USERNAME_FIELD.
-         *
-         *     Returns a JSON Web Token that can be used to authenticate later calls. */
-        JSONWebTokenRequest: {
-            password: string;
-            email: string;
         };
         LockStatus: {
             readonly locked: boolean;
@@ -1633,14 +2580,15 @@ export interface components {
             custom_key?: string | null;
             field_type?: components["schemas"]["FieldTypeEnum"];
             read_only?: boolean;
-            /** @description Given the *incoming* primitive data, return the value for this field
-             *     that should be validated and transformed to a native value. */
-            readonly value: string | {
-                [key: string]: unknown;
-            };
+            readonly value: (string | null) | (string[] | null) | (Record<string, unknown> | null);
             config?: Record<string, unknown> | null;
             /** Format: uuid */
+            previous_version_field?: string | null;
+            /** Format: uuid */
             metadata_template_field?: string | null;
+            readonly mandatory: boolean;
+            readonly metadata_template: components["schemas"]["MetadataTemplate"] | null;
+            order?: number | null;
             assigned_to_content_type?: components["schemas"]["MetadataAssignedToContentTypeEnum"];
             /** Format: uuid */
             assigned_to_object_id?: string | null;
@@ -1652,22 +2600,18 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
             uploads_datasets: string[];
-        };
-        MetadataDiffValue: {
-            key: string;
-            old: string | null;
-            new: string | null;
         };
         MetadataField: {
             /**
@@ -1684,13 +2628,47 @@ export interface components {
             field_type?: components["schemas"]["FieldTypeEnum"];
             read_only?: boolean;
         };
+        /**
+         * @description * `json` - JSON
+         *     * `csv` - CSV
+         *     * `xml` - XML
+         * @enum {string}
+         */
+        MetadataFormatEnum: "json" | "csv" | "xml";
+        MetadataTag: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            /** Format: uuid */
+            readonly folder: string;
+            readonly value: string;
+        };
         MetadataTemplate: {
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            metadata_template_container: components["schemas"]["MinimalMetadataTemplateContainer"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
             /** Format: date-time */
             readonly creation_date: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+        };
+        MetadataTemplateContainer: {
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly metadata_templates: components["schemas"]["MetadataTemplatesForMetadataTemplateContainer"][];
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             /** Format: uuid */
             assigned_to_object_id?: string | null;
-            assigned_to_content_type?: components["schemas"]["MetadataTemplateAssignedToContentTypeEnum"];
+            readonly assigned_to_content_object_name: string | null;
             readonly project: {
                 /** Format: uuid */
                 pk?: string;
@@ -1701,20 +2679,90 @@ export interface components {
              * Format: uuid
              */
             readonly pk: string;
+            assigned_to_content_type?: components["schemas"]["AssignedToContentTypeDf0Enum"];
+            latest_metadata_template?: components["schemas"]["MinimalMetadataTemplate"] | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
-            readonly assigned_to_content_object_name: string | null;
         };
-        /** @enum {string} */
-        MetadataTemplateAssignedToContentTypeEnum: "folders.folder" | "projects.project";
-        MetadataTemplateCreateRequest: {
+        MetadataTemplateContainerCloneActionPayloadRequest: {
+            assigned_to_content_type?: ("folders.folder" | "projects.project" | "uploads.uploadsdataset") | number | null;
+            /** Format: uuid */
+            assigned_to_object_id?: string | null;
+        };
+        MetadataTemplateContainerCreateRequest: {
             name: string;
-            assigned_to_content_type?: ("folders.folder" | "projects.project") | number | null;
+            assigned_to_content_type?: ("folders.folder" | "projects.project" | "uploads.uploadsdataset") | number | null;
             /** Format: uuid */
             assigned_to_object_id?: string | null;
             metadata_template_fields?: components["schemas"]["MetadataTemplateFieldNestedRequest"][];
+        };
+        MetadataTemplateContainerImportActionRequest: {
+            /** Format: binary */
+            file: string;
+            assigned_to_content_type?: ("folders.folder" | "projects.project" | "uploads.uploadsdataset") | number | null;
+            /** Format: uuid */
+            assigned_to_object_id?: string | null;
+        };
+        MetadataTemplateContainerRestoreVersionActionRequest: {
+            /** Format: uuid */
+            metadata_template: string;
+        };
+        MetadataTemplateContainerUpdateRequest: {
+            name: string;
+        };
+        MetadataTemplateContainerVersionActionPayloadRequest: {
+            name?: string | null;
+            metadata_template_fields?: {
+                field?: {
+                    key: string;
+                    /** @enum {string} */
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                } | (string | null);
+                custom_key?: string | null;
+                /** @enum {string} */
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
+                config?: Record<string, unknown> | null;
+                /** Format: uuid */
+                previous_version_field?: string | null;
+            }[];
+        };
+        MetadataTemplateDiff: {
+            old: components["schemas"]["MinimalMetadataTemplateDiff"];
+            new: components["schemas"]["MinimalMetadataTemplateDiff"];
+        };
+        MetadataTemplateDiffResponse: {
+            readonly fields: components["schemas"]["MetadataTemplateDiffValue"][];
+            version: components["schemas"]["MetadataTemplateDiff"];
+        };
+        MetadataTemplateDiffValue: {
+            old: components["schemas"]["MetadataTemplateField"] | null;
+            new: components["schemas"]["MetadataTemplateField"] | null;
+        };
+        MetadataTemplateExportJob: {
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            /** Format: date-time */
+            readonly finished_at: string | null;
+            readonly download_url: string;
+            readonly error_message: string | null;
+            /** Format: date-time */
+            readonly creation_date: string;
+            readonly status: components["schemas"]["Status024Enum"];
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly metadata_template_container_ids: unknown;
+            /** Format: date-time */
+            readonly expires_at: string | null;
+        };
+        MetadataTemplateExportJobCreateRequest: {
+            metadata_template_containers: string[];
         };
         MetadataTemplateField: {
             /**
@@ -1722,19 +2770,17 @@ export interface components {
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: uuid */
-            metadata_template: string;
+            metadata_template: components["schemas"]["MetadataTemplate"];
             /** Format: uuid */
             field?: string | null;
             custom_key?: string | null;
             field_type?: components["schemas"]["FieldTypeEnum"];
-            /** @description Given the *incoming* primitive data, return the value for this field
-             *     that should be validated and transformed to a native value. */
-            readonly value: string | {
-                [key: string]: unknown;
-            };
+            readonly value: (string | null) | (string[] | null) | (Record<string, unknown> | null);
             config?: unknown;
             mandatory?: boolean;
+            /** Format: uuid */
+            previous_version_field?: string | null;
+            order?: number | null;
         };
         MetadataTemplateFieldNestedRequest: {
             field?: components["schemas"]["MetadataFieldRequest"];
@@ -1742,22 +2788,73 @@ export interface components {
             field_type?: components["schemas"]["FieldTypeEnum"];
             config?: unknown;
             mandatory?: boolean;
+            /** Format: uuid */
+            previous_version_field?: string | null;
+            order?: number | null;
         };
-        MetadataTemplateMinimal: {
+        MetadataTemplateSearch: {
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            name: string;
+            readonly name: string;
+            readonly template_type: string;
+            readonly assigned_to: {
+                result_type?: string;
+                /** Format: uuid */
+                pk?: string;
+                name?: string;
+            } | null;
+            readonly field_count: string;
+            readonly latest_template: {
+                /** Format: uuid */
+                pk?: string;
+                name?: string | null;
+            } | null;
         };
         MetadataTemplateUpdateRequest: {
-            name: string;
-            assigned_to_content_type?: ("folders.folder" | "projects.project") | number | null;
-            /** Format: uuid */
-            assigned_to_object_id?: string | null;
-            metadata_template_fields?: components["schemas"]["MetadataTemplateFieldNestedRequest"][];
+            name?: string | null;
         };
+        MetadataTemplateVersionSearch: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            readonly name: string;
+            readonly template: {
+                /** Format: uuid */
+                pk?: string;
+                name?: string | null;
+            };
+            readonly template_type: string;
+            readonly assigned_to: {
+                result_type?: string;
+                /** Format: uuid */
+                pk?: string;
+                name?: string;
+            } | null;
+            readonly field_count: string;
+        };
+        MetadataTemplatesForMetadataTemplateContainer: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name?: string | null;
+            /** Format: date-time */
+            readonly creation_date: string;
+        };
+        /**
+         * @description * `SCHEDULED` - Scheduled
+         *     * `IN_PROGRESS` - In progress
+         *     * `ERROR` - Error
+         *     * `FINISHED` - Finished
+         * @enum {string}
+         */
+        MetadataUpgradeStatusEnum: "SCHEDULED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
         MinimalFlatUploadsVersion: {
             /**
              * Id
@@ -1766,6 +2863,19 @@ export interface components {
             readonly pk: string;
             /** Format: uuid */
             dataset?: string | null;
+        };
+        MinimalFlatUploadsVersionRequest: {
+            /** Format: uuid */
+            dataset?: string | null;
+        };
+        MinimalFlatUploadsVersionSearch: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name?: string | null;
+            readonly dataset: components["schemas"]["_NestedDatasetPkName"];
         };
         MinimalFolder: {
             /**
@@ -1785,27 +2895,74 @@ export interface components {
             custom_key?: string | null;
             field_type?: components["schemas"]["FieldTypeEnum"];
             read_only?: boolean;
-            /** @description Given the *incoming* primitive data, return the value for this field
-             *     that should be validated and transformed to a native value. */
-            readonly value: string | {
-                [key: string]: unknown;
-            };
+            readonly value: (string | null) | (string[] | null) | (Record<string, unknown> | null);
             config?: unknown;
             /** Format: uuid */
+            previous_version_field?: string | null;
+            /** Format: uuid */
             metadata_template_field?: string | null;
+            readonly mandatory: boolean;
+            readonly metadata_template: components["schemas"]["MetadataTemplate"] | null;
+            order?: number | null;
         };
-        MinimalProjectSearch: {
+        MinimalMetadataRequest: {
+            custom_key?: string | null;
+            field_type?: components["schemas"]["FieldTypeEnum"];
+            read_only?: boolean;
+            config?: unknown;
+            /** Format: uuid */
+            previous_version_field?: string | null;
+            /** Format: uuid */
+            metadata_template_field?: string | null;
+            order?: number | null;
+        };
+        MinimalMetadataTemplate: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name?: string | null;
+        };
+        MinimalMetadataTemplateContainer: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name: string;
+            assigned_to_content_type?: components["schemas"]["AssignedToContentTypeDf0Enum"];
+            /** Format: uuid */
+            assigned_to_object_id?: string | null;
+            readonly assigned_to_content_object_name: string | null;
+            readonly project: {
+                /** Format: uuid */
+                pk?: string;
+                name?: string;
+            } | null;
+        };
+        MinimalMetadataTemplateDiff: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name?: string | null;
             /** Format: date-time */
             readonly creation_date: string;
+        };
+        MinimalProjectSearch: {
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         MinimalUploadsDataset: {
@@ -1818,9 +2975,10 @@ export interface components {
             display_name?: string | null;
         };
         MinimalUploadsDatasetWithFolderSearch: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             /**
              * Id
              * Format: uuid
@@ -1828,8 +2986,7 @@ export interface components {
             readonly pk: string;
             folder?: components["schemas"]["FolderSearch"] | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         MinimalUploadsVersion: {
@@ -1839,6 +2996,7 @@ export interface components {
              */
             readonly pk: string;
             name?: string | null;
+            metadata_is_complete?: boolean;
             readonly version_file: components["schemas"]["MinimalUploadsVersionFile"];
             /** Format: date-time */
             readonly creation_date: string;
@@ -1854,25 +3012,25 @@ export interface components {
             readonly creation_date: string;
         };
         MinimalUploadsVersionFile: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
-            status?: components["schemas"]["Status819Enum"];
+            readonly name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            is_referenced?: boolean;
             readonly is_published: boolean;
             /** Format: date-time */
             publication_date?: string | null;
-            readonly metadata: components["schemas"]["MinimalMetadata"][];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            readonly name: string;
+            readonly creation_date: string;
+            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
+            status?: components["schemas"]["StatusDe1Enum"];
+            readonly metadata: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
-            is_referenced?: boolean;
         };
         MinimalUploadsVersionFileDiff: {
             /**
@@ -1881,34 +3039,36 @@ export interface components {
              */
             readonly pk: string;
             readonly name: string;
-        };
-        MinimalUploadsVersionFileSearch: {
             /** Format: date-time */
             readonly creation_date: string;
+        };
+        MinimalUploadsVersionFileSearch: {
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            readonly name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         MinimalUploadsVersionSearch: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         MinimalUser: {
@@ -1936,9 +3096,33 @@ export interface components {
             is_superuser?: boolean;
             is_anonymized?: boolean;
         };
+        MinimalUserRequest: {
+            /** @description Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only. */
+            username: string;
+            /**
+             * Email address
+             * Format: email
+             */
+            email: string;
+            first_name?: string;
+            last_name?: string;
+            /**
+             * Active
+             * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
+             */
+            is_active?: boolean;
+            /**
+             * Superuser status
+             * @description Designates that this user has all permissions without explicitly assigning them.
+             */
+            is_superuser?: boolean;
+            is_anonymized?: boolean;
+        };
+        /** @enum {string} */
+        MyMembershipEnum: "admin" | "member";
         PaginatedApprovalQueueList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -1949,11 +3133,41 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["ApprovalQueue"][];
+            results: components["schemas"]["ApprovalQueue"][];
+        };
+        PaginatedExportJobList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["ExportJob"][];
+        };
+        PaginatedFileParserConfigurationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["FileParserConfiguration"][];
         };
         PaginatedFolderListList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -1964,11 +3178,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["FolderList"][];
+            results: components["schemas"]["FolderList"][];
         };
         PaginatedMetadataFieldList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -1979,11 +3193,56 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["MetadataField"][];
+            results: components["schemas"]["MetadataField"][];
+        };
+        PaginatedMetadataTagList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["MetadataTag"][];
+        };
+        PaginatedMetadataTemplateContainerList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["MetadataTemplateContainer"][];
+        };
+        PaginatedMetadataTemplateExportJobList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=400&limit=100
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?offset=200&limit=100
+             */
+            previous?: string | null;
+            results: components["schemas"]["MetadataTemplateExportJob"][];
         };
         PaginatedMetadataTemplateFieldList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -1994,11 +3253,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["MetadataTemplateField"][];
+            results: components["schemas"]["MetadataTemplateField"][];
         };
         PaginatedMetadataTemplateList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -2009,11 +3268,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["MetadataTemplate"][];
+            results: components["schemas"]["MetadataTemplate"][];
         };
         PaginatedProjectList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -2024,11 +3283,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["Project"][];
+            results: components["schemas"]["Project"][];
         };
         PaginatedStorageList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -2039,11 +3298,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["Storage"][];
+            results: components["schemas"]["Storage"][];
         };
         PaginatedUploadsDatasetListList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -2054,11 +3313,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["UploadsDatasetList"][];
+            results: components["schemas"]["UploadsDatasetList"][];
         };
         PaginatedUploadsVersionList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -2069,11 +3328,11 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["UploadsVersion"][];
+            results: components["schemas"]["UploadsVersion"][];
         };
         PaginatedUserList: {
             /** @example 123 */
-            count?: number;
+            count: number;
             /**
              * Format: uri
              * @example http://api.example.org/accounts/?offset=400&limit=100
@@ -2084,8 +3343,13 @@ export interface components {
              * @example http://api.example.org/accounts/?offset=200&limit=100
              */
             previous?: string | null;
-            results?: components["schemas"]["User"][];
+            results: components["schemas"]["User"][];
         };
+        /**
+         * @description * `CSV_VALUE` - CSV value
+         * @enum {string}
+         */
+        ParserTypeEnum: "CSV_VALUE";
         PasswordToken: {
             password: string;
             token: string;
@@ -2093,6 +3357,14 @@ export interface components {
         PasswordTokenRequest: {
             password: string;
             token: string;
+        };
+        PatchedFileParserConfigurationRequest: {
+            /** Format: uuid */
+            assigned_to_object_id?: string;
+            config?: unknown;
+            assigned_to_content_type?: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "blacklist.blacklistedtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "file_parser.fileparser" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "metadata.metadatatag" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparserconfiguration") | number;
+            parser_type?: components["schemas"]["ParserTypeEnum"];
+            enabled?: boolean;
         };
         PatchedFolderPermissionUpdateRequest: {
             is_folder_admin?: boolean;
@@ -2110,13 +3382,13 @@ export interface components {
                     field?: {
                         key: string;
                         /** @enum {string} */
-                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                         read_only?: boolean;
                     };
                     custom_key?: string | null;
                     /** @enum {string} */
-                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                    value?: (string | null) | (Record<string, unknown> | null);
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                     mandatory?: boolean;
                 }[];
             } | null;
@@ -2124,23 +3396,23 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
         };
-        PatchedMetadataTemplateUpdateRequest: {
+        PatchedMetadataTemplateContainerUpdateRequest: {
             name?: string;
-            assigned_to_content_type?: ("folders.folder" | "projects.project") | number | null;
-            /** Format: uuid */
-            assigned_to_object_id?: string | null;
-            metadata_template_fields?: components["schemas"]["MetadataTemplateFieldNestedRequest"][];
+        };
+        PatchedMetadataTemplateUpdateRequest: {
+            name?: string | null;
         };
         PatchedProjectMembershipUpdateRequest: {
             is_project_admin?: boolean;
@@ -2156,13 +3428,13 @@ export interface components {
                     field?: {
                         key: string;
                         /** @enum {string} */
-                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                         read_only?: boolean;
                     };
                     custom_key?: string | null;
                     /** @enum {string} */
-                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                    value?: (string | null) | (Record<string, unknown> | null);
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                     mandatory?: boolean;
                 }[];
             } | null;
@@ -2170,15 +3442,16 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
         };
         PatchedUploadRequest: {
@@ -2189,7 +3462,7 @@ export interface components {
             upload_offset?: number;
             /** Format: int64 */
             upload_length?: number;
-            upload_metadata?: string;
+            upload_metadata?: unknown;
             filename?: string;
             temporary_file_path?: string | null;
             /** Format: date-time */
@@ -2201,32 +3474,53 @@ export interface components {
         };
         PatchedUploadsDatasetUpdatePayloadRequest: {
             name?: string | null;
+            metadata_template?: string | {
+                name: string;
+                metadata_template_fields: {
+                    field?: {
+                        key: string;
+                        /** @enum {string} */
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                        read_only?: boolean;
+                    };
+                    custom_key?: string | null;
+                    /** @enum {string} */
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
+                    mandatory?: boolean;
+                }[];
+            } | null;
         };
         PatchedUploadsVersionPayloadRequest: {
             name?: string | null;
             status?: components["schemas"]["UploadsVersionPayloadStatusEnum"];
         };
+        PatchedUserSettingsUpdateRequest: {
+            settings?: unknown;
+        };
         Project: {
-            /** Format: date-time */
-            readonly creation_date: string;
-            readonly folders_count: number;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
-            readonly metadata_templates_count: number;
-            metadata?: components["schemas"]["MinimalMetadata"][];
+            readonly datasets_count: number;
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             readonly folders: components["schemas"]["MinimalFolder"][];
-            readonly members_count: number;
+            readonly my_membership: components["schemas"]["MyMembershipEnum"];
+            readonly metadata_templates_count: number;
+            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
-            readonly is_deletable: boolean;
+            readonly folders_count: number;
             description?: unknown;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
+            readonly is_deletable: boolean;
+            metadata?: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly members_count: number;
         };
         ProjectCreatePayloadRequest: {
             name: string;
@@ -2239,13 +3533,13 @@ export interface components {
                     field?: {
                         key: string;
                         /** @enum {string} */
-                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                         read_only?: boolean;
                     };
                     custom_key?: string | null;
                     /** @enum {string} */
-                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                    value?: (string | null) | (Record<string, unknown> | null);
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                     mandatory?: boolean;
                 }[];
             } | null;
@@ -2253,15 +3547,16 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
         };
         ProjectMembersActionPayloadRequest: {
@@ -2293,18 +3588,21 @@ export interface components {
             can_create_folders?: boolean;
             is_metadata_template_admin?: boolean;
         };
+        ProjectMetadataTemplateContainerPoolActionRequest: {
+            metadata_template_container: string[];
+        };
         ProjectSearch: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         ProjectUpdatePayloadRequest: {
@@ -2316,13 +3614,13 @@ export interface components {
                     field?: {
                         key: string;
                         /** @enum {string} */
-                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                         read_only?: boolean;
                     };
                     custom_key?: string | null;
                     /** @enum {string} */
-                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                    value?: (string | null) | (Record<string, unknown> | null);
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                     mandatory?: boolean;
                 }[];
             } | null;
@@ -2330,15 +3628,16 @@ export interface components {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
         };
         ProjectUsersRequest: {
@@ -2368,20 +3667,193 @@ export interface components {
             question: string;
             slug?: string;
             answer?: string | null;
+            readonly answer_html: string;
             order?: number;
-        };
-        /** @description Serializer used for refreshing JWTs. */
-        RefreshAuthTokenRequest: {
-            token: string;
         };
         ResetTokenRequest: {
             token: string;
         };
-        Search: {
-            projects: components["schemas"]["ProjectSearch"][];
-            folders: components["schemas"]["FolderSearch"][];
-            uploads_datasets: components["schemas"]["UploadsDatasetSearch"][];
-            uploads_versions: components["schemas"]["UploadsVersionSearch"][];
+        /**
+         * @description * `full` - full
+         *     * `compact` - compact
+         * @enum {string}
+         */
+        ResponseModeEnum: "full" | "compact";
+        /**
+         * @description * `project` - project
+         *     * `folder` - folder
+         *     * `dataset` - dataset
+         *     * `dataset_version` - dataset_version
+         *     * `file` - file
+         *     * `template` - template
+         *     * `template_version` - template_version
+         * @enum {string}
+         */
+        ResultTypeEnum: "project" | "folder" | "dataset" | "dataset_version" | "file" | "template" | "template_version";
+        /**
+         * @description * `project` - project
+         *     * `folder` - folder
+         *     * `dataset` - dataset
+         *     * `dataset_version` - dataset_version
+         *     * `file` - file
+         *     * `template` - template
+         *     * `template_version` - template_version
+         * @enum {string}
+         */
+        ResultTypesEnum: "project" | "folder" | "dataset" | "dataset_version" | "file" | "template" | "template_version";
+        SearchMetadataChoiceOptionGroup: {
+            key: string;
+            field_type: components["schemas"]["FieldTypeEnum"];
+            source: components["schemas"]["SourceEnum"];
+            /** Format: uuid */
+            source_id: string;
+            /** Format: uuid */
+            metadata_template_id: string;
+            metadata_template_name: string | null;
+            metadata_template_container_name: string;
+            /** Format: uuid */
+            metadata_template_field_id: string;
+            source_name: string;
+            options: string[];
+        };
+        SearchMetadataChoiceOptionsResponse: {
+            results: components["schemas"]["SearchMetadataChoiceOptionGroup"][];
+        };
+        SearchMetadataKey: {
+            key: string;
+            field_type: components["schemas"]["FieldTypeEnum"];
+            source: components["schemas"]["SourceEnum"];
+            /** Format: uuid */
+            source_id: string;
+            is_linked: boolean;
+        };
+        SearchMetadataKeysResponse: {
+            results: components["schemas"]["SearchMetadataKey"][];
+        };
+        SearchRequestRequest: {
+            /**
+             * @description Result entity types to search across.
+             * @default [
+             *       "project",
+             *       "folder",
+             *       "dataset",
+             *       "dataset_version",
+             *       "file",
+             *       "template",
+             *       "template_version"
+             *     ]
+             */
+            result_types: components["schemas"]["ResultTypesEnum"][];
+            /** @description Optional broad text search across the main searchable fields of each selected result type. */
+            search_text?: string;
+            /**
+             * @description Page size.
+             * @default 25
+             */
+            limit: number;
+            /** @description Opaque cursor returned by a previous search response. */
+            cursor?: string;
+            /**
+             * @description Pagination direction when replaying a cursor.
+             *
+             *     * `next` - next
+             *     * `previous` - previous
+             * @default next
+             */
+            cursor_direction: components["schemas"]["CursorDirectionEnum"];
+            /** @description Sort rules applied to the unified mixed-type result list. Omit to use the conditional default sort. */
+            sort?: components["schemas"]["SearchSortRequest"][];
+            /** @description Optional nested condition tree. A group contains an `operator` (`AND` or `OR`) and a `conditions` array. Each condition is either a rule (`field`, `operator`, `value`) or another group. */
+            group?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * @description Response payload mode. Use `compact` for a lighter result card payload.
+             *
+             *     * `full` - full
+             *     * `compact` - compact
+             * @default full
+             */
+            response_mode: components["schemas"]["ResponseModeEnum"];
+        };
+        SearchResponse: {
+            count: number;
+            next_cursor: string | null;
+            previous_cursor: string | null;
+            results: components["schemas"]["SearchResult"][];
+        };
+        SearchResult: {
+            result_type: components["schemas"]["ResultTypeEnum"];
+            readonly item: components["schemas"]["SearchResultItem"];
+        };
+        SearchResultItem: components["schemas"]["ProjectSearch"] | components["schemas"]["FolderSearch"] | components["schemas"]["UploadsDatasetSearch"] | components["schemas"]["UploadsVersionSearch"] | components["schemas"]["UploadsVersionFileSearch"] | components["schemas"]["MetadataTemplateSearch"] | components["schemas"]["MetadataTemplateVersionSearch"];
+        SearchSchemaDefaultSortCondition: {
+            when: string;
+            sort: components["schemas"]["SearchSchemaDefaultSortConditionSort"][];
+        };
+        SearchSchemaDefaultSortConditionSort: {
+            field: string;
+            direction: string;
+        };
+        SearchSchemaField: {
+            id: string;
+            description: string;
+            operators: string[];
+            metadata_only: boolean;
+            enum_values: string[];
+            operators_by_field_type: {
+                [key: string]: string[];
+            };
+            value_type: string;
+        };
+        SearchSchemaResponse: {
+            result_types: string[];
+            default_result_types: string[];
+            sort_directions: string[];
+            response_modes: string[];
+            types: {
+                [key: string]: components["schemas"]["SearchSchemaType"];
+            };
+        };
+        SearchSchemaType: {
+            fields: components["schemas"]["SearchSchemaField"][];
+            sort_fields: string[];
+            default_sort: components["schemas"]["SearchSort"][];
+            default_sort_conditions: components["schemas"]["SearchSchemaDefaultSortCondition"][];
+        };
+        SearchSort: {
+            /**
+             * @description Sort field. Supported values: relevance, updated_at, created_at.
+             *
+             *     * `relevance` - relevance
+             *     * `updated_at` - updated_at
+             *     * `created_at` - created_at
+             */
+            field: components["schemas"]["FieldEnum"];
+            /**
+             * @description Sort direction.
+             *
+             *     * `asc` - asc
+             *     * `desc` - desc
+             */
+            direction: components["schemas"]["DirectionEnum"];
+        };
+        SearchSortRequest: {
+            /**
+             * @description Sort field. Supported values: relevance, updated_at, created_at.
+             *
+             *     * `relevance` - relevance
+             *     * `updated_at` - updated_at
+             *     * `created_at` - created_at
+             */
+            field: components["schemas"]["FieldEnum"];
+            /**
+             * @description Sort direction.
+             *
+             *     * `asc` - asc
+             *     * `desc` - desc
+             */
+            direction: components["schemas"]["DirectionEnum"];
         };
         Settings: {
             key: string;
@@ -2395,6 +3867,22 @@ export interface components {
             auth_code: string;
         };
         /**
+         * @description * `project` - project
+         *     * `folder` - folder
+         *     * `dataset` - dataset
+         *     * `template` - template
+         * @enum {string}
+         */
+        SourceEnum: "project" | "folder" | "dataset" | "template";
+        /**
+         * @description * `SCHEDULED` - Scheduled
+         *     * `IN_PROGRESS` - In progress
+         *     * `ERROR` - Error
+         *     * `FINISHED` - Finished
+         * @enum {string}
+         */
+        Status024Enum: "SCHEDULED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
+        /**
          * @description * `SCHEDULED` - Scheduled
          *     * `PROCESSED` - Processed
          *     * `IN_PROGRESS` - In progress
@@ -2402,16 +3890,12 @@ export interface components {
          *     * `FINISHED` - Finished
          * @enum {string}
          */
-        Status819Enum: "SCHEDULED" | "PROCESSED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
+        StatusDe1Enum: "SCHEDULED" | "PROCESSED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
         Storage: {
-            /** Format: date-time */
-            readonly creation_date: string;
-            /** @description Type of storage provider
-             *
-             *     * `default_local` - Default Local Storage
-             *     * `private_dss` - Private DSS Storage */
-            storage_type?: components["schemas"]["StorageTypeEnum"];
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name: string;
+            /** Format: date-time */
+            readonly last_modification_date: string;
             default?: boolean;
             local_private_dss_path: string;
             /**
@@ -2419,10 +3903,16 @@ export interface components {
              * Format: uuid
              */
             readonly pk: string;
+            /**
+             * @description Type of storage provider
+             *
+             *     * `default_local` - Default Local Storage
+             *     * `private_dss` - Private DSS Storage
+             */
+            storage_type?: components["schemas"]["StorageTypeEnum"];
             description?: unknown;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name: string;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         StorageCreatePayloadRequest: {
@@ -2451,6 +3941,12 @@ export interface components {
             readonly token: string;
             readonly user: components["schemas"]["UserResponse"];
         };
+        UpcomingAutoDeletion: {
+            today_or_tomorrow: number;
+            in_2_to_3_days: number;
+            in_4_to_7_days: number;
+            in_8_to_14_days: number;
+        };
         Upload: {
             readonly id: number;
             /** Format: uuid */
@@ -2460,7 +3956,7 @@ export interface components {
             upload_offset?: number;
             /** Format: int64 */
             upload_length?: number;
-            upload_metadata: string;
+            upload_metadata?: unknown;
             filename?: string;
             temporary_file_path?: string | null;
             /** Format: date-time */
@@ -2480,7 +3976,7 @@ export interface components {
             upload_offset?: number;
             /** Format: int64 */
             upload_length?: number;
-            upload_metadata: string;
+            upload_metadata?: unknown;
             filename?: string;
             temporary_file_path?: string | null;
             /** Format: date-time */
@@ -2491,28 +3987,33 @@ export interface components {
             dataset?: string | null;
         };
         UploadsDataset: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            display_name?: string | null;
+            readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
+            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
             readonly is_published: boolean;
+            readonly is_expired: boolean;
             /** Format: date-time */
             publication_date?: string | null;
-            /** Format: date-time */
-            expiry_date?: string | null;
-            readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
+            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            display_name?: string | null;
-            folder?: components["schemas"]["Folder"] | null;
-            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
+            status?: components["schemas"]["Status024Enum"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
+            readonly deletable_until_date: string | null;
+            /** Format: date-time */
+            expiry_date?: string | null;
+            folder?: components["schemas"]["Folder"] | null;
+            /** Format: date-time */
+            readonly creation_date: string;
+            readonly uploads_versions_count: number;
             readonly created_by: components["schemas"]["MinimalUser"];
-            readonly is_expired: boolean;
         };
         UploadsDatasetBulkDelete: {
             success: string[];
@@ -2521,10 +4022,96 @@ export interface components {
         UploadsDatasetBulkDeleteActionRequest: {
             uploads_datasets: string[];
         };
+        UploadsDatasetBulkFillMetadataTemplateFieldsEligible: {
+            /** Format: uuid */
+            pk: string;
+            display_name?: string | null;
+            /** Format: uuid */
+            base_version_pk: string | null;
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsField: {
+            /** Format: uuid */
+            pk: string;
+            metadata_template: components["schemas"]["MetadataTemplate"];
+            field?: components["schemas"]["MetadataField"] | null;
+            custom_key: string;
+            field_type: components["schemas"]["FieldTypeEnum"];
+            value?: unknown | null;
+            config: unknown;
+            mandatory: boolean;
+            /** Format: uuid */
+            previous_version_field?: string | null;
+            order?: number | null;
+            various_inputs: boolean;
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsPayloadRequest: {
+            uploads_datasets: string[];
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsResponse: {
+            eligible_uploads_datasets: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsEligible"][];
+            skipped_uploads_datasets_count: number;
+            skip_reasons: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSkipReason"][];
+            warnings: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsWarning"][];
+            has_skipped_due_to_pending_template_upgrade: boolean;
+            fields: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsField"][];
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsSkipReason: {
+            code: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSkipReasonCodeEnum"];
+            count: number;
+        };
+        /**
+         * @description * `PENDING_TEMPLATE_UPGRADE` - PENDING_TEMPLATE_UPGRADE
+         *     * `NOT_IN_FOLDER_SCOPE` - NOT_IN_FOLDER_SCOPE
+         *     * `NO_INHERITED_TEMPLATE_FIELDS` - NO_INHERITED_TEMPLATE_FIELDS
+         *     * `STALE_BASE_VERSION` - STALE_BASE_VERSION
+         *     * `NO_CHANGES` - NO_CHANGES
+         * @enum {string}
+         */
+        UploadsDatasetBulkFillMetadataTemplateFieldsSkipReasonCodeEnum: "PENDING_TEMPLATE_UPGRADE" | "NOT_IN_FOLDER_SCOPE" | "NO_INHERITED_TEMPLATE_FIELDS" | "STALE_BASE_VERSION" | "NO_CHANGES";
+        UploadsDatasetBulkFillMetadataTemplateFieldsSubmitBaseVersionRequest: {
+            /** Format: uuid */
+            uploads_dataset_pk: string;
+            /** Format: uuid */
+            base_version_pk: string | null;
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsSubmitFieldRequest: {
+            /** Format: uuid */
+            metadata_template_field_pk: string;
+            value: unknown | null;
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsSubmitPayloadRequest: {
+            targets: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSubmitBaseVersionRequest"][];
+            fields: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSubmitFieldRequest"][];
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsSubmitResponse: {
+            updated_uploads_datasets_count: number;
+            skipped_uploads_datasets_count: number;
+            skip_reasons: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSkipReason"][];
+        };
+        UploadsDatasetBulkFillMetadataTemplateFieldsWarning: {
+            code: components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsWarningCodeEnum"];
+        };
+        /**
+         * @description * `DIFFERENT_DATASET_METADATA_TEMPLATES` - DIFFERENT_DATASET_METADATA_TEMPLATES
+         * @enum {string}
+         */
+        UploadsDatasetBulkFillMetadataTemplateFieldsWarningCodeEnum: "DIFFERENT_DATASET_METADATA_TEMPLATES";
+        UploadsDatasetBulkPublish: {
+            success: string[];
+            error: components["schemas"]["UploadsDatasetBulkPublishError"][];
+        };
         UploadsDatasetBulkPublishActionRequest: {
             uploads_datasets: string[];
             /** Format: uuid */
             folder: string;
+        };
+        UploadsDatasetBulkPublishError: {
+            /** Format: uuid */
+            pk: string;
+            error: string;
+        };
+        UploadsDatasetBulkUpgradeMetadataActionRequest: {
+            uploads_datasets: string[];
         };
         UploadsDatasetCreatePayloadRequest: {
             name?: string | null;
@@ -2536,129 +4123,228 @@ export interface components {
             file: string;
         };
         UploadsDatasetList: {
-            /** Format: date-time */
-            readonly creation_date: string;
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly is_published: boolean;
+            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
+            uploads_versions_count?: number;
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
             /** Format: date-time */
             publication_date?: string | null;
             /** Format: date-time */
-            expiry_date?: string | null;
+            readonly creation_date: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            metadata_upgrade_status?: components["schemas"]["MetadataUpgradeStatusEnum"];
+            display_name?: string | null;
+            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
             readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly is_expired: boolean;
+            has_upgradeable_metadata_templates?: boolean;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            display_name?: string | null;
-            folder?: components["schemas"]["FolderSearch"] | null;
-            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
-            readonly created_by: components["schemas"]["MinimalUser"];
-            readonly is_expired: boolean;
+            deletable_until_date?: string | null;
+            /** Format: date-time */
+            expiry_date?: string | null;
+            folder?: components["schemas"]["FolderSearch"] | null;
+        };
+        UploadsDatasetMetadataUpgradeStatus: {
+            readonly has_upgradeable_metadata_templates: boolean;
+            readonly metadata_upgrade_status: string;
         };
         UploadsDatasetPublishActionRequest: {
             /** Format: uuid */
             folder?: string;
+        };
+        UploadsDatasetResolveUpgradeMetadataConflictPayloadRequest: {
+            /** Format: uuid */
+            base_version_pk: string;
+            resolutions: components["schemas"]["UploadsDatasetResolveUpgradeMetadataConflictResolutionRequest"][];
+        };
+        UploadsDatasetResolveUpgradeMetadataConflictResolutionRequest: {
+            conflict_id: string;
+            value: unknown | null;
         };
         UploadsDatasetRestoreUploadsVersionActionRequest: {
             /** Format: uuid */
             uploads_version: string;
         };
         UploadsDatasetSearch: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            display_name?: string | null;
+            latest_version?: components["schemas"]["MinimalUploadsVersionSearch"] | null;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            display_name?: string | null;
-            folder?: components["schemas"]["FolderSearch"] | null;
-            latest_version?: components["schemas"]["MinimalUploadsVersionSearch"] | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
+            deletable_until_date?: string | null;
+            folder?: components["schemas"]["FolderSearch"] | null;
+            /** Format: date-time */
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
         UploadsDatasetUpdatePayloadRequest: {
             name?: string | null;
+            metadata_template?: string | {
+                name: string;
+                metadata_template_fields: {
+                    field?: {
+                        key: string;
+                        /** @enum {string} */
+                        field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                        read_only?: boolean;
+                    };
+                    custom_key?: string | null;
+                    /** @enum {string} */
+                    field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                    value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
+                    mandatory?: boolean;
+                }[];
+            } | null;
+        };
+        UploadsDatasetUpgradeMetadataConflict: {
+            conflict_id: string;
+            error: string;
+            old: components["schemas"]["UploadsDatasetUpgradeMetadataConflictValue"];
+            new: components["schemas"]["UploadsDatasetUpgradeMetadataConflictValue"];
+        };
+        UploadsDatasetUpgradeMetadataConflictValue: {
+            field?: components["schemas"]["MetadataField"] | null;
+            custom_key?: string | null;
+            field_type?: components["schemas"]["FieldTypeEnum"];
+            value?: unknown | null;
+            config?: unknown | null;
+            metadata_template_field?: components["schemas"]["MetadataTemplateField"] | null;
+            /** Format: uuid */
+            previous_version_field?: string | null;
+            order?: number | null;
+        };
+        UploadsDatasetUpgradeMetadataPayload: {
+            /** Format: uuid */
+            base_version_pk: string | null;
+            template_versions: components["schemas"]["UploadsDatasetUpgradeMetadataTemplateVersion"][];
+            conflicts: components["schemas"]["UploadsDatasetUpgradeMetadataConflict"][];
+        };
+        UploadsDatasetUpgradeMetadataTemplateVersion: {
+            /** Format: uuid */
+            container_pk: string;
+            /** Format: uuid */
+            old_template_pk?: string | null;
+            /** Format: uuid */
+            new_template_pk?: string | null;
         };
         UploadsDatasetVersionActionPayloadRequest: {
+            name?: string | null;
             metadata?: {
                 field?: {
                     key: string;
                     /** @enum {string} */
-                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
                 } | (string | null);
                 custom_key?: string | null;
                 /** @enum {string} */
-                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION";
-                value?: (string | null) | (Record<string, unknown> | null);
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
                 config?: Record<string, unknown> | null;
                 /** Format: uuid */
                 metadata_template_field?: string | null;
+                order?: number | null;
             }[];
         };
         UploadsVersion: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly metadata_templates: components["schemas"]["MinimalMetadataTemplate"][];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly dataset: components["schemas"]["MinimalUploadsDataset"];
+            readonly version_file: components["schemas"]["MinimalUploadsVersionFile"];
             readonly is_published: boolean;
+            metadata_is_complete?: boolean;
             /** Format: date-time */
             publication_date?: string | null;
-            status?: components["schemas"]["UploadsVersionStatusEnum"];
-            metadata?: components["schemas"]["MinimalMetadata"][];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            metadata_is_complete?: boolean;
-            readonly version_file: components["schemas"]["MinimalUploadsVersionFile"];
-            readonly dataset: components["schemas"]["MinimalUploadsDataset"];
+            status?: components["schemas"]["Status024Enum"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
+            readonly creation_date: string;
+            metadata?: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly restored_uploads_version: components["schemas"]["MinimalUploadsVersion"] | null;
         };
         UploadsVersionDiff: {
             old: components["schemas"]["MinimalUploadsVersionDiff"];
             new: components["schemas"]["MinimalUploadsVersionDiff"];
         };
         UploadsVersionDiffResponse: {
-            readonly metadata: components["schemas"]["MetadataDiffValue"][];
+            readonly metadata: components["schemas"]["UploadsVersionDiffValue"][];
+            readonly version_file_metadata: components["schemas"]["UploadsVersionDiffValue"][];
             version_file?: components["schemas"]["UploadsVersionFileDiff"];
             version: components["schemas"]["UploadsVersionDiff"];
         };
+        UploadsVersionDiffValue: {
+            old: components["schemas"]["MinimalMetadata"] | null;
+            new: components["schemas"]["MinimalMetadata"] | null;
+        };
         UploadsVersionFile: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
-            status?: components["schemas"]["Status819Enum"];
+            readonly uploads_versions: components["schemas"]["MinimalFlatUploadsVersion"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly name: string;
+            is_referenced?: boolean;
             readonly is_published: boolean;
             /** Format: date-time */
             publication_date?: string | null;
-            readonly metadata: components["schemas"]["MinimalMetadata"][];
-            readonly uploads_versions: components["schemas"]["MinimalFlatUploadsVersion"][];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
+            /** Format: date-time */
+            readonly creation_date: string;
             storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
+            status?: components["schemas"]["StatusDe1Enum"];
+            readonly metadata: components["schemas"]["MinimalMetadata"][];
+            readonly created_by: components["schemas"]["MinimalUser"];
+        };
+        UploadsVersionFileDiff: {
+            old: components["schemas"]["MinimalUploadsVersionFileDiff"] | null;
+            new: components["schemas"]["MinimalUploadsVersionFileDiff"] | null;
+        };
+        UploadsVersionFileRequest: {
+            is_referenced?: boolean;
+            /** Format: date-time */
+            publication_date?: string | null;
+            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
+            status?: components["schemas"]["StatusDe1Enum"];
+        };
+        UploadsVersionFileSearch: {
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly uploads_versions: components["schemas"]["MinimalFlatUploadsVersionSearch"][];
             /** Format: date-time */
             readonly last_modification_date: string;
             readonly name: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            /** Format: date-time */
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
-            is_referenced?: boolean;
-        };
-        UploadsVersionFileDiff: {
-            old: components["schemas"]["MinimalUploadsVersionFileDiff"];
-            new: components["schemas"]["MinimalUploadsVersionFileDiff"];
         };
         UploadsVersionPayloadRequest: {
             name?: string | null;
@@ -2667,29 +4353,21 @@ export interface components {
         /** @enum {string} */
         UploadsVersionPayloadStatusEnum: "SCHEDULED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
         UploadsVersionSearch: {
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly last_modified_by: components["schemas"]["MinimalUser"];
+            name?: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            dataset: components["schemas"]["MinimalUploadsDatasetWithFolderSearch"];
+            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
-            dataset: components["schemas"]["MinimalUploadsDatasetWithFolderSearch"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            name?: string | null;
+            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
         };
-        /**
-         * @description * `SCHEDULED` - Scheduled
-         *     * `IN_PROGRESS` - In progress
-         *     * `ERROR` - Error
-         *     * `FINISHED` - Finished
-         * @enum {string}
-         */
-        UploadsVersionStatusEnum: "SCHEDULED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
         UploadsVersionsForUploadsDataset: {
             /**
              * Id
@@ -2744,6 +4422,7 @@ export interface components {
             im_titel_anrede?: string | null;
             im_titel_pre?: string | null;
             im_titel_post?: string | null;
+            settings?: unknown;
         };
         /** @description Used only for OpenAPI generator */
         UserResponse: {
@@ -2787,10 +4466,15 @@ export interface components {
             im_titel_anrede?: string | null;
             im_titel_pre?: string | null;
             im_titel_post?: string | null;
+            settings?: unknown;
         };
-        /** @description Serializer used for verifying JWTs. */
-        VerifyAuthTokenRequest: {
-            token: string;
+        _NestedDatasetPkName: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name?: string | null;
         };
     };
     responses: never;
@@ -2913,13 +4597,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["JSONWebTokenRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["JSONWebTokenRequest"];
-                "multipart/form-data": components["schemas"]["JSONWebTokenRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             201: {
                 headers: {
@@ -2957,13 +4635,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshAuthTokenRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["RefreshAuthTokenRequest"];
-                "multipart/form-data": components["schemas"]["RefreshAuthTokenRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             201: {
                 headers: {
@@ -2982,13 +4654,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VerifyAuthTokenRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["VerifyAuthTokenRequest"];
-                "multipart/form-data": components["schemas"]["VerifyAuthTokenRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             201: {
                 headers: {
@@ -3055,6 +4721,133 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContentPageList"];
+                };
+            };
+        };
+    };
+    v1_dashboard_list: {
+        parameters: {
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardSnapshot"];
+                };
+            };
+        };
+    };
+    v1_export_list: {
+        parameters: {
+            query?: {
+                export_type?: "folders.folder" | "projects.project" | "uploads.uploadsdataset" | "uploads.uploadsversion";
+                include_uploads_version_file?: boolean;
+                include_uploads_version_file_metadata?: boolean;
+                /** @description Number of results to return per page. */
+                limit?: number;
+                metadata_format?: "csv" | "json" | "xml";
+                /** @description Filter export jobs whose exported object list contains this UUID. */
+                object_id?: string;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                ordering?: "-expires_at" | "-finished_at" | "expires_at" | "finished_at";
+                /** @description A search term. */
+                search?: string;
+                status?: "ERROR" | "FINISHED" | "IN_PROGRESS" | "SCHEDULED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedExportJobList"];
+                };
+            };
+        };
+    };
+    v1_export_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportJobCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ExportJobCreateRequest"];
+                "multipart/form-data": components["schemas"]["ExportJobCreateRequest"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportJob"];
+                };
+            };
+        };
+    };
+    v1_export_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this export job. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportJob"];
+                };
+            };
+        };
+    };
+    v1_export_download_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this export job. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportJob"];
                 };
             };
         };
@@ -3151,9 +4944,184 @@ export interface operations {
             };
         };
     };
+    v1_file_parser_configuration_list: {
+        parameters: {
+            query?: {
+                assigned_to_content_type?: "folders.folder" | "projects.project" | "uploads.uploadsdataset";
+                assigned_to_object_id?: string;
+                enabled?: boolean;
+                limit?: number;
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                parser_type?: "CSV_VALUE";
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedFileParserConfigurationList"];
+                };
+            };
+        };
+    };
+    v1_file_parser_configuration_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileParserConfigurationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["FileParserConfigurationRequest"];
+                "multipart/form-data": components["schemas"]["FileParserConfigurationRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileParserConfiguration"];
+                };
+            };
+        };
+    };
+    v1_file_parser_configuration_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this file parser configuration. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileParserConfiguration"];
+                };
+            };
+        };
+    };
+    v1_file_parser_configuration_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this file parser configuration. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileParserConfigurationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["FileParserConfigurationRequest"];
+                "multipart/form-data": components["schemas"]["FileParserConfigurationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileParserConfiguration"];
+                };
+            };
+        };
+    };
+    v1_file_parser_configuration_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this file parser configuration. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_file_parser_configuration_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this file parser configuration. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedFileParserConfigurationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedFileParserConfigurationRequest"];
+                "multipart/form-data": components["schemas"]["PatchedFileParserConfigurationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileParserConfiguration"];
+                };
+            };
+        };
+    };
+    v1_file_parser_configuration_available_types_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileParserConfiguration"];
+                };
+            };
+        };
+    };
     v1_folder_list: {
         parameters: {
             query?: {
+                /** @description Filter by 'can edit' permission */
+                folder_permission__can_edit?: boolean;
                 /** @description Number of results to return per page. */
                 limit?: number;
                 metadata_template?: string;
@@ -3475,13 +5443,87 @@ export interface operations {
             };
         };
     };
+    v1_folder_metadata_template_container_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this folder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"][];
+                };
+            };
+        };
+    };
+    v1_folder_metadata_template_container_pool_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this folder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"][];
+                };
+            };
+        };
+    };
+    v1_folder_metadata_template_container_pool_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this folder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolderMetadataTemplateContainerPoolActionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["FolderMetadataTemplateContainerPoolActionRequest"];
+                "multipart/form-data": components["schemas"]["FolderMetadataTemplateContainerPoolActionRequest"];
+            };
+        };
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     v1_folder_metadata_templates_list: {
         parameters: {
             query?: {
-                metadata_template?: string;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
-                project?: string;
                 /** @description A search term. */
                 search?: string;
             };
@@ -3506,10 +5548,7 @@ export interface operations {
     };
     v1_folder_permissions_update: {
         parameters: {
-            query?: {
-                metadata_template?: string;
-                project?: string;
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this folder. */
@@ -3610,15 +5649,19 @@ export interface operations {
     v1_metadata_field_list: {
         parameters: {
             query?: {
-                /** @description * `INTEGER` - Integer
+                /**
+                 * @description * `INTEGER` - Integer
                  *     * `DECIMAL` - Decimal
                  *     * `DATETIME` - Date & Time
                  *     * `DATE` - Date
                  *     * `TIME` - Time
                  *     * `TEXT` - Text
                  *     * `WYSIWYG` - WYSIWYG editor
-                 *     * `SELECTION` - Selection */
-                field_type?: "DATE" | "DATETIME" | "DECIMAL" | "INTEGER" | "SELECTION" | "TEXT" | "TIME" | "WYSIWYG";
+                 *     * `SELECTION` - Selection
+                 *     * `MULTI_SELECTION` - Multi selection
+                 *     * `TAG` - Tag
+                 */
+                field_type?: "DATE" | "DATETIME" | "DECIMAL" | "INTEGER" | "MULTI_SELECTION" | "SELECTION" | "TAG" | "TEXT" | "TIME" | "WYSIWYG";
                 /** @description Number of results to return per page. */
                 limit?: number;
                 /** @description The initial index from which to return the results. */
@@ -3667,12 +5710,60 @@ export interface operations {
             };
         };
     };
+    v1_metadata_tag_list: {
+        parameters: {
+            query: {
+                folder: string;
+                limit?: number;
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMetadataTagList"];
+                };
+            };
+        };
+    };
+    v1_metadata_tag_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata tag. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTag"];
+                };
+            };
+        };
+    };
     v1_metadata_template_list: {
         parameters: {
             query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project" | "uploads.uploadsversion" | "uploads.uploadsversionfile";
-                assigned_to_object_id?: string;
                 limit?: number;
+                metadata_template_container?: string;
                 offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
@@ -3695,10 +5786,39 @@ export interface operations {
             };
         };
     };
-    v1_metadata_template_create: {
+    v1_metadata_template_container_list: {
         parameters: {
             query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
+                assigned_to_content_type?: "folders.folder" | "projects.project" | "uploads.uploadsdataset";
+                assigned_to_object_id?: string;
+                limit?: number;
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMetadataTemplateContainerList"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_create: {
+        parameters: {
+            query?: {
+                /** @description When true, suppress the automatic addition of a scoped template container to its project's or folder's pool. Defaults to false, meaning scoped creates are auto-pooled for callers with pool-edit permission. */
+                skip_pool_add?: boolean;
             };
             header?: never;
             path?: never;
@@ -3706,9 +5826,165 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MetadataTemplateCreateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateCreateRequest"];
-                "multipart/form-data": components["schemas"]["MetadataTemplateCreateRequest"];
+                "application/json": components["schemas"]["MetadataTemplateContainerCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateContainerCreateRequest"];
+                "multipart/form-data": components["schemas"]["MetadataTemplateContainerCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetadataTemplateContainerUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateContainerUpdateRequest"];
+                "multipart/form-data": components["schemas"]["MetadataTemplateContainerUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedMetadataTemplateContainerUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedMetadataTemplateContainerUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedMetadataTemplateContainerUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_clone_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MetadataTemplateContainerCloneActionPayloadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateContainerCloneActionPayloadRequest"];
+                "multipart/form-data": components["schemas"]["MetadataTemplateContainerCloneActionPayloadRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_lock_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LockStatus"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_restore_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetadataTemplateContainerRestoreVersionActionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateContainerRestoreVersionActionRequest"];
+                "multipart/form-data": components["schemas"]["MetadataTemplateContainerRestoreVersionActionRequest"];
             };
         };
         responses: {
@@ -3718,6 +5994,199 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MetadataTemplate"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_status_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LockStatus"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_unlock_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LockStatus"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_version_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template container. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MetadataTemplateContainerVersionActionPayloadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateContainerVersionActionPayloadRequest"];
+                "multipart/form-data": components["schemas"]["MetadataTemplateContainerVersionActionPayloadRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplate"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_container_import_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["MetadataTemplateContainerImportActionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateContainerImportActionRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_export_list: {
+        parameters: {
+            query?: {
+                /** @description Number of results to return per page. */
+                limit?: number;
+                /** @description The initial index from which to return the results. */
+                offset?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMetadataTemplateExportJobList"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_export_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetadataTemplateExportJobCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateExportJobCreateRequest"];
+                "multipart/form-data": components["schemas"]["MetadataTemplateExportJobCreateRequest"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateExportJob"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_export_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template export job. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateExportJob"];
+                };
+            };
+        };
+    };
+    v1_metadata_template_export_download_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template export job. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateExportJob"];
                 };
             };
         };
@@ -3776,9 +6245,7 @@ export interface operations {
     };
     v1_metadata_template_retrieve: {
         parameters: {
-            query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this metadata template. */
@@ -3800,9 +6267,7 @@ export interface operations {
     };
     v1_metadata_template_update: {
         parameters: {
-            query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this metadata template. */
@@ -3810,7 +6275,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/json": components["schemas"]["MetadataTemplateUpdateRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["MetadataTemplateUpdateRequest"];
@@ -3830,9 +6295,7 @@ export interface operations {
     };
     v1_metadata_template_partial_update: {
         parameters: {
-            query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this metadata template. */
@@ -3858,11 +6321,34 @@ export interface operations {
             };
         };
     };
+    v1_metadata_template_diff_retrieve: {
+        parameters: {
+            query: {
+                /** @description UUID of the metadata template to compare with */
+                compare: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this metadata template. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateDiffResponse"];
+                };
+            };
+        };
+    };
     v1_metadata_template_lock_create: {
         parameters: {
-            query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this metadata template. */
@@ -3884,9 +6370,7 @@ export interface operations {
     };
     v1_metadata_template_status_retrieve: {
         parameters: {
-            query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this metadata template. */
@@ -3908,9 +6392,7 @@ export interface operations {
     };
     v1_metadata_template_unlock_create: {
         parameters: {
-            query?: {
-                assigned_to_content_type?: "folders.folder" | "projects.project";
-            };
+            query?: never;
             header?: never;
             path: {
                 /** @description A UUID string identifying this metadata template. */
@@ -3986,6 +6468,8 @@ export interface operations {
                 offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                /** @description Filter by up to 50 project IDs. Repeat the parameter for multiple IDs. */
+                pk?: string[];
                 /** @description A search term. */
                 search?: string;
             };
@@ -4354,6 +6838,82 @@ export interface operations {
             };
         };
     };
+    v1_project_metadata_template_container_list: {
+        parameters: {
+            query?: {
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this project. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"][];
+                };
+            };
+        };
+    };
+    v1_project_metadata_template_container_pool_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this project. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"][];
+                };
+            };
+        };
+    };
+    v1_project_metadata_template_container_pool_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this project. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectMetadataTemplateContainerPoolActionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ProjectMetadataTemplateContainerPoolActionRequest"];
+                "multipart/form-data": components["schemas"]["ProjectMetadataTemplateContainerPoolActionRequest"];
+            };
+        };
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     v1_project_metadata_templates_list: {
         parameters: {
             query?: {
@@ -4518,12 +7078,64 @@ export interface operations {
             };
         };
     };
-    v1_search_global_retrieve: {
+    v1_search_global_create: {
         parameters: {
             query?: {
-                content_types?: ("folders.folder" | "projects.project" | "uploads.uploadsversion" | "uploads.uploadsversionfile")[];
-                limit?: number;
-                term?: string;
+                /** @description Optional response payload mode override. `compact` returns a lighter result item shape. */
+                view?: "compact" | "full";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SearchRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SearchRequestRequest"];
+                "multipart/form-data": components["schemas"]["SearchRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResponse"];
+                    "application/json;mode=compact": components["schemas"]["CompactSearchResponse"];
+                };
+            };
+        };
+    };
+    v1_search_global_schema_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchSchemaResponse"];
+                };
+            };
+        };
+    };
+    v1_search_metadata_choice_options_retrieve: {
+        parameters: {
+            query: {
+                dataset_id?: string[];
+                field_type: "MULTI_SELECTION" | "SELECTION" | "TAG";
+                folder_id?: string[];
+                /** @description One or more exact metadata keys, in display order. */
+                key: string[];
+                project_id?: string[];
+                template_id?: string[];
             };
             header?: never;
             path?: never;
@@ -4536,7 +7148,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Search"];
+                    "application/json": components["schemas"]["SearchMetadataChoiceOptionsResponse"];
+                };
+            };
+        };
+    };
+    v1_search_metadata_keys_retrieve: {
+        parameters: {
+            query?: {
+                /** @description One or more dataset UUIDs; each pulls in keys from its parent folder and project. */
+                dataset_id?: string[];
+                /** @description One or more folder UUIDs; each pulls in keys from its parent project too. */
+                folder_id?: string[];
+                /** @description One or more project UUIDs to include in the scope. */
+                project_id?: string[];
+                /** @description One or more metadata template container UUIDs. Rows from these templates are tagged `source: "template"`. When combined with entity scopes, entity rows are filtered to keys that also appear on a supplied template. */
+                template_id?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchMetadataKeysResponse"];
                 };
             };
         };
@@ -4713,16 +7353,46 @@ export interface operations {
         parameters: {
             query?: {
                 created_by?: number;
+                creation_date?: string;
+                deletable_until_date?: string;
+                display_name?: string;
+                expiry_date?: string;
                 folder?: string;
+                has_upgradeable_metadata_templates?: boolean;
+                id?: string;
+                last_modification_date?: string;
                 last_modified_by?: number;
                 /** @description Number of results to return per page. */
                 limit?: number;
+                locked?: boolean;
+                locked_at?: string;
+                locked_by?: number;
+                /** @description Filter by metadata is complete (latest version) */
+                metadata_is_complete?: boolean;
+                metadata_template?: string;
+                /**
+                 * @description * `SCHEDULED` - Scheduled
+                 *     * `IN_PROGRESS` - In progress
+                 *     * `ERROR` - Error
+                 *     * `FINISHED` - Finished
+                 */
+                metadata_upgrade_status?: "ERROR" | "FINISHED" | "IN_PROGRESS" | "SCHEDULED";
+                name?: string;
                 /** @description The initial index from which to return the results. */
                 offset?: number;
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                publication_date?: string;
                 /** @description A search term. */
                 search?: string;
+                /**
+                 * @description * `SCHEDULED` - Scheduled
+                 *     * `IN_PROGRESS` - In progress
+                 *     * `ERROR` - Error
+                 *     * `FINISHED` - Finished
+                 */
+                status?: "ERROR" | "FINISHED" | "IN_PROGRESS" | "SCHEDULED";
+                uploads_versions_count?: number;
             };
             header?: never;
             path?: never;
@@ -4774,7 +7444,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/offset+octet-stream": components["schemas"]["UploadRequest"];
             };
@@ -4800,7 +7470,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
                 "application/offset+octet-stream": components["schemas"]["UploadRequest"];
             };
@@ -5012,6 +7682,92 @@ export interface operations {
             };
         };
     };
+    v1_uploads_dataset_metadata_template_container_list: {
+        parameters: {
+            query?: {
+                created_by?: number;
+                folder?: string;
+                last_modified_by?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"][];
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_metadata_template_container_pool_list: {
+        parameters: {
+            query?: {
+                created_by?: number;
+                folder?: string;
+                last_modified_by?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplateContainer"][];
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_metadata_templates_list: {
+        parameters: {
+            query?: {
+                created_by?: number;
+                folder?: string;
+                last_modified_by?: number;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetadataTemplate"][];
+                };
+            };
+        };
+    };
     v1_uploads_dataset_publish_create: {
         parameters: {
             query?: never;
@@ -5075,6 +7831,34 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_resolve_upgrade_metadata_conflict_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadsDatasetResolveUpgradeMetadataConflictPayloadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UploadsDatasetResolveUpgradeMetadataConflictPayloadRequest"];
+                "multipart/form-data": components["schemas"]["UploadsDatasetResolveUpgradeMetadataConflictPayloadRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDataset"];
                 };
             };
         };
@@ -5151,6 +7935,72 @@ export interface operations {
             };
         };
     };
+    v1_uploads_dataset_upgrade_metadata_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDataset"];
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_upgrade_metadata_payload_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDatasetUpgradeMetadataPayload"];
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_upgrade_metadata_status_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads dataset. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDatasetMetadataUpgradeStatus"];
+                };
+            };
+        };
+    };
     v1_uploads_dataset_version_create: {
         parameters: {
             query?: never;
@@ -5204,6 +8054,56 @@ export interface operations {
             };
         };
     };
+    v1_uploads_dataset_bulk_fill_metadata_template_fields_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsPayloadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsPayloadRequest"];
+                "multipart/form-data": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsPayloadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsResponse"];
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_bulk_fill_metadata_template_fields_submit_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSubmitPayloadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSubmitPayloadRequest"];
+                "multipart/form-data": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSubmitPayloadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDatasetBulkFillMetadataTemplateFieldsSubmitResponse"];
+                };
+            };
+        };
+    };
     v1_uploads_dataset_bulk_publish_create: {
         parameters: {
             query?: never;
@@ -5216,6 +8116,39 @@ export interface operations {
                 "application/json": components["schemas"]["UploadsDatasetBulkPublishActionRequest"];
                 "application/x-www-form-urlencoded": components["schemas"]["UploadsDatasetBulkPublishActionRequest"];
                 "multipart/form-data": components["schemas"]["UploadsDatasetBulkPublishActionRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDatasetBulkPublish"];
+                };
+            };
+            207: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsDatasetBulkPublish"];
+                };
+            };
+        };
+    };
+    v1_uploads_dataset_bulk_upgrade_metadata_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadsDatasetBulkUpgradeMetadataActionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UploadsDatasetBulkUpgradeMetadataActionRequest"];
+                "multipart/form-data": components["schemas"]["UploadsDatasetBulkUpgradeMetadataActionRequest"];
             };
         };
         responses: {
@@ -5237,6 +8170,7 @@ export interface operations {
                 last_modified_by?: number;
                 /** @description Number of results to return per page. */
                 limit?: number;
+                metadata_is_complete?: boolean;
                 /** @description The initial index from which to return the results. */
                 offset?: number;
                 /** @description Which field to use when ordering the results. */
@@ -5244,11 +8178,13 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 version_file?: string;
-                /** @description * `SCHEDULED` - Scheduled
+                /**
+                 * @description * `SCHEDULED` - Scheduled
                  *     * `PROCESSED` - Processed
                  *     * `IN_PROGRESS` - In progress
                  *     * `ERROR` - Error
-                 *     * `FINISHED` - Finished */
+                 *     * `FINISHED` - Finished
+                 */
                 version_file__status?: "ERROR" | "FINISHED" | "IN_PROGRESS" | "PROCESSED" | "SCHEDULED";
             };
             header?: never;
@@ -5278,6 +8214,56 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsVersionFile"];
+                };
+            };
+        };
+    };
+    v1_uploads_version_file_parser_processing_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads version file. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsVersionFile"];
+                };
+            };
+        };
+    };
+    v1_uploads_version_file_retrigger_parser_processing_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads version file. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UploadsVersionFileRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UploadsVersionFileRequest"];
+                "multipart/form-data": components["schemas"]["UploadsVersionFileRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -5370,7 +8356,7 @@ export interface operations {
     v1_uploads_version_diff_retrieve: {
         parameters: {
             query: {
-                /** @description UUID of the UploadsVersion to compare with */
+                /** @description UUID of the uploads version to compare with */
                 compare: string;
             };
             header?: never;
@@ -5496,6 +8482,31 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["User"];
+                };
+            };
+        };
+    };
+    v1_user_me_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedUserSettingsUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedUserSettingsUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedUserSettingsUpdateRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {

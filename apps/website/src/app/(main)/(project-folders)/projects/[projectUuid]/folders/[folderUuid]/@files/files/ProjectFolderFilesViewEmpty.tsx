@@ -37,10 +37,10 @@ export function ProjectFolderFilesViewEmpty(props: { readonly folderUuid: string
 	const canUploadFiles = folderPermissionData?.[0]?.is_folder_admin || folderPermissionData?.[0]?.can_edit;
 
 	return (
-		<div className="bg-base-lavender-100/38 text-base-neutral-900 dark:bg-base-lavender-800/38 dark:text-base-neutral-40 flex h-[269px] flex-col place-content-center gap-8 rounded-2xl text-center">
+		<div className="flex h-[269px] flex-col place-content-center gap-8 rounded-2xl bg-base-lavender-100/38 text-center text-base-neutral-900 dark:bg-base-lavender-800/38 dark:text-base-neutral-40">
 			<div className="flex flex-col gap-2">
 				<span className="text-base-xl">No files yet</span>
-				<span>Assigned files will appear here.</span>
+				<span>Added files will appear here.</span>
 			</div>
 			{canUploadFiles ? (
 				<div className="flex place-content-center gap-2">
@@ -57,13 +57,9 @@ export function ProjectFolderFilesViewEmpty(props: { readonly folderUuid: string
 					<Modal isOpen={isOpen} onOpenChange={setIsOpen}>
 						<Button variant="filled">
 							<PackageOpenIcon aria-hidden size={18} strokeWidth={1.5} />
-							Assign files
+							Add files
 						</Button>
-						<ProjectFolderFilesDraftFilesAssignDialog
-							folderUuid={props.folderUuid}
-							isOpen={isOpen}
-							onOpenChange={setIsOpen}
-						/>
+						<ProjectFolderFilesDraftFilesAssignDialog folderUuid={props.folderUuid} />
 					</Modal>
 				</div>
 			) : null}

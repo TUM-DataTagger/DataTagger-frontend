@@ -2,9 +2,9 @@
 
 import type { VariantProps } from 'cva';
 import { CheckIcon } from 'lucide-react';
-import type { RefObject } from 'react';
-import { Switch as RACSwitch } from 'react-aria-components';
+import { composeRenderProps, Switch as RACSwitch } from 'react-aria-components';
 import type { SwitchProps as RACSwitchProps } from 'react-aria-components';
+import { Description, Label } from '@/components/ui/Field';
 import { compose, cva, cx } from '@/styles/cva';
 import { focusRing } from '@/styles/ui/focusRing';
 import { composeTailwindRenderProps } from '@/styles/util';
@@ -12,24 +12,24 @@ import { composeTailwindRenderProps } from '@/styles/util';
 export const switchStyles = compose(
 	focusRing,
 	cva({
-		base: 'text-base-md rounded-3xl border border-transparent px-px py-px transition forced-colors:bg-[Highlight]',
+		base: 'relative isolate inline-flex rounded-3xl border border-transparent px-px py-px transition forced-colors:bg-[Highlight]',
 		variants: {
 			variant: {
 				default: [
-					'bg-base-neutral-500 dark:bg-base-neutral-300 text-base-neutral-800 dark:text-base-neutral-100',
+					'bg-base-neutral-500 text-base-neutral-800 dark:bg-base-neutral-300 dark:text-base-neutral-100',
 					'group-hover:bg-base-neutral-400',
 					'group-focus-visible:bg-base-neutral-400',
-					'group-disabled:bg-base-neutral-200 dark:group-disabled:bg-base-neutral-700 group-disabled:cursor-default',
+					'group-disabled:cursor-default group-disabled:bg-base-neutral-200 dark:group-disabled:bg-base-neutral-700',
 					'group-selected:bg-base-neutral-800 group-selected:dark:bg-base-neutral-100',
 					'group-selected:group-hover:bg-base-neutral-600 group-selected:dark:group-hover:bg-base-neutral-300',
 					'group-selected:group-focus-visible:bg-base-neutral-600 group-selected:dark:group-focus-visible:bg-base-neutral-300',
 					'group-selected:group-pressed:bg-base-neutral-200 group-selected:dark:group-pressed:bg-base-neutral-700',
 				],
 				'green-lime': [
-					'bg-base-neutral-500 dark:bg-base-neutral-300 text-base-neutral-800 dark:text-base-neutral-100',
+					'bg-base-neutral-500 text-base-neutral-800 dark:bg-base-neutral-300 dark:text-base-neutral-100',
 					'group-hover:bg-base-neutral-400',
 					'group-focus-visible:bg-base-neutral-400',
-					'group-disabled:bg-base-neutral-200 dark:group-disabled:bg-base-neutral-700 group-disabled:cursor-default',
+					'group-disabled:cursor-default group-disabled:bg-base-neutral-200 dark:group-disabled:bg-base-neutral-700',
 					'group-selected:bg-base-green-lime-600 group-selected:dark:bg-base-green-lime-400',
 					'group-selected:group-hover:bg-base-green-lime-400 group-selected:dark:group-hover:bg-base-green-lime-600',
 					'group-selected:group-focus-visible:bg-base-green-lime-400 group-selected:dark:group-focus-visible:bg-base-green-lime-600',
@@ -50,7 +50,8 @@ export const switchStyles = compose(
 
 export type SwitchProps = RACSwitchProps &
 	VariantProps<typeof switchStyles> & {
-		readonly ref?: RefObject<HTMLLabelElement>;
+		readonly description?: string;
+		readonly label?: string;
 	};
 
 export function Switch(props: SwitchProps) {
@@ -59,27 +60,57 @@ export function Switch(props: SwitchProps) {
 			{...props}
 			className={composeTailwindRenderProps(
 				props.className,
-				'group inline-flex touch-none place-items-center gap-2 disabled:opacity-38',
+				'group has-[[slot=description]]:**:data-[slot=label]:text-base-label-md relative grid grid-cols-[1fr_auto] place-items-center gap-2 disabled:opacity-38 *:data-[slot=indicator]:col-start-1 *:data-[slot=indicator]:place-self-start *:data-[slot=label]:col-start-2 *:data-[slot=label]:row-start-1 *:data-[slot=label]:place-self-start *:[[slot=description]]:col-start-2 *:[[slot=description]]:row-start-2 *:[[slot=description]]:place-self-start',
 			)}
-			style={{ WebkitTapHighlightColor: 'transparent' }}
+			data-slot="control"
+			style={({ defaultStyle }) => ({
+				...defaultStyle,
+				WebkitTapHighlightColor: 'transparent',
+			})}
 		>
-			{(values) => (
-				<>
-					<span className={switchStyles({ ...values, variant: props.variant, size: props.size })}>
+			{composeRenderProps(props.children, (children, values) => {
+				const isStringChild = typeof children === 'string';
+				const hasCustomChildren = typeof children !== 'undefined';
+
+				const content = hasCustomChildren ? (
+					isStringChild ? (
+						<SwitchLabel>{children}</SwitchLabel>
+					) : (
+						children
+					)
+				) : (
+					<>
+						{props.label && <SwitchLabel>{props.label}</SwitchLabel>}
+						{props.description && <Description>{props.description}</Description>}
+					</>
+				);
+
+				return (
+					<>
 						<span
-							className={cx(
-								'group-pressed:w-6 group-selected:ml-4 bg-base-neutral-0 dark:bg-base-neutral-800 group-selected:group-pressed:ml-2 flex size-5 origin-right place-content-center place-items-center rounded-3xl transition-all duration-200 *:data-[slot=icon]:size-4 forced-colors:disabled:outline-[GrayText]',
-								props.size === 'sm' && 'group-pressed:w-5 group-selected:group-pressed:ml-3 size-4',
-							)}
+							className={switchStyles({ ...values, variant: props.variant, size: props.size })}
+							data-slot="indicator"
 						>
-							{values.isSelected && props.size !== 'sm' ? (
-								<CheckIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
-							) : null}
+							<span
+								aria-hidden
+								className={cx(
+									'pointer-events-none relative flex size-5 origin-right place-content-center place-items-center rounded-3xl bg-base-neutral-0 transition-all duration-200 group-pressed:w-6 group-selected:ml-4 group-selected:group-pressed:ml-2 *:data-[slot=icon]:size-4 *:data-[slot=icon]:shrink-0 dark:bg-base-neutral-800 forced-colors:disabled:outline-[GrayText]',
+									props.size === 'sm' && 'size-4 group-pressed:w-5 group-selected:group-pressed:ml-3',
+								)}
+							>
+								{values.isSelected && props.size !== 'sm' ? (
+									<CheckIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
+								) : null}
+							</span>
 						</span>
-					</span>
-					{typeof props.children === 'function' ? props.children(values) : props.children}
-				</>
-			)}
+						{content}
+					</>
+				);
+			})}
 		</RACSwitch>
 	);
+}
+
+export function SwitchLabel(props: React.ComponentProps<typeof Label>) {
+	return <Label {...props} elementType="span" data-slot="control-label" />;
 }

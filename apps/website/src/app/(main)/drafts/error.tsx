@@ -4,9 +4,10 @@ import { RefreshCwIcon } from 'lucide-react';
 import { NotFoundIcon } from '@/components/icons/NotFoundIcon';
 import { Button } from '@/components/ui/Button';
 import { buttonStyles } from '@/styles/ui/button';
+import { logger, LogCategory } from '@/util/logger';
 
 export default function Error({ error, reset }: { readonly error: Error & { digest?: string }; reset(): void }) {
-	console.error(error);
+	logger.error(LogCategory.Error, 'Drafts page error', { digest: error.digest, message: error.message });
 
 	return (
 		<div className="grow">
@@ -14,8 +15,8 @@ export default function Error({ error, reset }: { readonly error: Error & { dige
 				<NotFoundIcon />
 				<div className="flex flex-col gap-8">
 					<div className="flex flex-col gap-2">
-						<h1 className="text-base-lg md:text-base-heading-xs text-center">Error: Error</h1>
-						<p className="text-base-md md:text-base-lg text-center">
+						<h1 className="text-center text-base-lg md:text-base-heading-xs">Error: Error</h1>
+						<p className="text-center text-base-md md:text-base-lg">
 							This component has entered an errornous state. Click retry to try again.
 						</p>
 					</div>

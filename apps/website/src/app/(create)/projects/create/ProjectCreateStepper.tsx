@@ -29,7 +29,7 @@ export function ProjectCreateStepper(props: { readonly className?: string }) {
 						'flex size-[18px] place-content-center place-items-center rounded-full tabular-nums',
 						isStepOne
 							? 'bg-base-neutral-700 text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900'
-							: 'border-base-neutral-300 dark:border-base-neutral-500 dark:text-base-neutral-100 border',
+							: 'border border-base-neutral-300 dark:border-base-neutral-500 dark:text-base-neutral-100',
 					)}
 				>
 					1
@@ -37,7 +37,7 @@ export function ProjectCreateStepper(props: { readonly className?: string }) {
 				<span
 					className={cx(
 						isStepOne
-							? 'group-pressed:underline dark:text-base-neutral-100 group-hover:underline group-focus-visible:underline'
+							? 'group-hover:underline group-focus-visible:underline group-pressed:underline dark:text-base-neutral-100'
 							: 'text-base-neutral-600 dark:text-base-neutral-300',
 					)}
 				>
@@ -54,10 +54,10 @@ export function ProjectCreateStepper(props: { readonly className?: string }) {
 			>
 				<span
 					className={cx(
-						'flex size-[18px] place-content-center place-items-center rounded-full tabular-nums',
+						'flex size-4.5 place-content-center place-items-center rounded-full tabular-nums',
 						isStepTwo
 							? 'bg-base-neutral-700 text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900'
-							: 'border-base-neutral-300 dark:border-base-neutral-500 dark:text-base-neutral-100 border',
+							: 'border border-base-neutral-300 dark:border-base-neutral-500 dark:text-base-neutral-100',
 					)}
 				>
 					2
@@ -65,7 +65,7 @@ export function ProjectCreateStepper(props: { readonly className?: string }) {
 				<span
 					className={cx(
 						isStepTwo
-							? 'group-pressed:underline dark:text-base-neutral-100 group-hover:underline group-focus-visible:underline'
+							? 'group-hover:underline group-focus-visible:underline group-pressed:underline dark:text-base-neutral-100'
 							: 'text-base-neutral-600 dark:text-base-neutral-300',
 					)}
 				>

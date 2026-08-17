@@ -4,8 +4,11 @@ import { useQuery, useQueryClient, useSuspenseQueries } from '@tanstack/react-qu
 import { useAtom } from 'jotai';
 import {
 	FileDownIcon,
+	FolderArchiveIcon,
+	/* FolderInputIcon, */
 	HistoryIcon,
-	/* FolderArchiveIcon, */ MoreVerticalIcon,
+	/* FolderArchiveIcon, */
+	MoreVerticalIcon,
 	PanelRightOpenIcon,
 	PencilIcon,
 	XIcon,
@@ -14,22 +17,20 @@ import { useRouter } from 'next/navigation';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useState } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
-import { FileEditLockDialog } from '@/components/File';
-import { VersionHistoryCloseIndicator, VersionHistoryExitDialog } from '@/components/VersionHistory';
+import { FileDownloadDialog, FileEditLockDialog, FileExportDialog } from '@/components/File';
+import { FileVersionHistoryCloseIndicator, FileVersionHistoryExitDialog } from '@/components/FileVersionHistory';
 import { Button } from '@/components/ui/Button';
 import { Drawer, DrawerBody, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
 import { dropdownItemStyles } from '@/components/ui/Dropdown';
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/components/ui/Menu';
 import { Separator } from '@/components/ui/Separator';
 import { useSidebar } from '@/components/ui/Sidebar';
-import { useEnv } from '@/contexts/EnvContext';
-import { useWebSocket } from '@/contexts/WebSocket';
+import { useWebSocketMessages } from '@/contexts/WebSocket';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { SideSheetMode, sideSheetModeAtom, sideSheetSelectedDatasetAtom } from '@/stores/sideSheet';
 import { cx } from '@/styles/cva';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { ProjectFolderFileMoreMenuEditFilenameDialog } from './ProjectFolderFileMoreMenuEditFilenameDialog';
-// import { ProjectFolderFileMoreMenuExportDialog } from './ProjectFolderFileMoreMenuExportDialog';
 
 export function ProjectFolderFileMoreMenu(props: {
 	readonly className?: string;
@@ -40,20 +41,20 @@ export function ProjectFolderFileMoreMenu(props: {
 	const [queryState] = useQueryState('version', parseAsString);
 	const router = useRouter();
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
-	const env = useEnv();
 	const queryClient = useQueryClient();
 	const [isOpen, setIsOpen] = useState(false);
 	const [sideSheetMode, setSideSheetMode] = useAtom(sideSheetModeAtom);
 	const [sideSheetSelectedDataset, setSideSheetSelectedDataset] = useAtom(sideSheetSelectedDatasetAtom);
 	const { setOpen } = useSidebar();
 	const [isEditNameOpen, setIsEditNameOpen] = useState(false);
-	// const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isExportOpen, setIsExportOpen] = useState(false);
+	const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 	const [isEditLockOpen, setIsEditLockOpen] = useState(false);
 	const [isVersionHistoryExitDialogOpen, setIsVersionHistoryExitDialogOpen] = useState(false);
 
 	const { currentUserData } = useCurrentUser();
 
-	const { messages } = useWebSocket();
+	const messages = useWebSocketMessages();
 
 	const [lockData, datasetData] = useSuspenseQueries({
 		queries: [
@@ -66,11 +67,22 @@ export function ProjectFolderFileMoreMenu(props: {
 		],
 	});
 
+	const { data: datasetVersionData } = useQuery(
+		$api.queryOptions(
+			'get',
+			'/api/v1/uploads-version/{id}/',
+			{
+				params: { path: { id: datasetData.data.latest_version?.pk ?? '' } },
+			},
+			{ enabled: Boolean(datasetData.data.latest_version) },
+		),
+	);
+
 	const lockMessage = messages[props.fileUuid]?.find((message) => message.type === 'lock_status_changed')?.data;
 	const isFileLocked = lockMessage?.status === undefined ? Boolean(lockData.data.locked) : Boolean(lockMessage.status);
 
 	const isVersionHistoryModeActive = Boolean(
-		sideSheetMode === SideSheetMode.VersionHistory && sideSheetSelectedDataset,
+		sideSheetMode === SideSheetMode.FileVersionHistory && sideSheetSelectedDataset,
 	);
 
 	const isLatestVersionSelected = Boolean(!queryState || queryState === datasetData.data.latest_version?.pk);
@@ -129,6 +141,7 @@ export function ProjectFolderFileMoreMenu(props: {
 										<DrawerClose
 											aria-label="Exit version history"
 											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+											id="exit-version-history"
 											onPress={() => setIsVersionHistoryExitDialogOpen(true)}
 											variant="unset"
 										>
@@ -140,7 +153,7 @@ export function ProjectFolderFileMoreMenu(props: {
 											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
 											id="show-version-history"
 											onPress={() => {
-												setSideSheetMode(SideSheetMode.VersionHistory);
+												setSideSheetMode(SideSheetMode.FileVersionHistory);
 												setSideSheetSelectedDataset(props.fileUuid);
 												setOpen(true);
 											}}
@@ -149,9 +162,9 @@ export function ProjectFolderFileMoreMenu(props: {
 											<HistoryIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> Show version history
 										</DrawerClose>
 									)}
-									<Separator />
-									{queryState || !canEdit ? null : (
+									{!isLatestVersionSelected || !canEdit ? null : (
 										<>
+											<Separator />
 											<DrawerClose
 												aria-label="Edit filename"
 												className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
@@ -190,23 +203,33 @@ export function ProjectFolderFileMoreMenu(props: {
 											</DrawerClose>
 										</>
 									)}
-									<a
-										className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
-										href={`${env.BASE_API_URL}/api/v1/uploads-version/${queryState ?? datasetData.data.latest_version?.pk}/download/?as_attachment=true`}
-										rel="noreferrer noopener external"
-										target="_blank"
-									>
-										<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
-									</a>
-									{/* <Button
+									<Separator />
+									{/* {isLatestVersionSelected ? (
+										<DrawerClose>
+											<FolderInputIcon aria-hidden size={18} strokeWidth={1.5} /> Import
+										</DrawerClose>
+									) : null} */}
+									<DrawerClose
 										aria-label="Export (zip)"
 										className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
 										id="export"
 										onPress={() => setIsExportOpen(true)}
 										variant="unset"
 									>
-										<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-									</Button> */}
+										<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
+									</DrawerClose>
+									<Separator />
+									{datasetVersionData?.version_file ? (
+										<DrawerClose
+											aria-label="Download"
+											className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+											id="download"
+											onPress={() => setIsDownloadOpen(true)}
+											variant="unset"
+										>
+											<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
+										</DrawerClose>
+									) : null}
 								</DrawerBody>
 							</DrawerContent>
 						</Drawer>
@@ -226,7 +249,7 @@ export function ProjectFolderFileMoreMenu(props: {
 					>
 						<MoreVerticalIcon aria-hidden size={18} strokeWidth={1.5} />
 					</MenuTrigger>
-					<MenuContent placement="bottom">
+					<MenuContent popover={{ arrow: false }}>
 						{isVersionHistoryModeActive ? (
 							<MenuItem
 								aria-label="Exit version history"
@@ -244,7 +267,7 @@ export function ProjectFolderFileMoreMenu(props: {
 								id="show-version-history"
 								key="show-version-history"
 								onAction={() => {
-									setSideSheetMode(SideSheetMode.VersionHistory);
+									setSideSheetMode(SideSheetMode.FileVersionHistory);
 									setSideSheetSelectedDataset(props.fileUuid);
 									setOpen(true);
 								}}
@@ -252,9 +275,9 @@ export function ProjectFolderFileMoreMenu(props: {
 								<HistoryIcon aria-hidden size={18} strokeWidth={1.5} /> Show version history
 							</MenuItem>
 						)}
-						<MenuSeparator />
-						{queryState || !canEdit ? null : (
+						{!isLatestVersionSelected || !canEdit ? null : (
 							<>
+								<MenuSeparator />
 								<MenuItem
 									aria-label="Edit filename"
 									id="edit"
@@ -289,16 +312,21 @@ export function ProjectFolderFileMoreMenu(props: {
 								</MenuItem>
 							</>
 						)}
-						<MenuItem
-							href={`${env.BASE_API_URL}/api/v1/uploads-version/${queryState ?? datasetData.data.latest_version?.pk}/download/?as_attachment=true`}
-							rel="noreferrer noopener external"
-							target="_blank"
-						>
-							<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
+						<MenuSeparator />
+						{/* {isLatestVersionSelected ? (
+							<MenuItem>
+								<FolderInputIcon aria-hidden size={18} strokeWidth={1.5} /> Import
+							</MenuItem>
+						) : null} */}
+						<MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
+							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
 						</MenuItem>
-						{/* <MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
-							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export (zip)
-						</MenuItem> */}
+						<MenuSeparator />
+						{datasetVersionData?.version_file ? (
+							<MenuItem aria-label="Download" id="download" onAction={() => setIsDownloadOpen(true)}>
+								<FileDownIcon aria-hidden size={18} strokeWidth={1.5} /> Download
+							</MenuItem>
+						) : null}
 					</MenuContent>
 				</Menu>
 			) : (
@@ -308,7 +336,7 @@ export function ProjectFolderFileMoreMenu(props: {
 							<PanelRightOpenIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} />
 						</Button>
 					) : null}
-					<VersionHistoryCloseIndicator />
+					<FileVersionHistoryCloseIndicator />
 				</div>
 			)}
 			<ProjectFolderFileMoreMenuEditFilenameDialog
@@ -318,14 +346,20 @@ export function ProjectFolderFileMoreMenu(props: {
 				isOpen={isEditNameOpen}
 				onOpenChange={setIsEditNameOpen}
 			/>
-			{/* <ProjectFolderFileMoreMenuExportDialog
-				filename={filename}
+			<FileExportDialog
+				filename={datasetData.data.display_name ?? ''}
 				isOpen={isExportOpen}
 				onOpenChange={setIsExportOpen}
-				versionUuid={versionUuid}
-			/> */}
+				versionUuid={queryState ?? datasetData.data.latest_version?.pk ?? ''}
+			/>
+			<FileDownloadDialog
+				filename={datasetData.data.display_name ?? ''}
+				isOpen={isDownloadOpen}
+				onOpenChange={setIsDownloadOpen}
+				versionUuid={queryState ?? datasetData.data.latest_version?.pk ?? ''}
+			/>
 			<FileEditLockDialog fileUuid={props.fileUuid} isOpen={isEditLockOpen} onOpenChange={setIsEditLockOpen} />
-			<VersionHistoryExitDialog
+			<FileVersionHistoryExitDialog
 				isOpen={isVersionHistoryExitDialogOpen}
 				onOpenChange={setIsVersionHistoryExitDialogOpen}
 			/>

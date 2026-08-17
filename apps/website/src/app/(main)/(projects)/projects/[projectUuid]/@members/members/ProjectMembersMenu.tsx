@@ -11,7 +11,7 @@ export function ProjectMembersMenu(props: { readonly projectUuid: string }) {
 		<>
 			<ProjectEdit
 				href={`/projects/${props.projectUuid}/members/edit`}
-				onClick={(isLocked) => setIsEditLockOpen(isLocked as boolean)}
+				onClick={(isLocked) => setIsEditLockOpen(Boolean(isLocked))}
 				projectUuid={props.projectUuid}
 			/>
 			<ProjectEditLockDialog isOpen={isEditLockOpen} onOpenChange={setIsEditLockOpen} projectUuid={props.projectUuid} />

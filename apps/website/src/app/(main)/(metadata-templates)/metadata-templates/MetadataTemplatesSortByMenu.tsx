@@ -1,6 +1,6 @@
 'use client';
 
-import { SortByMenu, useSortByState } from '@/components/SortByMenu';
+import { SortByMenu, useSortByState } from '@/components/query-controls/SortByMenu';
 
 const sortOptions = {
 	name: 'Metadata template name A-Z',

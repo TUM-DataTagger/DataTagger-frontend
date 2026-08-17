@@ -18,9 +18,9 @@ import { Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader } 
 import {
 	Select,
 	SelectLabel,
-	SelectList,
-	SelectOption,
-	SelectOptionDescription,
+	SelectContent,
+	SelectItem,
+	SelectDescription,
 	SelectSection,
 	SelectTrigger,
 } from '@/components/ui/Select';
@@ -37,9 +37,10 @@ import {
 import { cx } from '@/styles/cva';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { formatErrorMessage } from '@/util/formatErrorMessage';
+import { logger, LogCategory } from '@/util/logger';
 import type { components } from '@/util/openapiSchema';
 
-const isAdmin = (toCheck: string) => toCheck === 'admin';
+const isAdmin = (toCheck: string | undefined) => toCheck === 'admin';
 
 export function ProjectMembersEditForm({
 	projectUuid,
@@ -93,7 +94,7 @@ export function ProjectMembersEditForm({
 		Object.values(projectExtendedMemberPermissions[member] ?? {}).filter(Boolean).length;
 
 	const { mutate } = useMutation({
-		mutationFn: async (_: any) => {
+		mutationFn: async () => {
 			const payload = {
 				project_users: [...projectMembers.values()].map((member) => {
 					const projectPermission = projectMemberPermission[member];
@@ -122,6 +123,7 @@ export function ProjectMembersEditForm({
 			}
 		},
 		async onSuccess() {
+			logger.debug(LogCategory.Cache, 'Project members updated - invalidating caches', { projectId: projectUuid });
 			await queryClient.invalidateQueries({
 				queryKey: $api.queryOptions('get', '/api/v1/project-membership/', {
 					params: { query: { project: projectUuid, member: currentUserData?.pk ?? -1 } },
@@ -154,7 +156,7 @@ export function ProjectMembersEditForm({
 		});
 	}
 
-	function onProjectMemberPermissionChange(member: string, val: string) {
+	function onProjectMemberPermissionChange(member: string, val: 'admin' | 'member') {
 		setProject((draft) => {
 			draft.project.memberPermission[member] = val;
 		});
@@ -162,9 +164,7 @@ export function ProjectMembersEditForm({
 
 	function onProjectMemberExtendedPermissionChange(member: string, permission: string, value: boolean) {
 		setProject((draft) => {
-			if (!draft.project.extendedMemberPermissions[member]) {
-				draft.project.extendedMemberPermissions[member] = {};
-			}
+			draft.project.extendedMemberPermissions[member] ??= {};
 
 			draft.project.extendedMemberPermissions[member][permission] = value;
 		});
@@ -202,11 +202,11 @@ export function ProjectMembersEditForm({
 	}
 
 	return (
-		<form {...props} id="project-members-edit" onSubmit={handleSubmit((input) => mutate(input))}>
+		<form {...props} id="project-members-edit" onSubmit={handleSubmit(() => mutate())}>
 			<div className="flex flex-col gap-8">
 				{errors.root ? (
 					<Alert>
-						<AlertCircleIcon aria-hidden size={24} strokeWidth={1.5} />
+						<AlertCircleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 						{errors.root?.message}
 					</Alert>
 				) : null}
@@ -234,11 +234,11 @@ export function ProjectMembersEditForm({
 						<div className="grid gap-2">
 							{[...projectMembers.values()].map((member: string, idx: number) => (
 								<div
-									className="border-base-neutral-100 text-base-md dark:border-base-neutral-700 grid min-h-16 place-items-center content-center gap-4 rounded-sm border px-4 py-3 md:grid-cols-5 md:grid-rows-none md:gap-[58px]"
+									className="grid min-h-16 place-items-center content-center gap-4 rounded-sm border border-base-neutral-100 px-4 py-3 text-base-md md:grid-cols-5 md:grid-rows-none md:gap-[58px] dark:border-base-neutral-700"
 									key={`${member}-${idx}`}
 								>
 									<span
-										className="col-span-2 max-w-[20ch] place-self-start justify-self-start truncate pt-[10px]"
+										className="col-span-2 max-w-[20ch] place-self-start justify-self-start truncate pt-2.5"
 										title={member}
 									>
 										{member}
@@ -253,11 +253,11 @@ export function ProjectMembersEditForm({
 											<Select
 												aria-label="Project permissions"
 												isDisabled={selectedMemberPermission(member) === 'admin' && projectMembersWithAdmin.length < 2}
-												onSelectionChange={async (val) => onProjectMemberPermissionChange(member, val as string)}
-												selectedKey={selectedMemberPermission(member)}
+												onChange={async (val) => onProjectMemberPermissionChange(member, val as 'admin' | 'member')}
+												value={selectedMemberPermission(member)}
 											>
 												<SelectTrigger />
-												<SelectList>
+												<SelectContent popover={{ className: 'max-w-(--trigger-width)' }}>
 													<SelectSection title="Project permissions">
 														{[
 															{
@@ -271,15 +271,13 @@ export function ProjectMembersEditForm({
 																description: 'No access to files unless defined in folders',
 															},
 														].map((item) => (
-															<SelectOption id={item.id} key={item.id} textValue={item.name}>
+															<SelectItem id={item.id} key={item.id} textValue={item.name}>
 																<SelectLabel>{item.name}</SelectLabel>
-																<SelectOptionDescription className="line-clamp-none">
-																	{item.description}
-																</SelectOptionDescription>
-															</SelectOption>
+																<SelectDescription className="line-clamp-none">{item.description}</SelectDescription>
+															</SelectItem>
 														))}
 													</SelectSection>
-												</SelectList>
+												</SelectContent>
 											</Select>
 											{selectedMemberPermission(member) === 'admin' && projectMembersWithAdmin.length < 2 ? null : (
 												<Modal>
@@ -294,14 +292,10 @@ export function ProjectMembersEditForm({
 														</ModalHeader>
 														<ModalBody>
 															{member === currentUserData?.email ? (
-																<div className="bg-base-tangerine-100 flex place-items-center gap-3 rounded-[4px] px-4 py-3">
-																	<AlertTriangleIcon
-																		aria-hidden
-																		className="text-base-tangerine-500"
-																		strokeWidth={1.5}
-																	/>
+																<Alert variant="warning">
+																	<AlertTriangleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 																	Once the process has been completed, you will no longer be able to access the project.
-																</div>
+																</Alert>
 															) : (
 																'Once the process has been completed, the user will no longer be able to access the project.'
 															)}
@@ -322,7 +316,7 @@ export function ProjectMembersEditForm({
 													<AccordionTrigger
 														prepend={
 															numSelectedMemberExtendedPermissions(member) ? (
-																<span className="bg-base-lavender-200 text-base-neutral-900 dark:bg-base-lavender-600 h-4 w-[14px] rounded-full">
+																<span className="h-4 w-[14px] rounded-full bg-base-lavender-200 text-base-neutral-900 dark:bg-base-lavender-600">
 																	{numSelectedMemberExtendedPermissions(member)}
 																</span>
 															) : null
@@ -332,8 +326,12 @@ export function ProjectMembersEditForm({
 													</AccordionTrigger>
 													<AccordionContent className="flex flex-col gap-2">
 														<Checkbox
-															className="text-base-sm"
-															classNames={{ boxContainer: 'flex-row-reverse place-content-between w-full' }}
+															className={cx(
+																'*:data-[slot=checkbox]:grid-cols-[1fr_1rem]',
+																'**:data-[slot=indicator]:col-start-2',
+																'**:data-[slot=label]:col-start-1',
+																'**:[[slot=description]]:col-start-1',
+															)}
 															isDisabled={isAdmin(selectedMemberPermission(member))}
 															isSelected={selectedMemberExtendedPermissionCreateFolders(member)}
 															onChange={async (val) => onProjectMemberExtendedPermissionChange(member, 'folders', val)}
@@ -341,8 +339,12 @@ export function ProjectMembersEditForm({
 															Can create folders
 														</Checkbox>
 														<Checkbox
-															className="text-base-sm"
-															classNames={{ boxContainer: 'flex-row-reverse place-content-between w-full' }}
+															className={cx(
+																'*:data-[slot=checkbox]:grid-cols-[1fr_1rem]',
+																'**:data-[slot=indicator]:col-start-2',
+																'**:data-[slot=label]:col-start-1',
+																'**:[[slot=description]]:col-start-1',
+															)}
 															isDisabled={isAdmin(selectedMemberPermission(member))}
 															isSelected={selectedMemberExtendedPermissionCreateMetadataTemplates(member)}
 															onChange={async (val) =>

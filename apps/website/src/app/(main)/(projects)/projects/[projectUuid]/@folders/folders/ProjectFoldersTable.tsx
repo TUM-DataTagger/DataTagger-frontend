@@ -1,8 +1,8 @@
 'use client';
 
-import { Package2Icon, FileIcon } from 'lucide-react';
-import Link from 'next/link';
+import { FileIcon, DatabaseIcon } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { Link } from '@/components/ui/Link';
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
 import { buttonStyles } from '@/styles/ui/button';
 import type { components } from '@/util/openapiSchema';
@@ -17,7 +17,7 @@ export function ProjectFoldersTable(props: { readonly data?: ProjectFolder[] | u
 	return (
 		<div className="flex flex-col">
 			<ProjectFoldersCreateTable
-				className="border-base-neutral-100 dark:border-base-neutral-700 border-0 border-b"
+				className="border-0 border-b border-base-neutral-100 dark:border-base-neutral-700"
 				href={`/projects/${params.projectUuid}/folders/create`}
 				projectUuid={params.projectUuid}
 			/>
@@ -44,20 +44,23 @@ export function ProjectFoldersTable(props: { readonly data?: ProjectFolder[] | u
 									className={buttonStyles({
 										variant: 'unset',
 										className:
-											'group-hover:text-base-lavender-600 dark:group-hover:text-base-lavender-400 print:inline-flex',
+											'group-hover:text-base-lavender-600 dark:group-hover:text-base-lavender-400 group-pressed:text-base-neutral-900 dark:group-pressed:text-base-neutral-40 print:inline-flex',
 									})}
 									href={`/projects/${params.projectUuid}/folders/${item.pk}`}
+									variant="unset"
 								>
-									<span className="max-w-[30ch] truncate">{item.name}</span>
+									<span className="max-w-[30ch] truncate" title={item.name}>
+										{item.name}
+									</span>
 								</Link>
 							</TableCell>
 							<TableCell style={{ width: '100px' }} textValue={item.storage?.name ?? 'DSS'}>
 								<div className="flex place-items-center gap-2">
 									<span
 										aria-label="Storage"
-										className="text-base-sm flex place-items-center gap-2 place-self-start text-neutral-500 dark:text-neutral-300"
+										className="flex place-items-center gap-2 place-self-start text-base-sm text-neutral-500 dark:text-neutral-300"
 									>
-										<Package2Icon aria-hidden size={18} strokeWidth={1.5} />
+										<DatabaseIcon aria-hidden size={18} strokeWidth={1.5} />
 										{item.storage?.name ?? 'DSS'}
 									</span>
 								</div>
@@ -66,7 +69,7 @@ export function ProjectFoldersTable(props: { readonly data?: ProjectFolder[] | u
 								<div className="flex place-content-end">
 									<span
 										aria-label="Files"
-										className="bg-base-neutral-700 text-base-sm text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900 flex place-items-center gap-1 place-self-start rounded-sm px-2 py-1"
+										className="flex place-items-center gap-1 place-self-start rounded-sm bg-base-neutral-700 px-2 py-1 text-base-sm text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900"
 									>
 										<FileIcon aria-hidden size={18} strokeWidth={1.5} /> {item.datasets_count ?? 0}
 									</span>

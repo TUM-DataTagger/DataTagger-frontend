@@ -16,18 +16,16 @@ export function GlobalUploadAssistantTabs() {
 			onSelectionChange={setGlobalUploadAssistantTab}
 			selectedKey={globalUploadAssistantTab}
 		>
-			<TabList className="h-14 min-h-14 place-content-center gap-0">
+			<TabList className="h-14 min-h-14 place-content-center gap-0" selectionIndicator={false}>
 				<Tab
-					className="border-base-neutral-300 selected:bg-base-lavender-200 text-base-label-md hover:bg-base-lavender-400 dark:hover:text-base-neutral-900 pressed:bg-base-lavender-500 selected:hover:bg-base-lavender-400 selected:pressed:bg-base-lavender-500 dark:selected:bg-base-lavender-600 dark:hover:bg-base-lavender-400 dark:pressed:bg-base-lavender-300 dark:selected:hover:bg-base-lavender-400 dark:selected:pressed:bg-base-lavender-300 w-full place-content-center rounded-none rounded-l-lg border"
-					hasIndicator={false}
+					className="w-full place-content-center rounded-none rounded-l-lg border border-base-neutral-300 text-base-label-md hover:bg-base-lavender-400 dark:hover:bg-base-lavender-400 dark:hover:text-base-neutral-900 pressed:bg-base-lavender-500 dark:pressed:bg-base-lavender-300 selected:bg-base-lavender-200 selected:hover:bg-base-lavender-400 dark:selected:bg-base-lavender-600 dark:selected:hover:bg-base-lavender-400 selected:pressed:bg-base-lavender-500 dark:selected:pressed:bg-base-lavender-300"
 					id="drafts"
 				>
 					{globalUploadAssistantTab === 'drafts' ? <CheckIcon aria-hidden size={18} strokeWidth={1.5} /> : null}
 					Drafts
 				</Tab>
 				<Tab
-					className="border-base-neutral-300 selected:bg-base-lavender-200 text-base-label-md hover:bg-base-lavender-400 dark:hover:text-base-neutral-900 pressed:bg-base-lavender-500 selected:hover:bg-base-lavender-400 selected:pressed:bg-base-lavender-500 dark:selected:bg-base-lavender-600 dark:hover:bg-base-lavender-400 dark:pressed:bg-base-lavender-300 dark:selected:hover:bg-base-lavender-400 dark:selected:pressed:bg-base-lavender-300 w-full place-content-center rounded-none rounded-r-lg border border-l-0"
-					hasIndicator={false}
+					className="w-full place-content-center rounded-none rounded-r-lg border border-l-0 border-base-neutral-300 text-base-label-md hover:bg-base-lavender-400 dark:hover:bg-base-lavender-400 dark:hover:text-base-neutral-900 pressed:bg-base-lavender-500 dark:pressed:bg-base-lavender-300 selected:bg-base-lavender-200 selected:hover:bg-base-lavender-400 dark:selected:bg-base-lavender-600 dark:selected:hover:bg-base-lavender-400 selected:pressed:bg-base-lavender-500 dark:selected:pressed:bg-base-lavender-300"
 					id="folders"
 				>
 					{globalUploadAssistantTab === 'folders' ? <CheckIcon aria-hidden size={18} strokeWidth={1.5} /> : null}
@@ -36,10 +34,10 @@ export function GlobalUploadAssistantTabs() {
 			</TabList>
 
 			<TabPanel id="drafts">
-				<GlobalUploadAssistantDraftsTab />
+				{globalUploadAssistantTab === 'drafts' ? <GlobalUploadAssistantDraftsTab /> : null}
 			</TabPanel>
 			<TabPanel id="folders">
-				<GlobalUploadAssistantFoldersTab />
+				{globalUploadAssistantTab === 'folders' ? <GlobalUploadAssistantFoldersTab /> : null}
 			</TabPanel>
 		</Tabs>
 	);

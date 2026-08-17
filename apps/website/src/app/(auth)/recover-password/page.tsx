@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { withSafeRedirectQuery } from '@/util/authRedirect';
+import { redirectAuthenticatedUserFromAuthRoute } from '@/util/serverAuth';
 import { RecoverPasswordForm } from './RecoverPasswordForm';
 
 export const metadata: Metadata = {
@@ -7,7 +9,12 @@ export const metadata: Metadata = {
 	description: 'Recover the password to your account',
 };
 
-export default async function Page() {
+export default async function Page({ searchParams }: { readonly searchParams: Promise<{ readonly next?: string }> }) {
+	await redirectAuthenticatedUserFromAuthRoute();
+
+	const { next } = await searchParams;
+	const loginHref = withSafeRedirectQuery('/login', next);
+
 	return (
 		<div className="mx-auto flex w-full max-w-xl grow flex-col gap-4 px-4 pt-48 pb-4">
 			<div className="mb-8 flex flex-col gap-2">
@@ -15,7 +22,7 @@ export default async function Page() {
 			</div>
 			<RecoverPasswordForm />
 			<p className="text-base-sm">
-				<Link className="text-base-lavender-500" href="/login">
+				<Link className="text-base-lavender-500" href={loginHref}>
 					Return to Login.
 				</Link>
 			</p>

@@ -28,16 +28,25 @@ import {
 	SuperscriptIcon,
 	UnderlineIcon,
 	UnlinkIcon,
+	XCircleIcon,
 } from 'lucide-react';
 import { useEffect, useState, type ComponentProps } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/Field';
+import { Input, InputGroup } from '@/components/ui/Input';
 import { Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
 import { TextField } from '@/components/ui/TextField';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
 import { cx } from '@/styles/cva';
+import { logger, LogCategory } from '@/util/logger';
 import { BlockLatexPlugin, InlineLatexPlugin } from './LatexPlugin';
-
 import '@benrbray/prosemirror-math/dist/prosemirror-math.css';
 import 'katex/dist/katex.min.css';
+
+const TOOLBAR_BUTTON_ACTIVE_STYLES =
+	'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500';
+
+const TOOLBAR_BUTTON_BASE_STYLES = 'h-8 w-8 p-[7px]';
 
 function EditorSetLinkDialog(props: { readonly href: string; onChange(href: string): void }) {
 	const [href, setHref] = useState(props.href);
@@ -50,14 +59,17 @@ function EditorSetLinkDialog(props: { readonly href: string; onChange(href: stri
 		<ModalContent>
 			<ModalHeader hidden />
 			<ModalBody>
-				<TextField
-					autoFocus
-					isClearable
-					label={props.href ? 'Edit link' : 'Set link'}
-					onChange={(value) => setHref(value)}
-					placeholder="Enter URL"
-					value={href}
-				/>
+				<TextField autoFocus onChange={(value) => setHref(value)} value={href}>
+					<Label>{props.href ? 'Edit link' : 'Set link'}</Label>
+					<InputGroup>
+						<Input placeholder="Enter URL" />
+						{href ? (
+							<Button aria-label="Clear URL" onPress={() => setHref('')} size="icon" variant="unset">
+								<XCircleIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+							</Button>
+						) : null}
+					</InputGroup>
+				</TextField>
 			</ModalBody>
 			<ModalFooter>
 				<ModalClose variant="secondary-discreet">Cancel</ModalClose>
@@ -124,8 +136,8 @@ export function Editor({
 			attributes: {
 				class: cx(
 					editable
-						? 'prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl border-base-neutral-300 bg-base-neutral-0 text-base-md! text-base-neutral-900 placeholder:text-base-neutral-400 hover:border-base-neutral-200 disabled:border-base-neutral-100 disabled:bg-base-neutral-100 disabled:hover:border-base-neutral-100 dark:border-base-neutral-500 dark:bg-base-neutral-800 dark:text-base-neutral-40 dark:placeholder:text-base-neutral-500 dark:hover:border-base-neutral-600 dark:disabled:border-base-neutral-700 dark:disabled:bg-base-neutral-700 dark:disabled:hover:border-base-neutral-700 max-h-40 min-h-24 max-w-[536px] overflow-auto rounded-b border border-t-0 p-[14px] outline-0 transition-all disabled:cursor-not-allowed disabled:opacity-38'
-						: 'prose-neutral dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl text-base-md! text-base-neutral-900 dark:text-base-neutral-40 max-w-none',
+						? 'prose prose-sm max-h-40 min-h-24 max-w-[536px] overflow-auto rounded-b border border-t-0 border-base-neutral-300 bg-base-neutral-0 p-3.5 text-base-md! text-base-neutral-900 outline-0 transition-all placeholder:text-base-neutral-400 hover:border-base-neutral-200 disabled:cursor-not-allowed disabled:border-transparent disabled:bg-base-neutral-100 disabled:opacity-38 disabled:hover:border-transparent sm:prose-base lg:prose-lg xl:prose-2xl dark:border-base-neutral-500 dark:bg-base-neutral-800 dark:text-base-neutral-40 dark:prose-invert dark:placeholder:text-base-neutral-500 dark:hover:border-base-neutral-600 dark:disabled:border-transparent dark:disabled:bg-base-neutral-700 dark:disabled:hover:border-transparent'
+						: 'prose prose-sm max-w-none text-base-md! text-base-neutral-900 prose-neutral sm:prose-base lg:prose-lg xl:prose-2xl dark:text-base-neutral-40 dark:prose-invert',
 				),
 			},
 		},
@@ -135,7 +147,7 @@ export function Editor({
 			props.onChange?.(editor.getJSON());
 		},
 		onContentError({ error }) {
-			console.error('Editor encountered an error:', error);
+			logger.error(LogCategory.Editor, 'Content error encountered', { error });
 		},
 	});
 
@@ -146,101 +158,74 @@ export function Editor({
 	return (
 		<EditorContent {...props} editor={editor}>
 			{editable ? (
-				<div className="border-base-neutral-300 border-b-base-neutral-100 dark:border-base-neutral-500 flex min-h-12 flex-wrap gap-x-6 rounded-t border p-2">
+				<div className="flex min-h-12 flex-wrap gap-x-6 rounded-t border border-base-neutral-300 border-b-base-neutral-100 p-2 dark:border-base-neutral-500">
 					<div>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Bold"
-								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('bold')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
-								)}
+								className={cx(TOOLBAR_BUTTON_BASE_STYLES, editor.isActive('bold') && TOOLBAR_BUTTON_ACTIVE_STYLES)}
 								isDisabled={!editor.can().chain().focus().toggleBold().run()}
 								onPress={() => editor.chain().focus().toggleBold().run()}
 								variant="discreet"
 							>
 								<BoldIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Bold</TooltipContent>
+							<TooltipContent arrow={false}>Bold</TooltipContent>
 						</Tooltip>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Italic"
-								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('italic')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
-								)}
+								className={cx(TOOLBAR_BUTTON_BASE_STYLES, editor.isActive('italic') && TOOLBAR_BUTTON_ACTIVE_STYLES)}
 								isDisabled={!editor.can().chain().focus().toggleItalic().run()}
 								onPress={() => editor.chain().focus().toggleItalic().run()}
 								variant="discreet"
 							>
 								<ItalicIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Italic</TooltipContent>
+							<TooltipContent arrow={false}>Italic</TooltipContent>
 						</Tooltip>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Underline"
-								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('underline')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
-								)}
+								className={cx(TOOLBAR_BUTTON_BASE_STYLES, editor.isActive('underline') && TOOLBAR_BUTTON_ACTIVE_STYLES)}
 								isDisabled={!editor.can().chain().focus().toggleUnderline().run()}
 								onPress={() => editor.chain().focus().toggleUnderline().run()}
 								variant="discreet"
 							>
 								<UnderlineIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Underline</TooltipContent>
+							<TooltipContent arrow={false}>Underline</TooltipContent>
 						</Tooltip>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Strikethrough"
-								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('strike')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
-								)}
+								className={cx(TOOLBAR_BUTTON_BASE_STYLES, editor.isActive('strike') && TOOLBAR_BUTTON_ACTIVE_STYLES)}
 								isDisabled={!editor.can().chain().focus().toggleStrike().run()}
 								onPress={() => editor.chain().focus().toggleStrike().run()}
 								variant="discreet"
 							>
 								<StrikethroughIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Strike</TooltipContent>
+							<TooltipContent arrow={false}>Strike</TooltipContent>
 						</Tooltip>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Subscript"
-								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('subscript')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
-								)}
+								className={cx(TOOLBAR_BUTTON_BASE_STYLES, editor.isActive('subscript') && TOOLBAR_BUTTON_ACTIVE_STYLES)}
 								isDisabled={!editor.can().chain().focus().toggleSubscript().run()}
 								onPress={() => editor.chain().focus().toggleSubscript().run()}
 								variant="discreet"
 							>
 								<SubscriptIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Subscript</TooltipContent>
+							<TooltipContent arrow={false}>Subscript</TooltipContent>
 						</Tooltip>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Superscript"
 								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('superscript')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
+									TOOLBAR_BUTTON_BASE_STYLES,
+									editor.isActive('superscript') && TOOLBAR_BUTTON_ACTIVE_STYLES,
 								)}
 								isDisabled={!editor.can().chain().focus().toggleSuperscript().run()}
 								onPress={() => editor.chain().focus().toggleSuperscript().run()}
@@ -248,7 +233,7 @@ export function Editor({
 							>
 								<SuperscriptIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Superscript</TooltipContent>
+							<TooltipContent arrow={false}>Superscript</TooltipContent>
 						</Tooltip>
 					</div>
 
@@ -257,10 +242,8 @@ export function Editor({
 							<TooltipTrigger
 								aria-label="Bullet list"
 								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('bulletList')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
+									TOOLBAR_BUTTON_BASE_STYLES,
+									editor.isActive('bulletList') && TOOLBAR_BUTTON_ACTIVE_STYLES,
 								)}
 								isDisabled={!editor.can().chain().focus().toggleBulletList().run()}
 								onPress={() => editor.chain().focus().toggleBulletList().run()}
@@ -268,16 +251,14 @@ export function Editor({
 							>
 								<ListIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Bullet list</TooltipContent>
+							<TooltipContent arrow={false}>Bullet list</TooltipContent>
 						</Tooltip>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Ordered list"
 								className={cx(
-									'h-8 w-8 p-[7px]',
-									editor.isActive('orderedList')
-										? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-										: '',
+									TOOLBAR_BUTTON_BASE_STYLES,
+									editor.isActive('orderedList') && TOOLBAR_BUTTON_ACTIVE_STYLES,
 								)}
 								isDisabled={!editor.can().chain().focus().toggleOrderedList().run()}
 								onPress={() => editor.chain().focus().toggleOrderedList().run()}
@@ -285,7 +266,7 @@ export function Editor({
 							>
 								<ListOrderedIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Ordered list</TooltipContent>
+							<TooltipContent arrow={false}>Ordered list</TooltipContent>
 						</Tooltip>
 					</div>
 
@@ -294,12 +275,7 @@ export function Editor({
 							<Tooltip delay={400}>
 								<TooltipTrigger
 									aria-label={editor.isActive('link') ? 'Edit link' : 'Set link'}
-									className={cx(
-										'h-8 w-8 p-[7px]',
-										editor.isActive('link')
-											? 'bg-base-neutral-100 hover:bg-base-neutral-200 focus-visible:bg-base-neutral-200 pressed:bg-base-neutral-300 dark:bg-base-neutral-700 dark:hover:bg-base-neutral-600 dark:focus-visible:bg-base-neutral-600 dark:pressed:bg-base-neutral-500'
-											: '',
-									)}
+									className={cx(TOOLBAR_BUTTON_BASE_STYLES, editor.isActive('link') && TOOLBAR_BUTTON_ACTIVE_STYLES)}
 									variant="discreet"
 								>
 									<LinkIcon aria-hidden size={18} strokeWidth={1.5} />
@@ -314,20 +290,20 @@ export function Editor({
 										}
 									}}
 								/>
-								<TooltipContent showArrow={false}>{editor.isActive('link') ? 'Edit link' : 'Set link'}</TooltipContent>
+								<TooltipContent arrow={false}>{editor.isActive('link') ? 'Edit link' : 'Set link'}</TooltipContent>
 							</Tooltip>
 						</Modal>
 						<Tooltip delay={400}>
 							<TooltipTrigger
 								aria-label="Unset link"
-								className="h-8 w-8 p-[7px]"
+								className={TOOLBAR_BUTTON_BASE_STYLES}
 								isDisabled={!editor.isActive('link')}
 								onPress={() => editor.chain().focus().unsetLink().run()}
 								variant="discreet"
 							>
 								<UnlinkIcon aria-hidden size={18} strokeWidth={1.5} />
 							</TooltipTrigger>
-							<TooltipContent showArrow={false}>Unset link</TooltipContent>
+							<TooltipContent arrow={false}>Unset link</TooltipContent>
 						</Tooltip>
 					</div>
 				</div>

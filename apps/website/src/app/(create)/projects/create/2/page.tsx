@@ -11,8 +11,8 @@ export default async function Page() {
 	return (
 		<>
 			<ProjectCreateHeader>
-				<h1 className="text-base-heading-md dark:text-base-neutral-40 text-center">Set up project's first folder</h1>
-				<p className="text-base-md text-base-neutral-600 dark:text-base-neutral-300 max-w-[536px] place-self-center text-center">
+				<h1 className="text-center text-base-heading-md dark:text-base-neutral-40">Set up project's first folder</h1>
+				<p className="max-w-[536px] place-self-center text-center text-base-md text-base-neutral-600 dark:text-base-neutral-300">
 					Create a folder within a project to centrally manage your research data and give access to selected members of
 					your project.
 				</p>

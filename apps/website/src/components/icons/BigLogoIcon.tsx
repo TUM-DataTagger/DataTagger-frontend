@@ -1,7 +1,7 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
 import { BigLogo, BigLogoDark } from './BigLogo';
 
 export const BigLogoIcon = () => {

@@ -1,23 +1,15 @@
 'use client';
 
-// import { useSetAtom } from 'jotai';
 import { useSetAtom } from 'jotai';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
-import { initialState, projectAtom } from '@/stores/createProject';
+import { CreateRouteCancelButton } from '@/components/create-route/frame/CreateRouteCancelButton';
+import { resetCreateProjectFolderStateAtom } from '@/stores/createProjectFolder';
 
 export function CancelButton() {
-	const router = useRouter();
-	const setCreateProject = useSetAtom(projectAtom);
+	const resetCreateProjectFolderState = useSetAtom(resetCreateProjectFolderStateAtom);
 
-	async function onPress() {
-		setCreateProject(initialState);
-		router.push('../folders');
+	async function onBeforeNavigate() {
+		resetCreateProjectFolderState();
 	}
 
-	return (
-		<Button onPress={async () => onPress()} variant="secondary-discreet">
-			Cancel
-		</Button>
-	);
+	return <CreateRouteCancelButton href="../folders" onBeforeNavigate={onBeforeNavigate} />;
 }

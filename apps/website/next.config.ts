@@ -1,6 +1,6 @@
 import createMDX from '@next/mdx';
 import type { NextConfig } from 'next';
-import { versionInfo } from './src/util/version-info';
+import { versionInfo } from './src/util/version-info.ts';
 
 const withMDX = createMDX({});
 
@@ -26,13 +26,9 @@ export default withMDX({
 		},
 	},
 	experimental: {
-		ppr: true,
-		reactCompiler: true,
 		mdxRs: true,
 	},
-	eslint: {
-		ignoreDuringBuilds: true,
-	},
+	reactCompiler: true,
 	typescript: {
 		ignoreBuildErrors: true,
 	},

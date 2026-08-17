@@ -1,27 +1,42 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { AlertCircleIcon, Loader2Icon } from 'lucide-react';
+import { parseAsString, useQueryState } from 'nuqs';
+import { useState } from 'react';
+import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
-import { openAPIClient } from '@/util/clientFetch';
+import { getSafeRedirectTarget } from '@/util/authRedirect';
 
 export function LoginButton() {
-	const router = useRouter();
+	const [nextTarget] = useQueryState('next', parseAsString);
+	const [isPending, setIsPending] = useState(false);
+	const safeNextTarget = getSafeRedirectTarget(nextTarget);
 
-	async function onClick() {
-		const { data: shibbolethData } = await openAPIClient.GET('/api/v1/shibboleth/start/');
-
-		if (shibbolethData) {
-			router.push(shibbolethData.shibboleth_login_url);
-		}
+	function onClick() {
+		setIsPending(true);
+		const route = safeNextTarget
+			? `/auth/shibboleth-start?${new URLSearchParams({ next: safeNextTarget }).toString()}`
+			: '/auth/shibboleth-start';
+		window.location.assign(route);
 	}
 
 	return (
-		<Button
-			className="bg-base-lavender-100 text-base-xl hover:bg-base-lavender-200 pressed:bg-base-lavender-300 dark:bg-base-lavender-800 dark:hover:bg-base-lavender-700 dark:pressed:bg-base-lavender-600 h-[84px] rounded-lg"
-			onPress={async () => onClick()}
-			variant="unset"
-		>
-			Login for TUM members
-		</Button>
+		<div className="flex flex-col gap-4">
+			<Button
+				className="h-21 rounded-lg bg-base-lavender-100 text-base-xl hover:bg-base-lavender-200 dark:bg-base-lavender-800 dark:hover:bg-base-lavender-700 pressed:bg-base-lavender-300 dark:pressed:bg-base-lavender-600"
+				isDisabled={isPending}
+				onPress={onClick}
+				variant="unset"
+			>
+				{isPending ? <Loader2Icon aria-hidden className="animate-spin" size={18} strokeWidth={1.5} /> : null}
+				Login for TUM members
+			</Button>
+			{isPending ? (
+				<Alert>
+					<AlertCircleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
+					Redirecting to TUM login…
+				</Alert>
+			) : null}
+		</div>
 	);
 }

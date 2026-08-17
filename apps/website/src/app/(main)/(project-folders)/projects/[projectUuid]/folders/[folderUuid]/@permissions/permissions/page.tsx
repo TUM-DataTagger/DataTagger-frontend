@@ -1,10 +1,14 @@
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import type { Metadata } from 'next';
-import { openAPIClient } from '@/util/fetch';
+import { $api } from '@/util/fetch';
+import { getQueryClient } from '@/util/getQueryClient';
 import { ProjectFolderPermissionsView } from './ProjectFolderPermissionsView';
 
 export const metadata: Metadata = {
 	title: 'Folder page | Permissions',
 };
+
+const limit = 12;
 
 export default async function Page({
 	params,
@@ -13,13 +17,21 @@ export default async function Page({
 }) {
 	const { folderUuid, projectUuid } = await params;
 
-	const { data: folderPermissionsData } = await openAPIClient.GET('/api/v1/folder-permission/', {
-		params: { query: { folder: folderUuid, ordering: '-is_folder_admin,member__email' } },
-	});
+	const queryClient = getQueryClient();
+
+	await queryClient.prefetchQuery(
+		$api.queryOptions('get', '/api/v1/folder-permission/', {
+			params: {
+				query: { folder: folderUuid, ordering: '-is_folder_admin,-can_edit,project_membership__member__email' },
+			},
+		}),
+	);
 
 	return (
 		<div className="flex flex-col gap-6">
-			<ProjectFolderPermissionsView data={folderPermissionsData} folderUuid={folderUuid} projectUuid={projectUuid} />
+			<HydrationBoundary state={dehydrate(queryClient)}>
+				<ProjectFolderPermissionsView folderUuid={folderUuid} limit={limit} projectUuid={projectUuid} />
+			</HydrationBoundary>
 		</div>
 	);
 }

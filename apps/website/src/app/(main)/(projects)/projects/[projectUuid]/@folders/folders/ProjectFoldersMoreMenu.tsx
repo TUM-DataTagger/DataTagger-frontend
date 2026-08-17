@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { MoreVerticalIcon, PencilIcon, Share2Icon, SplitIcon, TrashIcon } from 'lucide-react';
+import { FolderArchiveIcon, MoreVerticalIcon, PencilIcon, Share2Icon, SplitIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCopyToClipboard, useMediaQuery } from 'usehooks-ts';
+import { ExportJobDialog } from '@/components/ExportJobDialog';
 import { FolderDeleteDialog, FolderEditLockDialog } from '@/components/Folder';
 import { Button } from '@/components/ui/Button';
 import { Drawer, DrawerBody, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/Drawer';
@@ -15,6 +16,7 @@ import { globalToastQueue, ToastType } from '@/components/ui/Toast';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cx } from '@/styles/cva';
 import { $api, openAPIClient } from '@/util/clientFetch';
+import { EXPORT_TYPES } from '@/util/exportJobs';
 import { ProjectFoldersMoreMenuEditNameDialog } from './ProjectFoldersMoreMenuEditNameDialog';
 
 export function ProjectFoldersMoreMenu({
@@ -31,6 +33,7 @@ export function ProjectFoldersMoreMenu({
 	const queryClient = useQueryClient();
 	const [isOpen, setIsOpen] = useState(false);
 	const [_, copy] = useCopyToClipboard();
+	const [isExportOpen, setIsExportOpen] = useState(false);
 	const [isEditNameOpen, setIsEditNameOpen] = useState(false);
 	const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 	const [isEditLockOpen, setIsEditLockOpen] = useState(false);
@@ -108,6 +111,16 @@ export function ProjectFoldersMoreMenu({
 								>
 									<Share2Icon aria-hidden size={18} strokeWidth={1.5} /> Share detail link
 								</DrawerClose>
+								<Separator />
+								<DrawerClose
+									aria-label="Export (zip)"
+									className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+									id="export"
+									onPress={() => setIsExportOpen(true)}
+									variant="unset"
+								>
+									<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
+								</DrawerClose>
 								{canEdit ? (
 									<>
 										<Separator />
@@ -158,7 +171,7 @@ export function ProjectFoldersMoreMenu({
 					>
 						<MoreVerticalIcon aria-hidden size={18} strokeWidth={1.5} />
 					</MenuTrigger>
-					<MenuContent placement="bottom">
+					<MenuContent placement="bottom" popover={{ arrow: false }}>
 						<MenuItem
 							aria-label="Open in new tab"
 							href={`/projects/${props.projectUuid}/folders/${props.folderUuid}`}
@@ -168,6 +181,10 @@ export function ProjectFoldersMoreMenu({
 						</MenuItem>
 						<MenuItem aria-label="Share detail link" id="share" onAction={copyToClipboard}>
 							<Share2Icon aria-hidden size={18} strokeWidth={1.5} /> Share detail link
+						</MenuItem>
+						<MenuSeparator />
+						<MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
+							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
 						</MenuItem>
 						{canEdit ? (
 							<>
@@ -203,6 +220,18 @@ export function ProjectFoldersMoreMenu({
 					</MenuContent>
 				</Menu>
 			)}
+			<ExportJobDialog
+				description={
+					<>
+						Export available data from <span className="text-base-label-md">{props.folderName}</span> to a zip file.
+					</>
+				}
+				exportType={EXPORT_TYPES.Folder}
+				isOpen={isExportOpen}
+				onOpenChange={setIsExportOpen}
+				title="Export folder"
+				uuids={[props.folderUuid]}
+			/>
 			<ProjectFoldersMoreMenuEditNameDialog
 				folderName={props.folderName}
 				folderUuid={props.folderUuid}

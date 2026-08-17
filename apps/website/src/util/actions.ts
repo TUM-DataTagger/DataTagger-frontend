@@ -27,9 +27,17 @@ export type SuccessResult<Type> = {
  * An error response should have a top level `error` string, and then keyed
  * messages depending on what fields errored out.
  */
-export type ErrorData = Record<string, string> & {
+export type ErrorData = {
+	[field: string]: string | undefined;
 	error: string;
+	root?: string;
 };
+
+/**
+ * Input type for the error() function - accepts either a string
+ * or a partial error object with optional fields.
+ */
+export type ErrorInput = Partial<ErrorData> | string;
 
 /**
  * An error response shape
@@ -61,11 +69,22 @@ export function ok<Type>(data: Type): SuccessResult<Type> {
 /**
  * Formats and returns an unsuccessful action result
  *
- * @param errors - An error object keyed of field or an error string
+ * @param errors - An error object keyed by field or an error string
  * @returns A formatted action error value
  */
-export function error(errors: any | string): ErrorResult {
-	const result = typeof errors === 'string' ? { error: errors } : errors;
+export function error(errors: ErrorInput): ErrorResult {
+	if (typeof errors === 'string') {
+		return {
+			ok: false,
+			errors: { error: errors },
+		};
+	}
+
+	// Ensure the error field is always present
+	const result: ErrorData = {
+		error: errors.error ?? errors.root ?? 'An error occurred',
+		...errors,
+	};
 
 	return {
 		ok: false,

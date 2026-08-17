@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation';
 import type { PropsWithChildren } from 'react';
+import { EditRouteTopBar } from '@/components/edit-route/frame/EditRouteTopBar';
 import { openAPIClient } from '@/util/fetch';
 import { CloseButton } from './CloseButton';
 
 export default async function Layout({
 	params,
 	children,
-}: PropsWithChildren<{ readonly params: Promise<{ readonly folderUuid: string }> }>) {
-	const { folderUuid } = await params;
+}: PropsWithChildren<{ readonly params: Promise<{ readonly folderUuid: string; readonly projectUuid: string }> }>) {
+	const { folderUuid, projectUuid } = await params;
 
 	const { data: currentUserData } = await openAPIClient.GET('/api/v1/user/me/');
 
@@ -25,10 +26,10 @@ export default async function Layout({
 
 	return (
 		<>
-			<div className="bg-base-neutral-800 text-base-xl text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900 sticky top-0 z-10 flex h-16 place-content-between place-items-center px-4 pt-6 pb-4 md:px-[132px]">
-				<span>Edit basic information</span>
-				<CloseButton folderUuid={folderUuid} />
-			</div>
+			<EditRouteTopBar
+				closeButton={<CloseButton folderUuid={folderUuid} projectUuid={projectUuid} />}
+				title="Edit basic information"
+			/>
 			{children}
 		</>
 	);

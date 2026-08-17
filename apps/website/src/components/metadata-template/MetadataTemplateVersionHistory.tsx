@@ -1,0 +1,179 @@
+'use client';
+
+import { format } from '@formkit/tempo';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSetAtom } from 'jotai';
+import { LocateFixedIcon, PanelRightCloseIcon, XIcon } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { parseAsString, useQueryState } from 'nuqs';
+import { useState, useEffect } from 'react';
+import type { ModalOverlayProps } from 'react-aria-components';
+import { useMediaQuery } from 'usehooks-ts';
+import { Button } from '@/components/ui/Button';
+import { ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/ui/Modal';
+import { useSidebar } from '@/components/ui/Sidebar';
+import { Tag, TagGroup } from '@/components/ui/TagGroup';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/Tooltip';
+import { SideSheetMode, sideSheetModeAtom, sideSheetSelectedMetadataTemplateContainerAtom } from '@/stores/sideSheet';
+import { cx } from '@/styles/cva';
+import { $api } from '@/util/clientFetch';
+
+export function MetadataTemplateVersionHistoryBadge(props: {
+	readonly className?: string;
+	readonly metadataTemplateContainerUuid: string;
+	readonly versionUuid?: string;
+}) {
+	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
+	const [queryState] = useQueryState('version', parseAsString);
+
+	const { data: metadataTemplateContainerData } = useSuspenseQuery(
+		$api.queryOptions('get', '/api/v1/metadata-template-container/{id}/', {
+			params: { path: { id: props.metadataTemplateContainerUuid } },
+		}),
+	);
+
+	const { data: datasetVersionData, isLoading: isLoadingDatasetVersionData } = useQuery(
+		$api.queryOptions(
+			'get',
+			'/api/v1/metadata-template/{id}/',
+			{
+				params: {
+					path: {
+						id: props.versionUuid ?? queryState ?? metadataTemplateContainerData.latest_metadata_template?.pk ?? '',
+					},
+				},
+			},
+			{
+				enabled: Boolean(props.versionUuid ?? queryState ?? metadataTemplateContainerData.latest_metadata_template?.pk),
+			},
+		),
+	);
+
+	const isLatestVersionSelected = props.versionUuid
+		? props.versionUuid === metadataTemplateContainerData.latest_metadata_template?.pk
+		: !queryState || queryState === metadataTemplateContainerData.latest_metadata_template?.pk;
+
+	const versionName =
+		datasetVersionData?.name ?? format(datasetVersionData?.creation_date ?? new Date(), 'MMM D, YYYY hh:mm', 'en');
+
+	return (
+		<TagGroup aria-label="Current version" className="place-self-auto">
+			<Tag color="info" textValue="Current version">
+				{isLatestVersionSelected ? (
+					<div className="flex place-items-center gap-1">
+						<LocateFixedIcon aria-hidden size={18} strokeWidth={1.5} /> Current version
+					</div>
+				) : isLoadingDatasetVersionData ? (
+					'Loading ...'
+				) : (
+					<span
+						className={cx('max-w-[100ch] truncate', props.className, isMobile && 'max-w-[30ch]')}
+						title={`Version: ${versionName}`}
+					>
+						Version: {versionName}
+					</span>
+				)}
+			</Tag>
+		</TagGroup>
+	);
+}
+
+export function MetadataTemplateVersionHistoryCloseIndicator() {
+	const [isVersionHistoryExitDialogOpen, setIsVersionHistoryExitDialogOpen] = useState(false);
+
+	return (
+		<>
+			<Tooltip delay={400}>
+				<TooltipTrigger onPress={() => setIsVersionHistoryExitDialogOpen(true)} size="icon" variant="crystal-tonal">
+					<XIcon aria-hidden size={18} strokeWidth={1.5} />
+				</TooltipTrigger>
+				<TooltipContent arrow={false}>Exit version history</TooltipContent>
+			</Tooltip>
+			<MetadataTemplateVersionHistoryExitDialog
+				isOpen={isVersionHistoryExitDialogOpen}
+				onOpenChange={setIsVersionHistoryExitDialogOpen}
+			/>
+		</>
+	);
+}
+
+export function MetadataTemplateVersionHistoryCheck() {
+	const { metadataTemplateContainerUuid } = useParams<{ readonly metadataTemplateContainerUuid: string }>();
+	const [queryState] = useQueryState('version', parseAsString);
+	const setSideSheetMode = useSetAtom(sideSheetModeAtom);
+	const setSideSheetSelectedMetadataTemplateContainer = useSetAtom(sideSheetSelectedMetadataTemplateContainerAtom);
+	const { setOpen } = useSidebar();
+
+	useEffect(() => {
+		if (queryState && metadataTemplateContainerUuid) {
+			setOpen(true);
+			setSideSheetMode(SideSheetMode.MetadataTemplateVersionHistory);
+			setSideSheetSelectedMetadataTemplateContainer(metadataTemplateContainerUuid);
+		}
+	}, [
+		queryState,
+		metadataTemplateContainerUuid,
+		setOpen,
+		setSideSheetMode,
+		setSideSheetSelectedMetadataTemplateContainer,
+	]);
+
+	useEffect(
+		() => () => {
+			setOpen(false);
+			setSideSheetMode(SideSheetMode.Dataset);
+			setSideSheetSelectedMetadataTemplateContainer(null);
+		},
+		// eslint-disable-next-line react-compiler/react-compiler
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally cleanup only on unmount
+		[],
+	);
+
+	return null;
+}
+
+export function MetadataTemplateVersionHistoryExitDialog({ ...props }: ModalOverlayProps) {
+	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
+	const [, setQueryState] = useQueryState('version', parseAsString);
+	const setSideSheetMode = useSetAtom(sideSheetModeAtom);
+	const setSideSheetSelectedMetadataTemplateContainer = useSetAtom(sideSheetSelectedMetadataTemplateContainerAtom);
+	const { setOpen } = useSidebar();
+
+	return (
+		<ModalContent {...props} role="alertdialog">
+			<ModalHeader>
+				<ModalTitle className="block">
+					You are about to <strong>exit</strong> the <strong>version history mode</strong>.
+				</ModalTitle>
+			</ModalHeader>
+			{isMobile && (
+				<ModalBody>
+					<p className="text-base-neutral-600 dark:text-base-neutral-300">
+						To minimize the side sheet and focus on details of the selected version, use the panels hide action{' '}
+						<span aria-hidden>
+							"
+							<PanelRightCloseIcon aria-hidden className="inline-block" size={18} strokeWidth={1.5} />"
+						</span>
+						.
+					</p>
+				</ModalBody>
+			)}
+			<ModalFooter>
+				<ModalClose variant="secondary-discreet">Cancel</ModalClose>
+				<Button
+					onPress={async () => {
+						setOpen(false);
+						props.onOpenChange?.(false);
+						await setQueryState(null);
+						setSideSheetMode(SideSheetMode.Dataset);
+						setSideSheetSelectedMetadataTemplateContainer(null);
+					}}
+					type="submit"
+					variant="filled"
+				>
+					Exit version history
+				</Button>
+			</ModalFooter>
+		</ModalContent>
+	);
+}

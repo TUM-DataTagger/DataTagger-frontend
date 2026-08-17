@@ -1,14 +1,20 @@
-import { enableMapSet } from 'immer';
-import { atom } from 'jotai';
-import { selectAtom } from 'jotai/utils';
+import { enableArrayMethods, enableMapSet } from 'immer';
 import { atomWithImmer } from 'jotai-immer';
+import { selectAtom } from 'jotai/utils';
+import {
+	createProjectMembersWithAdminAtom,
+	createProjectMembersWithoutAdminAtom,
+	type ExtendedPermissions,
+	type ProjectPermission,
+} from '@/stores/memberFilters';
 
 enableMapSet();
+enableArrayMethods();
 
 type InitialState = {
 	project: {
-		extendedMemberPermissions: Record<string, Record<string, boolean>>;
-		memberPermission: Record<string, any>;
+		extendedMemberPermissions: Record<string, ExtendedPermissions>;
+		memberPermission: Record<string, ProjectPermission | undefined>;
 		members: Set<string>;
 		name: string;
 	};
@@ -29,28 +35,12 @@ export const projectExtendedMemberPermissionsAtom = selectAtom(
 	(project) => project.project.extendedMemberPermissions,
 );
 
-export const projectMembersWithAdminAtom = atom((get) => {
-	const projectMembers = get(projectMembersAtom);
-	const projectMemberPermission = get(projectMemberPermissionAtom);
-	const projectMembersWithAdmin: { id: string; name: string }[] = [];
-	for (const member of projectMembers) {
-		if (projectMemberPermission[member] === 'admin') {
-			projectMembersWithAdmin.push({ id: member, name: member });
-		}
-	}
+export const projectMembersWithAdminAtom = createProjectMembersWithAdminAtom(
+	projectMembersAtom,
+	projectMemberPermissionAtom,
+);
 
-	return projectMembersWithAdmin;
-});
-
-export const projectMembersWithoutAdminAtom = atom((get) => {
-	const projectMembers = get(projectMembersAtom);
-	const projectMemberPermission = get(projectMemberPermissionAtom);
-	const projectMembersWithoutAdmin: { id: string; name: string }[] = [];
-	for (const member of projectMembers) {
-		if (projectMemberPermission[member] !== 'admin') {
-			projectMembersWithoutAdmin.push({ id: member, name: member });
-		}
-	}
-
-	return projectMembersWithoutAdmin;
-});
+export const projectMembersWithoutAdminAtom = createProjectMembersWithoutAdminAtom(
+	projectMembersAtom,
+	projectMemberPermissionAtom,
+);

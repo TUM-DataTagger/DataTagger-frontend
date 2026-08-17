@@ -2,45 +2,57 @@
 
 import type { DateDuration } from '@internationalized/date';
 import { CalendarIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { DatePicker as RACDatePicker } from 'react-aria-components';
 import type {
 	DatePickerProps as RACDatePickerProps,
 	DateValue as RACDateValue,
-	DialogProps as RACDialogProps,
 	PopoverProps as RACPopoverProps,
-	ValidationResult as RACValidationResult,
+	GroupProps as RACGroupProps,
 } from 'react-aria-components';
+import { useMediaQuery } from 'usehooks-ts';
 import { Button } from '@/components/ui/Button';
 import { Calendar } from '@/components/ui/Calendar';
 import { DateInput } from '@/components/ui/DateField';
-import { Description, FieldError, FieldGroup, Label } from '@/components/ui/Field';
+import { fieldStyles } from '@/components/ui/Field';
+import { InputGroup } from '@/components/ui/Input';
+import { ModalContent } from '@/components/ui/Modal';
 import { PopoverClose, PopoverContent } from '@/components/ui/Popover';
 import { cx } from '@/styles/cva';
 import { composeTailwindRenderProps } from '@/styles/util';
 
-export type DatePickerOverlayProps = Omit<RACDialogProps, 'children' | 'className' | 'style'> &
-	Omit<RACPopoverProps, 'children' | 'className' | 'style'> & {
-		readonly children?: React.ReactNode;
-		readonly className?: string | ((values: { defaultClassName?: string }) => string);
-		readonly closeButton?: boolean;
-		readonly pageBehavior?: 'single' | 'visible';
-		readonly range?: boolean;
-		readonly visibleDuration?: DateDuration;
-	};
+export type DatePickerOverlayProps = Omit<RACPopoverProps, 'children'> & {
+	readonly closeButton?: boolean;
+	readonly pageBehavior?: 'single' | 'visible';
+	readonly range?: boolean;
+	readonly visibleDuration?: DateDuration;
+};
 
 export function DatePickerOverlay({
-	visibleDuration = { months: 1 },
 	closeButton = true,
-	pageBehavior = 'visible',
+	placement = 'bottom',
+	range: _range,
+	pageBehavior: _pageBehavior = 'visible',
+	visibleDuration: _visibleDuration = { months: 1 },
 	...props
 }: DatePickerOverlayProps) {
+	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
+
+	if (isMobile) {
+		return (
+			<ModalContent aria-label={props['aria-label'] ?? 'Date picker'} className="sm:max-w-2xs" closeButton={false}>
+				<div className="flex place-content-center p-4">
+					<Calendar />
+				</div>
+			</ModalContent>
+		);
+	}
+
 	return (
 		<PopoverContent
 			{...props}
-			className={cx('flex snap-x place-content-center rounded-lg')}
-			isDismissable={false}
-			showArrow={false}
+			className={cx('flex min-w-auto snap-x place-content-center rounded-lg')}
+			placement={placement}
+			arrow={false}
 		>
 			{/* {props.range ? <RangeCalendar pageBehavior={pageBehavior} visibleDuration={visibleDuration} /> : <Calendar />} */}
 			<Calendar />
@@ -54,30 +66,33 @@ export function DatePickerOverlay({
 }
 
 export type DatePickerProps<Type extends RACDateValue> = RACDatePickerProps<Type> & {
-	readonly description?: string;
-	readonly errorMessage?: string | ((validation: RACValidationResult) => string) | undefined;
-	readonly label?: ReactNode | string;
-	readonly prefix?: ReactNode | string;
+	readonly popover?: Omit<RACPopoverProps, 'children'>;
 };
 
-export function DatePicker<Type extends RACDateValue>(props: DatePickerProps<Type>) {
+export function DatePicker<Type extends RACDateValue>({ popover, ...props }: DatePickerProps<Type>) {
 	return (
 		<RACDatePicker
 			{...props}
-			className={composeTailwindRenderProps(props.className, 'group/date-picker flex w-full flex-col gap-1')}
-			isInvalid={Boolean(props.errorMessage)}
+			className={composeTailwindRenderProps(props.className, fieldStyles())}
+			data-slot="control"
 		>
-			{props.label && <Label>{props.label}</Label>}
-			<FieldGroup isDisabled={props.isDisabled!} isInvalid={Boolean(props.errorMessage)}>
-				{props.prefix && typeof props.prefix === 'string' ? <span className="ml-3">{props.prefix}</span> : props.prefix}
-				<DateInput />
-				<Button className="mr-1! size-8!" size="icon-sm" variant="discreet">
-					<CalendarIcon aria-hidden className="size-4.5!" data-slot="icon" size={18} strokeWidth={1.5} />
-				</Button>
-			</FieldGroup>
-			{props.description && <Description>{props.description}</Description>}
-			<FieldError>{props.errorMessage}</FieldError>
-			<DatePickerOverlay />
+			{(values) => (
+				<>
+					{typeof props.children === 'function' ? props.children(values) : props.children}
+					<DatePickerOverlay {...popover} />
+				</>
+			)}
 		</RACDatePicker>
+	);
+}
+
+export function DatePickerTrigger(props: RACGroupProps) {
+	return (
+		<InputGroup {...props} className={cx('*:data-[slot=control]:w-full', props.className)}>
+			<DateInput />
+			<Button data-slot="date-picker-trigger" size="icon" variant="unset">
+				<CalendarIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+			</Button>
+		</InputGroup>
 	);
 }

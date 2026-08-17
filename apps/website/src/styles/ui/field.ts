@@ -11,7 +11,7 @@ export const fieldBorderStyles = cva({
 			false: null,
 		},
 		isDisabled: {
-			true: 'border-base-neutral-100 bg-base-neutral-100 hover:border-base-neutral-100 opacity-38 forced-colors:border-[GrayText]',
+			true: 'border-transparent bg-base-neutral-100 opacity-38 hover:border-transparent forced-colors:border-[GrayText]',
 			false: null,
 		},
 	},

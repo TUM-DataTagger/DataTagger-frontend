@@ -1,7 +1,7 @@
+import { MetadataTemplateCreateHeader } from '@/components/metadata-template/create/MetadataTemplateCreateHeader';
 import { openAPIClient } from '@/util/fetch';
 import { MetadataTemplateCreateFooter } from './MetadataTemplateCreateFooter';
 import { MetadataTemplateCreateForm } from './MetadataTemplateCreateForm';
-import { MetadataTemplateCreateHeader } from './MetadataTemplateCreateHeader';
 
 export default async function Page({
 	params,
@@ -17,10 +17,10 @@ export default async function Page({
 	return (
 		<>
 			<MetadataTemplateCreateHeader>
-				<h1 className="text-base-heading-md dark:text-base-neutral-40 text-center">
+				<h1 className="text-center text-base-heading-md dark:text-base-neutral-40">
 					Set up your first metadata template
 				</h1>
-				<p className="text-base-md text-base-neutral-600 dark:text-base-neutral-300 max-w-[536px] place-self-center text-center">
+				<p className="max-w-[536px] place-self-center text-center text-base-md text-base-neutral-600 dark:text-base-neutral-300">
 					Use metadata templates to create a reusable template for your metadata.
 				</p>
 			</MetadataTemplateCreateHeader>

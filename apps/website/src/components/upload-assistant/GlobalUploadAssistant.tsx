@@ -3,6 +3,7 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { ChevronDownIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import dynamic from 'next/dynamic';
 import { useState, useLayoutEffect } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import { Button } from '@/components/ui/Button';
@@ -57,8 +58,8 @@ export function GlobalUploadAssistant() {
 					: { height: '48px', width: '192px' }
 			}
 			className={cx(
-				'fixed right-0 bottom-0 z-30 flex flex-col md:right-[1.5rem] lg:right-[8rem] print:hidden',
-				isSidebarOpen && 'lg:right-[25.5rem]',
+				'fixed right-0 bottom-0 z-30 flex flex-col md:right-6 lg:right-32 print:hidden',
+				isSidebarOpen && 'lg:right-102',
 				isGlobalUploadAssistantOpen && 'shadow-base-md',
 				isSidebarOpen && needsScrollbarGutter && 'lg:right-[calc(25.5rem+11px)]',
 			)}
@@ -66,7 +67,7 @@ export function GlobalUploadAssistant() {
 		>
 			<Button
 				className={cx(
-					'bg-base-neutral-800 text-base-label-md text-base-neutral-40 dark:bg-base-neutral-100 dark:text-base-neutral-900 flex h-12 place-content-between items-center rounded-none rounded-tl-2xl p-4 focus-visible:z-10 md:rounded-tr-sm',
+					'flex h-12 place-content-between items-center rounded-none rounded-tl-2xl bg-base-neutral-800 p-4 text-base-label-md text-base-neutral-40 focus-visible:z-10 md:rounded-tr-sm dark:bg-base-neutral-100 dark:text-base-neutral-900',
 					isGlobalUploadAssistantOpen && isMobile ? 'rounded-none' : '',
 				)}
 				onPress={() => setIsGlobalUploadAssistantOpen((prev) => !prev)}
@@ -81,7 +82,7 @@ export function GlobalUploadAssistant() {
 				{isGlobalUploadAssistantOpen && (
 					<div
 						className={cx(
-							'border-base-neutral-200 bg-base-neutral-0 dark:border-base-neutral-600 dark:bg-base-neutral-800 flex h-full max-h-[calc(100vh_-_3rem)] border border-t-0 md:h-[540px]',
+							'flex h-full max-h-[calc(100vh-3rem)] border border-t-0 border-base-neutral-200 bg-base-neutral-0 md:h-[540px] dark:border-base-neutral-600 dark:bg-base-neutral-800',
 							// !isGlobalUploadAssistantOpen && '[@-moz-document_url-prefix()]:hidden',
 						)}
 					>
@@ -92,3 +93,5 @@ export function GlobalUploadAssistant() {
 		</motion.div>
 	);
 }
+
+export const GlobalUploadAssistantNoSSR = dynamic(async () => GlobalUploadAssistant, { ssr: false });

@@ -2,17 +2,21 @@
 
 import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AlertCircleIcon } from 'lucide-react';
-import type { ModalOverlayProps } from 'react-aria-components';
+import { AlertCircleIcon, XCircleIcon } from 'lucide-react';
+import { type ModalOverlayProps } from 'react-aria-components';
 import { Controller, useForm } from 'react-hook-form';
 import type { InferInput } from 'valibot';
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
+import { FieldError, Label } from '@/components/ui/Field';
+import { Form, useDialogForm } from '@/components/ui/Form';
+import { Input, InputGroup } from '@/components/ui/Input';
 import { ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
 import { TextField } from '@/components/ui/TextField';
 import { FilenameEditSchema } from '@/schemas/FilenameEditSchema';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { formatErrorMessage } from '@/util/formatErrorMessage';
+import { logger, LogCategory } from '@/util/logger';
 
 type ProjectFolderFileEditInput = InferInput<typeof FilenameEditSchema>;
 
@@ -66,7 +70,12 @@ export function ProjectFolderFileMoreMenuEditFilenameDialog({
 				throw new Error(formatErrorMessage(datasetError, datasetResponse));
 			}
 		},
-		async onSuccess() {
+		async onSuccess(_data, variables) {
+			logger.info(LogCategory.File, 'File renamed', {
+				fileUuid,
+				newFilename: variables.name,
+			});
+
 			props.onOpenChange?.(false);
 
 			await queryClient.invalidateQueries({
@@ -89,6 +98,7 @@ export function ProjectFolderFileMoreMenuEditFilenameDialog({
 			});
 		},
 	});
+	const { formProps, submitButtonProps } = useDialogForm('project-folder-file-edit-filename');
 
 	return (
 		<ModalContent
@@ -97,12 +107,12 @@ export function ProjectFolderFileMoreMenuEditFilenameDialog({
 			isKeyboardDismissDisabled
 			role="alertdialog"
 		>
-			<form onSubmit={handleSubmit((input) => mutate(input))}>
-				<ModalHeader aria-hidden />
-				<ModalBody>
+			<ModalHeader aria-hidden />
+			<ModalBody>
+				<Form {...formProps} onSubmit={handleSubmit((input) => mutate(input))}>
 					{errors.root && (
-						<Alert>
-							<AlertCircleIcon aria-hidden size={24} strokeWidth={1.5} />
+						<Alert className="mb-6">
+							<AlertCircleIcon aria-hidden className="shrink-0" size={24} strokeWidth={1.5} />
 							{errors.root?.message}
 						</Alert>
 					)}
@@ -113,36 +123,41 @@ export function ProjectFolderFileMoreMenuEditFilenameDialog({
 						render={({ field, fieldState }) => (
 							<TextField
 								autoComplete="off"
-								autoFocus
-								errorMessage={fieldState.error?.message}
-								isClearable
 								isDisabled={field.disabled ?? false}
 								isInvalid={fieldState.invalid}
-								label="Edit filename"
 								onBlur={field.onBlur}
 								onChange={field.onChange}
-								placeholder="Enter filename"
-								type="text"
 								value={field.value ?? ''}
-							/>
+							>
+								<Label>Edit filename</Label>
+								<InputGroup>
+									<Input autoFocus placeholder="Enter filename" />
+									{field.value && !field.disabled && (
+										<Button aria-label="Clear filename" onPress={() => field.onChange('')} size="icon" variant="unset">
+											<XCircleIcon aria-hidden className="size-6 shrink-0 stroke-[1.5]" />
+										</Button>
+									)}
+								</InputGroup>
+								{fieldState.error?.message ? <FieldError>{fieldState.error.message}</FieldError> : null}
+							</TextField>
 						)}
 					/>
-				</ModalBody>
-				<ModalFooter>
-					<ModalClose
-						onPress={async () => {
-							clearErrors();
-							await setUnlocked();
-						}}
-						variant="secondary-discreet"
-					>
-						Cancel
-					</ModalClose>
-					<Button type="submit" variant="filled">
-						Save changes
-					</Button>
-				</ModalFooter>
-			</form>
+				</Form>
+			</ModalBody>
+			<ModalFooter>
+				<ModalClose
+					onPress={async () => {
+						clearErrors();
+						await setUnlocked();
+					}}
+					variant="secondary-discreet"
+				>
+					Cancel
+				</ModalClose>
+				<Button {...submitButtonProps} variant="filled">
+					Save changes
+				</Button>
+			</ModalFooter>
 		</ModalContent>
 	);
 }

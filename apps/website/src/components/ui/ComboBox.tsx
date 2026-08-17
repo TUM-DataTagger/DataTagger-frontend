@@ -1,118 +1,132 @@
 'use client';
 
-import { ChevronDownIcon, XCircleIcon } from 'lucide-react';
-import { use, type ReactNode } from 'react';
+import { ChevronDownIcon } from 'lucide-react';
+import type { ReactNode, UIEvent } from 'react';
 import type {
+	ComboBoxValueProps as RACComboBoxValueProps,
+	PopoverProps,
 	ComboBoxProps as RACComboBoxProps,
 	InputProps as RACInputProps,
 	ListBoxProps as RACListBoxProps,
-	ValidationResult as RACValidationResult,
 } from 'react-aria-components';
-import { ComboBoxStateContext as RACComboBoxStateContext, ComboBox as RACComboBox } from 'react-aria-components';
+import {
+	ComboBoxContext as RACComboBoxContext,
+	ComboBox as RACComboBox,
+	ComboBoxValue as RACComboBoxValue,
+	ListBox as RACListBox,
+	ListBoxItem as RACListBoxItem,
+	useSlottedContext,
+} from 'react-aria-components';
 import { Button } from '@/components/ui/Button';
-import { Description, FieldError, FieldGroup, Input, Label } from '@/components/ui/Field';
-import { ListBox } from '@/components/ui/ListBox';
-import { PopoverContent, type PopoverContentProps } from '@/components/ui/Popover';
+import { fieldStyles } from '@/components/ui/Field';
+import { Input, InputGroup } from '@/components/ui/Input';
+import { PopoverContent } from '@/components/ui/Popover';
 import { cx } from '@/styles/cva';
 import { composeTailwindRenderProps } from '@/styles/util';
 
 export type ComboBoxProps<Type extends object> = Omit<RACComboBoxProps<Type>, 'children'> & {
 	readonly children: ReactNode;
-	readonly description?: string | null;
-	readonly errorMessage?: string | ((validation: RACValidationResult) => string) | undefined;
-	readonly label?: string;
-	readonly placeholder?: string;
 };
 
 export function ComboBox<Type extends object>(props: ComboBoxProps<Type>) {
 	return (
 		<RACComboBox
 			{...props}
-			className={composeTailwindRenderProps(props.className, 'group flex w-full flex-col gap-1.5')}
-			data-slot="combo-box"
-		>
-			{props.label && <Label>{props.label}</Label>}
-			{props.children}
-			{props.description && <Description>{props.description}</Description>}
-			<FieldError>{props.errorMessage}</FieldError>
-		</RACComboBox>
+			className={composeTailwindRenderProps(props.className, fieldStyles())}
+			data-slot="control"
+		/>
 	);
 }
 
-export type ComboBoxListProps<Type extends object> = Pick<PopoverContentProps, 'placement'> &
-	RACListBoxProps<Type> & {
-		readonly classNames?: {
-			readonly popover?: PopoverContentProps['className'];
+type ComboBoxListProps<Type extends object> = Omit<RACListBoxProps<Type>, 'layout' | 'orientation'> &
+	Pick<PopoverProps, 'placement'> & {
+		readonly loadMore?: {
+			readonly hasMore: boolean;
+			readonly isLoadingMore: boolean;
+			onLoadMore(): void;
 		};
+		readonly popover?: Omit<PopoverProps, 'children'>;
 	};
 
-export function ComboBoxList<Type extends object>(props: ComboBoxListProps<Type>) {
+export function ComboBoxContent<Type extends object>({ loadMore, popover, ...props }: ComboBoxListProps<Type>) {
+	const handleScrollCapture = (event: UIEvent<HTMLDivElement>) => {
+		(popover as { onScrollCapture?(event: UIEvent<HTMLDivElement>): void } | undefined)?.onScrollCapture?.(event);
+		if (!loadMore?.hasMore || loadMore.isLoadingMore) {
+			return;
+		}
+
+		const target = event.target instanceof HTMLElement ? event.target : event.currentTarget;
+		const distanceFromBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+		if (distanceFromBottom <= Math.max(target.clientHeight, 64)) {
+			loadMore.onLoadMore();
+		}
+	};
+
 	return (
 		<PopoverContent
-			className={cx(
-				'w-[calc(var(--trigger-width)+var(--spacing)_*_2)] min-w-[calc(var(--trigger-width)+var(--spacing)_*_2)] scroll-py-1 overflow-y-auto overscroll-contain',
-				props.classNames?.popover,
-			)}
-			isNonModal
-			placement={props.placement!}
-			respectScreen={false}
-			showArrow={false}
+			{...popover}
+			className={cx('min-w-(--trigger-width) scroll-py-1 overflow-y-auto overscroll-contain', popover?.className)}
+			onScrollCapture={handleScrollCapture}
+			placement={popover?.placement ?? 'bottom'}
+			arrow={false}
 		>
-			<ListBox {...props} className={cx('grid-cols-[auto_1fr] border-0', props.className)}>
-				{props.children}
-			</ListBox>
+			<RACListBox
+				{...props}
+				className={cx(
+					"grid max-h-96 w-full grid-cols-[auto_1fr] flex-col gap-y-1 p-1 outline-hidden *:[[role='group']+[role='separator']]:mt-1",
+					props.className,
+				)}
+				layout="stack"
+				orientation="vertical"
+			>
+				{typeof props.children === 'function' ? (
+					props.children
+				) : (
+					<>
+						{props.children}
+						{loadMore?.isLoadingMore ? (
+							<RACListBoxItem
+								id="__combobox-loading-more__"
+								isDisabled
+								textValue="Loading more results"
+								className="col-span-full px-3 py-2 text-base-label-sm text-base-neutral-600 dark:text-base-neutral-300"
+							>
+								Loading more...
+							</RACListBoxItem>
+						) : null}
+					</>
+				)}
+			</RACListBox>
 		</PopoverContent>
 	);
 }
 
-export function ComboBoxClearButton() {
-	const state = use(RACComboBoxStateContext);
+export function ComboBoxInput(props: RACInputProps) {
+	const context = useSlottedContext(RACComboBoxContext);
 
 	return (
-		<Button
-			aria-label="Clear"
-			className="flex size-6 place-items-center p-0.5"
-			excludeFromTabOrder
-			onPress={() => {
-				state?.setSelectedKey(null);
-				state?.open();
-			}}
-			preventFocusOnPress
-			size="icon"
-			slot={null}
-			variant="unset"
-		>
-			<XCircleIcon
-				aria-hidden
-				className="animate-in size-6 shrink-0 transition forced-colors:text-[ButtonText] forced-colors:group-disabled:text-[GrayText]"
-				size={24}
-				strokeWidth={1.5}
-			/>
-		</Button>
+		<InputGroup>
+			<Input {...props} placeholder={props?.placeholder ?? ''} />
+			<Button className="*:data-[slot=icon]:size-6" size="icon" variant="unset">
+				{!context?.inputValue && (
+					<ChevronDownIcon
+						className="transition duration-200 group-open:rotate-180 forced-colors:text-[ButtonText] forced-colors:group-disabled:text-[GrayText]"
+						data-slot="icon"
+						size={24}
+						strokeWidth={1.5}
+					/>
+				)}
+			</Button>
+		</InputGroup>
 	);
 }
 
-export function ComboBoxInput(props: RACInputProps) {
-	const context = use(RACComboBoxStateContext);
-
-	return (
-		<FieldGroup className="relative pl-0">
-			<Input {...props} placeholder={props?.placeholder} />
-			{(context?.inputValue || context?.selectedKey) && <ComboBoxClearButton />}
-			<Button className={cx('size-6 p-0.5', 'inputValue' in (context ?? {}) && 'ml-2')} size="icon" variant="unset">
-				<ChevronDownIcon
-					aria-hidden
-					className="size-6 shrink-0 transition duration-200 group-open:rotate-180 forced-colors:text-[ButtonText] forced-colors:group-disabled:text-[GrayText]"
-					size={24}
-					strokeWidth={1.5}
-				/>
-			</Button>
-		</FieldGroup>
-	);
+export function ComboBoxValue<Type extends object>(props: RACComboBoxValueProps<Type>) {
+	return <RACComboBoxValue {...props} data-slot="control" />;
 }
 
 export {
-	DropdownItem as ComboBoxOption,
+	DropdownItem as ComboBoxItem,
 	DropdownLabel as ComboBoxLabel,
 	DropdownSection as ComboBoxSection,
 	DropdownDescription as ComboBoxDescription,

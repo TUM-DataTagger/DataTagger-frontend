@@ -15,6 +15,7 @@ export function MetadataTemplatesCreateGrid({
 	VariantProps<typeof gridCardStyles> & {
 		readonly className?: string | undefined;
 		readonly href: string;
+		readonly isDisabled?: boolean;
 	}
 >) {
 	const { currentUserData } = useCurrentUser();
@@ -22,12 +23,18 @@ export function MetadataTemplatesCreateGrid({
 	const isGlobalMetadataTemplateAdmin = currentUserData?.is_global_metadata_template_admin;
 
 	return isGlobalMetadataTemplateAdmin ? (
-		<GridListItem aria-label="Create metadata template" className="rounded-xl" href={props.href}>
+		<GridListItem
+			aria-label="Create metadata template"
+			className="rounded-xl"
+			hasCheckbox={false}
+			href={props.href}
+			isDisabled={props.isDisabled}
+		>
 			<div
 				className={gridCardStyles({
 					variant,
 					className: cx(
-						'relative h-[150px] w-full min-w-64 cursor-pointer flex-row place-content-center place-items-center gap-2 border-transparent md:w-auto dark:border-transparent',
+						'relative h-[150px] w-full min-w-64 cursor-pointer flex-row place-content-center place-items-center gap-2 border-transparent md:max-w-64 dark:border-transparent',
 						props.className,
 					),
 				})}

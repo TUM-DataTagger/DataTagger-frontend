@@ -2,8 +2,7 @@
 
 import { format } from '@formkit/tempo';
 import { useSetAtom } from 'jotai';
-import { InfoIcon, Wand2Icon } from 'lucide-react';
-import Link from 'next/link';
+import { FileWarningIcon, InfoIcon, Wand2Icon } from 'lucide-react';
 import { useQueryStates, parseAsBoolean, parseAsString, parseAsArrayOf } from 'nuqs';
 import type { Selection } from 'react-aria-components';
 import { useMediaQuery } from 'usehooks-ts';
@@ -13,10 +12,12 @@ import { GridList, GridListItem } from '@/components/ui/GridList';
 import { useSidebar } from '@/components/ui/Sidebar';
 import { globalUploadAssistantOpenAtom } from '@/stores/globalUploadAssistant';
 import { sideSheetSelectedDatasetAtom } from '@/stores/sideSheet';
+import { cx } from '@/styles/cva';
 import { gridCardStyles } from '@/styles/ui/gridCard';
 import { convertDataRateLog } from '@/util/convertDataRate';
 import { differenceInDays } from '@/util/differenceInDays';
 import type { components } from '@/util/openapiSchema';
+import { getSelectionStringValues } from '@/util/selection';
 import { DraftsMoreMenu } from './DraftsMoreMenu';
 
 type Draft = components['schemas']['UploadsDatasetList'];
@@ -32,14 +33,17 @@ export function DraftsGrid(props: { readonly data?: Draft[] | undefined }) {
 	const setSideSheetSelectedDataset = useSetAtom(sideSheetSelectedDatasetAtom);
 
 	const handleSelectionChange = async (selectedKeys: Selection) => {
-		const newSelected = Array.from(selectedKeys as Set<string>);
+		const newSelected = getSelectionStringValues(
+			selectedKeys,
+			props.data?.map((item) => item.pk),
+		);
 		await setQueryStates({ selected: newSelected.length ? newSelected : null });
 	};
 
 	return (
 		<GridList
 			aria-label="Draft files"
-			className="layout-grid:gap-3.5"
+			className="overscroll-auto layout-grid:gap-4"
 			dependencies={[queryStates.bulk_edit]}
 			items={props.data ?? []}
 			layout="grid"
@@ -57,10 +61,15 @@ export function DraftsGrid(props: { readonly data?: Draft[] | undefined }) {
 					key={`${item.pk}-${queryStates.bulk_edit}`}
 					textValue={item.display_name ?? 'Empty dataset'}
 				>
-					<div className="relative h-[182px] w-full min-w-64 gap-6 md:w-auto">
+					<div className="relative h-[182px] w-full min-w-64 gap-6 md:max-w-64">
 						{queryStates.bulk_edit ? null : (
 							<div className="absolute top-2 right-2">
-								<DraftsMoreMenu fileUuid={item.pk} filename={item.display_name} versionUuid={item.latest_version?.pk} />
+								<DraftsMoreMenu
+									fileUuid={item.pk}
+									filename={item.display_name}
+									hasFile={Boolean(item.latest_version?.version_file)}
+									versionUuid={item.latest_version?.pk}
+								/>
 							</div>
 						)}
 						<div className="absolute right-4 bottom-3">
@@ -88,19 +97,21 @@ export function DraftsGrid(props: { readonly data?: Draft[] | undefined }) {
 						>
 							<span className="flex grow flex-col place-content-between gap-6">
 								<span className="flex flex-col gap-3">
-									{queryStates.bulk_edit ? (
-										<Link
-											className="group-active:text-base-neutral-900 group-hover:text-base-lavender-600 group-hover:group-active:text-base-neutral-900 group-focus-visible:text-base-lavender-600 dark:group-active:text-base-neutral-40 dark:group-hover:text-base-lavender-400 dark:group-hover:group-active:text-base-neutral-40 dark:group-focus-visible:text-base-lavender-400 line-clamp-2 max-w-[25ch] break-words text-ellipsis"
-											href={`/drafts/${item.pk}`}
-										>
-											{item.display_name ?? 'Empty dataset'}
-										</Link>
-									) : (
-										<span className="group-active:text-base-neutral-900 group-hover:text-base-lavender-600 group-hover:group-active:text-base-neutral-900 group-focus-visible:text-base-lavender-600 dark:group-active:text-base-neutral-40 dark:group-hover:text-base-lavender-400 dark:group-hover:group-active:text-base-neutral-40 dark:group-focus-visible:text-base-lavender-400 line-clamp-2 max-w-[25ch] break-words text-ellipsis">
-											{item.display_name ?? 'Empty dataset'}
-										</span>
-									)}
-									<span>
+									<span
+										className="line-clamp-2 max-w-[25ch] wrap-break-word text-ellipsis group-hover:text-base-lavender-600 group-focus-visible:text-base-lavender-600 group-pressed:text-base-neutral-900 group-hover:group-pressed:text-base-neutral-900 dark:group-hover:text-base-lavender-400 dark:group-focus-visible:text-base-lavender-400 dark:group-pressed:text-base-neutral-40 dark:group-hover:group-pressed:text-base-neutral-40"
+										title={item.display_name ?? 'Empty dataset'}
+									>
+										{item.display_name ?? 'Empty dataset'}
+									</span>
+									<span className="flex gap-2">
+										{item?.latest_version?.version_file ? null : (
+											<FileWarningIcon
+												aria-hidden
+												className="shrink-0 text-base-tangerine-600 dark:text-base-tangerine-400"
+												size={18}
+												strokeWidth={1.5}
+											/>
+										)}
 										{convertDataRateLog(
 											item?.latest_version?.version_file?.metadata?.find(
 												(metadata) => metadata.custom_key === 'FILE_SIZE',
@@ -108,8 +119,13 @@ export function DraftsGrid(props: { readonly data?: Draft[] | undefined }) {
 										) ?? '...'}
 									</span>
 								</span>
-								<span className="mb-1 flex flex-col gap-3">
-									<span className="text-base-sm text-base-neutral-600 dark:text-base-neutral-300 inline-flex place-items-center gap-2">
+								<span className="flex flex-col gap-3">
+									<span
+										className={cx(
+											'inline-flex place-items-center gap-2 text-base-sm text-base-neutral-600 dark:text-base-neutral-300',
+											item.expiry_date && differenceInDays(item.expiry_date) <= 14 ? '' : 'mb-1',
+										)}
+									>
 										<Wand2Icon aria-hidden size={18} strokeWidth={1.5} />{' '}
 										{format(item.creation_date, 'MMM D, YYYY hh:mm', 'en')}
 									</span>

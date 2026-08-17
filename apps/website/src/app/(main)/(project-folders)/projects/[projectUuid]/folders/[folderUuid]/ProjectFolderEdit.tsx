@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type VariantProps } from 'cva';
 import { PencilIcon } from 'lucide-react';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import type { PropsWithChildren } from 'react';
 import { Button } from '@/components/ui/Button';
@@ -18,7 +19,7 @@ export function ProjectFolderEdit({
 	VariantProps<typeof Button> & {
 		readonly className?: string | undefined;
 		readonly folderUuid: string;
-		readonly href: string;
+		readonly href: Route;
 		onClick?(isLocked: boolean): void;
 	}
 >) {

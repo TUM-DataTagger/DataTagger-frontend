@@ -1,17 +1,50 @@
 'use client';
 
 import { ChevronDownIcon, ChevronUpIcon, MinusIcon, PlusIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
 import {
 	NumberField as RACNumberField,
+	type InputProps,
 	type NumberFieldProps as RACNumberFieldProps,
-	type ValidationResult,
 } from 'react-aria-components';
 import { useMediaQuery } from 'usehooks-ts';
 import { Button, type ButtonProps } from '@/components/ui/Button';
-import { Description, FieldError, FieldGroup, Input, Label } from '@/components/ui/Field';
+import { fieldStyles } from '@/components/ui/Field';
+import { Input, InputGroup } from '@/components/ui/Input';
 import { cx } from '@/styles/cva';
 import { composeTailwindRenderProps } from '@/styles/util';
+
+export function NumberField(props: RACNumberFieldProps) {
+	return (
+		<RACNumberField
+			{...props}
+			className={composeTailwindRenderProps(props.className, fieldStyles())}
+			data-slot="control"
+		/>
+	);
+}
+
+export function NumberInput(props: InputProps) {
+	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
+
+	return (
+		<InputGroup className={isMobile ? '[--input-gutter-end:--spacing(13)] [--input-gutter-start:--spacing(13)]' : ''}>
+			{isMobile && <StepperButton className="top-px! left-px! h-[37.5px] w-10 rounded-l p-px" slot="increment" />}
+			<Input {...props} className={cx('tabular-nums', props.className)} />
+			{isMobile && <StepperButton className="top-px! right-px! h-[37.5px] w-10 rounded-r p-px" slot="decrement" />}
+			{!isMobile && (
+				<div
+					className="pointer-events-auto right-0 p-px in-disabled:pointer-events-none in-disabled:opacity-38"
+					data-slot="text"
+				>
+					<div className="flex h-full flex-col overflow-hidden rounded-r">
+						<StepperButton emblemType="chevron" slot="increment" />
+						<StepperButton emblemType="chevron" slot="decrement" />
+					</div>
+				</div>
+			)}
+		</InputGroup>
+	);
+}
 
 type StepperButtonProps = ButtonProps & {
 	readonly className?: string;
@@ -37,7 +70,7 @@ function StepperButton({ emblemType = 'default', ...props }: StepperButtonProps)
 		<Button
 			{...props}
 			className={cx(
-				'size-5 shrink-0 p-0',
+				'inline-grid size-5 shrink-0 place-content-center p-0',
 				'bg-base-neutral-100 dark:bg-base-neutral-700/48',
 				'hover:bg-base-neutral-200 dark:hover:bg-base-neutral-700',
 				'focus-visible:bg-base-neutral-200 dark:focus-visible:bg-base-neutral-700',
@@ -50,40 +83,5 @@ function StepperButton({ emblemType = 'default', ...props }: StepperButtonProps)
 		>
 			{icon}
 		</Button>
-	);
-}
-
-export type NumberFieldProps = RACNumberFieldProps & {
-	readonly description?: string;
-	readonly errorMessage?: string | ((validation: ValidationResult) => string) | undefined;
-	readonly label?: ReactNode | string;
-	readonly placeholder?: string;
-};
-
-export function NumberField(props: NumberFieldProps) {
-	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
-
-	return (
-		<RACNumberField
-			{...props}
-			className={composeTailwindRenderProps(props.className, 'group flex w-full flex-col gap-1')}
-			isInvalid={Boolean(props.errorMessage)}
-		>
-			{props.label && <Label>{props.label}</Label>}
-			<FieldGroup isDisabled={props.isDisabled!} isInvalid={Boolean(props.errorMessage)}>
-				{isMobile ? <StepperButton className="ml-0! size-10!" slot="decrement" /> : null}
-				<Input className="tabular-nums" placeholder={props.placeholder} />
-				{isMobile ? (
-					<StepperButton className="mr-0! size-10!" slot="increment" />
-				) : (
-					<div className="flex h-full flex-col">
-						<StepperButton emblemType="chevron" slot="increment" />
-						<StepperButton emblemType="chevron" slot="decrement" />
-					</div>
-				)}
-			</FieldGroup>
-			{props.description && <Description>{props.description}</Description>}
-			<FieldError>{props.errorMessage}</FieldError>
-		</RACNumberField>
 	);
 }
