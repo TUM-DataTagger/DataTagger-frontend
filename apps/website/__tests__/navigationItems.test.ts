@@ -12,6 +12,7 @@ describe('main navigation items', () => {
 		).toEqual([
 			{ href: '/drafts', id: 'drafts', label: 'My draft files' },
 			{ href: '/projects', id: 'projects', label: 'Projects' },
+			{ href: '/experiments', id: 'experiments', label: 'Experiments' },
 			{ href: '/metadata-templates', id: 'metadata-templates', label: 'Metadata templates' },
 			{ href: '/search', id: 'advanced-search', label: 'Advanced search' },
 		]);

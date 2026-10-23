@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { VariantProps } from 'cva';
-import { FilePlusIcon, PackageOpenIcon } from 'lucide-react';
+import { FilePlusIcon, FolderUpIcon, PackageOpenIcon } from 'lucide-react';
 import { useState } from 'react';
 import { UploadTrigger } from '@/components/UploadTrigger';
 import { Button } from '@/components/ui/Button';
@@ -13,6 +13,7 @@ import { cx } from '@/styles/cva';
 import { gridCardStyles } from '@/styles/ui/gridCard';
 import { $api } from '@/util/clientFetch';
 import { ProjectFolderFilesDraftFilesAssignDialog } from './ProjectFolderFilesDraftFilesAssignDialog';
+import { useCurrentSubfolder } from './useCurrentSubfolder';
 
 export function ProjectFolderFilesUploadGrid({
 	variant = 'secondary-filled',
@@ -45,6 +46,7 @@ export function ProjectFolderFilesUploadGrid({
 		}),
 	);
 
+	const [currentSubfolder] = useCurrentSubfolder();
 	const canUploadFiles = folderPermissionData?.[0]?.is_folder_admin || folderPermissionData?.[0]?.can_edit;
 
 	return canUploadFiles ? (
@@ -54,12 +56,17 @@ export function ProjectFolderFilesUploadGrid({
 			hasCheckbox={false}
 			isDisabled={props.isDisabled}
 		>
-			<UploadTrigger folderName={folderData?.name} folderUuid={props.folderUuid} projectUuid={folderData?.project.pk}>
+			<UploadTrigger
+				folderName={folderData?.name}
+				folderUuid={props.folderUuid}
+				projectUuid={folderData?.project.pk}
+				subfolderUuid={currentSubfolder}
+			>
 				<Button
 					className={gridCardStyles({
 						variant,
 						className: cx(
-							'relative h-[182px] w-full shrink! grow flex-row place-content-center place-items-center gap-2 rounded-r-none focus-visible:z-10 focus-visible:outline-2',
+							'relative h-[182px] w-full shrink! grow flex-col place-content-center place-items-center gap-2 rounded-r-none px-2 focus-visible:z-10 focus-visible:outline-2',
 							props.className,
 						),
 					})}
@@ -70,12 +77,35 @@ export function ProjectFolderFilesUploadGrid({
 					Upload
 				</Button>
 			</UploadTrigger>
+			<UploadTrigger
+				acceptDirectory
+				folderName={folderData?.name}
+				folderUuid={props.folderUuid}
+				projectUuid={folderData?.project.pk}
+				subfolderUuid={currentSubfolder}
+			>
+				<Button
+					aria-label="Upload folder"
+					className={gridCardStyles({
+						variant,
+						className: cx(
+							'relative h-[182px] w-full shrink! grow flex-col place-content-center place-items-center gap-2 rounded-none px-2 focus-visible:z-10 focus-visible:outline-2',
+							props.className,
+						),
+					})}
+					isDisabled={props.isDisabled}
+					variant="unset"
+				>
+					<FolderUpIcon aria-hidden size={18} strokeWidth={1.5} />
+					Folder
+				</Button>
+			</UploadTrigger>
 			<Modal isOpen={isOpen} onOpenChange={setIsOpen}>
 				<Button
 					className={gridCardStyles({
 						variant,
 						className: cx(
-							'relative h-[182px] w-full shrink! grow flex-row place-content-center place-items-center gap-2 rounded-l-none focus-visible:outline-2',
+							'relative h-[182px] w-full shrink! grow flex-col place-content-center place-items-center gap-2 rounded-l-none px-2 focus-visible:outline-2',
 							props.className,
 						),
 					})}

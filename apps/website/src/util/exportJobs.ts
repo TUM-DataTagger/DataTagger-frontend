@@ -5,6 +5,8 @@ export const EXPORT_POLL_INTERVAL_MS = 2_000;
 export const EXPORT_TYPES = {
 	Project: 'projects.project',
 	Folder: 'folders.folder',
+	Subfolder: 'folders.subfolder',
+	ExperimentLink: 'elabftw.experimentlink',
 	UploadsDataset: 'uploads.uploadsdataset',
 	UploadsVersion: 'uploads.uploadsversion',
 } as const satisfies Record<string, components['schemas']['ExportTypeEnum']>;
@@ -24,6 +26,13 @@ export type ExportContentOptions = {
 export const DEFAULT_EXPORT_CONTENT_OPTIONS = {
 	includeFiles: true,
 	includeMetadata: true,
+	metadataFormat: 'json',
+} as const satisfies ExportContentOptions;
+
+// Files only, so folder exports keep the original directory structure (e.g. of NMR experiments)
+export const FILES_ONLY_EXPORT_CONTENT_OPTIONS = {
+	includeFiles: true,
+	includeMetadata: false,
 	metadataFormat: 'json',
 } as const satisfies ExportContentOptions;
 

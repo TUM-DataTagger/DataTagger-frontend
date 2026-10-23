@@ -41,7 +41,13 @@ export function Providers(props: PropsWithChildren) {
 
 	return (
 		<NuqsAdapter>
-			<ThemeProvider attribute="class" storageKey="visual-mode">
+			<ThemeProvider
+				attribute="class"
+				// The theme script only needs to run in the server-rendered HTML. On the client, React 19 warns about
+				// script tags in components, so it is marked as non-executable there.
+				scriptProps={typeof window === 'undefined' ? undefined : { type: 'application/json' }}
+				storageKey="visual-mode"
+			>
 				<QueryClientProvider client={queryClient}>
 					<I18nProvider locale="en-US">
 						<RouterProvider

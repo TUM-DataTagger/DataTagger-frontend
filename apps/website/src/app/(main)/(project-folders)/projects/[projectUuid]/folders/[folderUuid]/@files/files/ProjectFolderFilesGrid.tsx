@@ -79,6 +79,7 @@ export function ProjectFolderFilesGrid(props: {
 								{effectiveBulkEdit ? null : (
 									<div className="absolute top-2 right-2">
 										<ProjectFolderFilesMoreMenu
+											canMove={props.canBulkEdit}
 											fileUuid={item.pk}
 											filename={item.display_name}
 											folderUuid={params.folderUuid}

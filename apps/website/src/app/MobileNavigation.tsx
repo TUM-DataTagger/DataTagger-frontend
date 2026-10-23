@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import {
 	// CircleUserRoundIcon,
+	FlaskConicalIcon,
 	LogOutIcon,
 	MoreVerticalIcon,
 	SettingsIcon,
@@ -57,6 +58,14 @@ export function MobileNavigation() {
 						>
 							<CircleUserRoundIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> My Profile
 						</Link> */}
+						<Link
+							aria-label="eLabFTW connection"
+							className={dropdownItemStyles({ className: 'text-base-sm flex gap-2' })}
+							href="/account/elabftw"
+							onClick={() => setIsOpen(false)}
+						>
+							<FlaskConicalIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> eLabFTW connection
+						</Link>
 						{isUserSettingsEnabled ? (
 							<Link
 								aria-label="Settings"

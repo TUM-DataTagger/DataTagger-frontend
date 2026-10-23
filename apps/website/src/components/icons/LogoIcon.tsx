@@ -1,13 +1,8 @@
 'use client';
 
-import { useTheme } from 'next-themes';
-import dynamic from 'next/dynamic';
-import { Logo, LogoDark } from './Logo';
+import { BrandLogo } from './BrandLogo';
 
-export const LogoIcon = () => {
-	const { resolvedTheme } = useTheme();
+// The logo is configured in branding/branding.json
+export const LogoIcon = () => <BrandLogo size="small" />;
 
-	return resolvedTheme === 'light' ? <Logo aria-hidden /> : <LogoDark aria-hidden />;
-};
-
-export const LogoIconNoSSR = dynamic(async () => LogoIcon, { ssr: false });
+export const LogoIconNoSSR = LogoIcon;

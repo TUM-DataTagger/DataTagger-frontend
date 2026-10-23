@@ -29,3 +29,16 @@ export async function processDropItem(item: DropItem, directory?: string) {
 
 	return [];
 }
+
+// Files picked via a directory picker carry their path in `webkitRelativePath` (e.g. "10/pdata/1/1r");
+// map it to the same directory format and deny list as dropped folders.
+export function processSelectedFile(file: File) {
+	const segments = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
+	if (segments.some((segment) => DENY_LIST.some((deny) => segment.includes(deny)))) {
+		return [];
+	}
+
+	const directory = segments.length > 1 ? segments.slice(0, -1).join(' / ') : undefined;
+
+	return [{ file, directory }];
+}

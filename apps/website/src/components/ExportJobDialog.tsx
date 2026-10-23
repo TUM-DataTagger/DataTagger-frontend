@@ -38,6 +38,7 @@ const exportOptionCheckboxClassName = cx(
 );
 
 type ExportJobDialogProps = ModalOverlayProps & {
+	readonly defaultOptions?: ExportContentOptions | undefined;
 	readonly description?: ReactNode;
 	readonly exportType: ExportType;
 	onJobCreated?(job: ExportJob): Promise<void> | void;
@@ -76,6 +77,7 @@ async function retrieveExportJob(jobId: string): Promise<ExportJob> {
 }
 
 export function ExportJobDialog({
+	defaultOptions = DEFAULT_EXPORT_CONTENT_OPTIONS,
 	description,
 	exportType,
 	onJobCreated,
@@ -83,7 +85,7 @@ export function ExportJobDialog({
 	uuids,
 	...props
 }: ExportJobDialogProps) {
-	const [options, setOptions] = useState<ExportContentOptions>(DEFAULT_EXPORT_CONTENT_OPTIONS);
+	const [options, setOptions] = useState<ExportContentOptions>(defaultOptions);
 	const [submittedDescription, setSubmittedDescription] = useState<ReactNode>(null);
 	const lifecycle = useExportJobLifecycle({
 		createJob: createExportJob,
@@ -92,7 +94,7 @@ export function ExportJobDialog({
 		onJobCreated,
 		onOpenChange: props.onOpenChange,
 		onReset() {
-			setOptions(DEFAULT_EXPORT_CONTENT_OPTIONS);
+			setOptions(defaultOptions);
 			setSubmittedDescription(null);
 		},
 		queryKey: ['export-job'],

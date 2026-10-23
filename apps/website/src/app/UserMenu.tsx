@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
 	ChevronDownIcon,
 	// CircleUserRoundIcon,
+	FlaskConicalIcon,
 	LogOutIcon,
 	SettingsIcon,
 	UserRoundIcon,
@@ -64,6 +65,10 @@ export function UserMenu(props: ButtonProps) {
 				{/* <MenuItem aria-label="My profile" id="my-profile" key="my-profile">
 					<CircleUserRoundIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> My Profile
 				</MenuItem> */}
+				<MenuItem aria-label="eLabFTW connection" href="/account/elabftw" id="elabftw">
+					<FlaskConicalIcon aria-hidden data-slot="icon" size={18} strokeWidth={1.5} /> eLabFTW connection
+				</MenuItem>
+				{isUserSettingsEnabled ? null : <MenuSeparator />}
 				{isUserSettingsEnabled ? (
 					<>
 						<MenuItem aria-label="Settings" href="/account/settings" id="settings">

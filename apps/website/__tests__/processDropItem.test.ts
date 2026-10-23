@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { DENY_LIST, processDropItem } from '@/util/processDropItem';
+import { DENY_LIST, processDropItem, processSelectedFile } from '@/util/processDropItem';
 
 vi.mock('react-aria-components', () => ({
 	isFileDropItem: (item: unknown) => (item as { kind?: string })?.kind === 'file',
@@ -71,5 +71,30 @@ describe('processDropItem', () => {
 		const unsupported = { kind: 'unknown', name: 'mystery' };
 
 		await expect(processDropItem(unsupported as never)).resolves.toEqual([]);
+	});
+});
+
+function createSelectedFile(name: string, webkitRelativePath: string) {
+	const file = new File(['content'], name);
+	Object.defineProperty(file, 'webkitRelativePath', { value: webkitRelativePath });
+	return file;
+}
+
+describe('processSelectedFile', () => {
+	it('returns no directory for files selected without a folder picker', () => {
+		const file = createSelectedFile('report.pdf', '');
+
+		expect(processSelectedFile(file)).toEqual([{ file, directory: undefined }]);
+	});
+
+	it('builds the same directory path as dropped folders from the relative path', () => {
+		const file = createSelectedFile('1r', '10/pdata/1/1r');
+
+		expect(processSelectedFile(file)).toEqual([{ file, directory: '10 / pdata / 1' }]);
+	});
+
+	it('rejects files whose name or any parent directory is on the deny list', () => {
+		expect(processSelectedFile(createSelectedFile('Thumbs.db', '10/Thumbs.db'))).toEqual([]);
+		expect(processSelectedFile(createSelectedFile('config', '10/.git/config'))).toEqual([]);
 	});
 });

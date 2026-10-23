@@ -7,10 +7,12 @@ import { useUploadIntent } from '@/uploads/useUploadIntent';
 
 export function UploadTrigger(
 	props: PropsWithChildren<{
+		readonly acceptDirectory?: boolean | undefined;
 		readonly folderName?: string | undefined;
 		readonly folderUuid?: string | undefined;
 		readonly origin?: UploadOrigin | undefined;
 		readonly projectUuid?: string | undefined;
+		readonly subfolderUuid?: string | null | undefined;
 	}>,
 ) {
 	const { startSelectedCreateUploads } = useUploadIntent();
@@ -27,6 +29,7 @@ export function UploadTrigger(
 						folderName: props.folderName,
 						folderUuid: props.folderUuid,
 						projectUuid: props.projectUuid,
+						subfolderUuid: props.subfolderUuid,
 					}
 				: { kind: 'draft' },
 			files,
@@ -35,7 +38,7 @@ export function UploadTrigger(
 	};
 
 	return (
-		<FileTrigger allowsMultiple onSelect={onSelect}>
+		<FileTrigger acceptDirectory={props.acceptDirectory} allowsMultiple onSelect={onSelect}>
 			{props.children}
 		</FileTrigger>
 	);

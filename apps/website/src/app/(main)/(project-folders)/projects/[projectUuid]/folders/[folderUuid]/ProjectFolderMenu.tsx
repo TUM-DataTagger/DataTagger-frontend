@@ -31,7 +31,7 @@ export function ProjectFolderMenu(props: { readonly folderUuid: string; readonly
 				onClick={(isLocked) => setIsEditLockOpen(Boolean(isLocked))}
 			/>
 			<ExportJobDialog
-				description="Export available data from this folder to a zip file."
+				description="Export available data from this folder to a zip file. Without metadata, the zip keeps the original subfolder structure."
 				exportType={EXPORT_TYPES.Folder}
 				isOpen={isExportOpen}
 				onOpenChange={setIsExportOpen}

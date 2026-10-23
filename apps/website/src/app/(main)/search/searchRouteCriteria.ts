@@ -17,6 +17,7 @@ type SearchSort = components['schemas']['SearchSort'];
 const RESULT_TYPE_ORDER = [
 	'project',
 	'folder',
+	'subfolder',
 	'dataset',
 	'dataset_version',
 	'file',
@@ -27,6 +28,7 @@ const RESULT_TYPE_ORDER = [
 const RESULT_TYPE_LABELS = {
 	project: 'Projects',
 	folder: 'Folders',
+	subfolder: 'Subfolders',
 	dataset: 'Files',
 	dataset_version: 'Versions',
 	file: 'File attachments',

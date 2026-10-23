@@ -21,7 +21,7 @@ import { $api, openAPIClient } from '@/util/clientFetch';
 import { dashboardSnapshotQueryOptions } from '@/util/dashboardSnapshot';
 import { formatErrorMessage } from '@/util/formatErrorMessage';
 import { logger, LogCategory } from '@/util/logger';
-import { processDropItem } from '@/util/processDropItem';
+import { processDropItem, processSelectedFile } from '@/util/processDropItem';
 import { recordRecentProjectUploadActivity } from '@/util/recentActivity';
 import type { UploadOrigin } from './types';
 
@@ -34,6 +34,7 @@ type FolderUploadDestination = {
 	readonly folderUuid: string;
 	readonly kind: 'folder';
 	readonly projectUuid?: string | undefined;
+	readonly subfolderUuid?: string | null | undefined;
 };
 
 export type UploadDestination = DraftUploadDestination | FolderUploadDestination;
@@ -58,6 +59,7 @@ export type UploadQueueItem = {
 	readonly percentComplete: number;
 	readonly projectUuid?: string | undefined;
 	readonly selected?: boolean | undefined;
+	readonly subfolderUuid?: string | null | undefined;
 	readonly uploadSpeed: number;
 	readonly uuid: string;
 };
@@ -117,6 +119,7 @@ function destinationFromQueueItem(upload: InternalUploadQueueItem): UploadDestin
 			folderName: upload.folderName,
 			folderUuid: upload.folderUuid,
 			projectUuid: upload.projectUuid,
+			subfolderUuid: upload.subfolderUuid,
 		};
 	}
 
@@ -179,6 +182,11 @@ export function useUploadIntent() {
 				}),
 				queryClient.invalidateQueries({
 					queryKey: $api.queryOptions('get', '/api/v1/uploads-dataset/', {
+						params: { query: { folder: destination.folderUuid } },
+					}).queryKey,
+				}),
+				queryClient.invalidateQueries({
+					queryKey: $api.queryOptions('get', '/api/v1/subfolder/', {
 						params: { query: { folder: destination.folderUuid } },
 					}).queryKey,
 				}),
@@ -286,6 +294,9 @@ export function useUploadIntent() {
 						previousUpload.projectUuid = isFolderDestination(input.destination)
 							? input.destination.projectUuid
 							: undefined;
+						previousUpload.subfolderUuid = isFolderDestination(input.destination)
+							? input.destination.subfolderUuid
+							: undefined;
 						previousUpload.directory = input.directory;
 						previousUpload.origin = input.origin;
 						previousUpload.finished = false;
@@ -307,6 +318,7 @@ export function useUploadIntent() {
 						folderUuid: isFolderDestination(input.destination) ? input.destination.folderUuid : undefined,
 						folderName: isFolderDestination(input.destination) ? input.destination.folderName : undefined,
 						projectUuid: isFolderDestination(input.destination) ? input.destination.projectUuid : undefined,
+						subfolderUuid: isFolderDestination(input.destination) ? input.destination.subfolderUuid : undefined,
 						directory: input.directory,
 						origin: input.origin,
 						finished: false,
@@ -440,6 +452,7 @@ export function useUploadIntent() {
 				folderUuid: isFolderDestination(input.destination) ? input.destination.folderUuid : undefined,
 				folderName: isFolderDestination(input.destination) ? input.destination.folderName : undefined,
 				projectUuid: isFolderDestination(input.destination) ? input.destination.projectUuid : undefined,
+				subfolderUuid: isFolderDestination(input.destination) ? input.destination.subfolderUuid : undefined,
 				directory: input.directory,
 				finished: false,
 				percentComplete: 0,
@@ -463,7 +476,14 @@ export function useUploadIntent() {
 		const { data, error, response } = await openAPIClient.POST('/api/v1/uploads-dataset/', {
 			body: {
 				name: file.name,
-				folder: isFolderDestination(destination) ? destination.folderUuid : null,
+				...(isFolderDestination(destination)
+					? {
+							folder: destination.folderUuid,
+							// Recreate the structure of uploaded folders as subfolders below the current subfolder
+							subfolder: destination.subfolderUuid ?? null,
+							subfolder_path: options.directory ?? null,
+						}
+					: { folder: null }),
 			},
 		});
 
@@ -579,7 +599,7 @@ export function useUploadIntent() {
 	};
 
 	const startSelectedCreateUploads = async ({ destination, files, origin }: StartSelectedCreateUploadsInput) => {
-		const selectedFiles = Array.from(files);
+		const selectedFiles = Array.from(files).flatMap(processSelectedFile);
 		if (selectedFiles.length === 0) {
 			return;
 		}
@@ -587,9 +607,9 @@ export function useUploadIntent() {
 		openUploadAssistant(destination);
 
 		const failedFiles: string[] = [];
-		for (const file of selectedFiles) {
+		for (const { file, directory } of selectedFiles) {
 			try {
-				await startCreateUpload(file, destination, { origin });
+				await startCreateUpload(file, destination, { directory, origin });
 			} catch (error) {
 				logger.error(LogCategory.Upload, 'Failed to initialize selected upload', {
 					filename: file.name,

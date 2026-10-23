@@ -1,6 +1,13 @@
 'use client';
 
-import { FileDownIcon, FolderArchiveIcon, MoreVerticalIcon, Share2Icon, SplitIcon } from 'lucide-react';
+import {
+	FileDownIcon,
+	FolderArchiveIcon,
+	FolderInputIcon,
+	MoreVerticalIcon,
+	Share2Icon,
+	SplitIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCopyToClipboard, useMediaQuery } from 'usehooks-ts';
@@ -13,8 +20,10 @@ import { Separator } from '@/components/ui/Separator';
 import { globalToastQueue, ToastType } from '@/components/ui/Toast';
 import { cx } from '@/styles/cva';
 import { EXPORT_TYPES } from '@/util/exportJobs';
+import { MoveToSubfolderDialog } from './ProjectFolderSubfolders';
 
 export function ProjectFolderFilesMoreMenu({
+	canMove = false,
 	projectUuid,
 	folderUuid,
 	fileUuid,
@@ -22,6 +31,7 @@ export function ProjectFolderFilesMoreMenu({
 	filename,
 	...props
 }: {
+	readonly canMove?: boolean;
 	readonly className?: string;
 	readonly fileUuid: string;
 	readonly filename?: string | null | undefined;
@@ -32,6 +42,7 @@ export function ProjectFolderFilesMoreMenu({
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
 	const [isExportOpen, setIsExportOpen] = useState(false);
 	const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+	const [isMoveOpen, setIsMoveOpen] = useState(false);
 	const [_, copy] = useCopyToClipboard();
 
 	const copyToClipboard = async () => {
@@ -98,6 +109,17 @@ export function ProjectFolderFilesMoreMenu({
 								>
 									<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
 								</DrawerClose>
+								{canMove ? (
+									<DrawerClose
+										aria-label="Move to subfolder"
+										className={dropdownItemStyles({ className: 'text-base-sm flex place-content-start gap-2' })}
+										id="move"
+										onPress={() => setIsMoveOpen(true)}
+										variant="unset"
+									>
+										<FolderInputIcon aria-hidden size={18} strokeWidth={1.5} /> Move to subfolder
+									</DrawerClose>
+								) : null}
 							</DrawerBody>
 						</DrawerContent>
 					</Drawer>
@@ -133,6 +155,11 @@ export function ProjectFolderFilesMoreMenu({
 						<MenuItem aria-label="Export (zip)" id="export" onAction={async () => setIsExportOpen(true)}>
 							<FolderArchiveIcon aria-hidden size={18} strokeWidth={1.5} /> Export
 						</MenuItem>
+						{canMove ? (
+							<MenuItem aria-label="Move to subfolder" id="move" onAction={() => setIsMoveOpen(true)}>
+								<FolderInputIcon aria-hidden size={18} strokeWidth={1.5} /> Move to subfolder
+							</MenuItem>
+						) : null}
 					</MenuContent>
 				</Menu>
 			)}
@@ -149,6 +176,14 @@ export function ProjectFolderFilesMoreMenu({
 				title="Export dataset"
 				uuids={[fileUuid]}
 			/>
+			{isMoveOpen ? (
+				<MoveToSubfolderDialog
+					folderUuid={folderUuid}
+					isOpen={isMoveOpen}
+					onOpenChange={setIsMoveOpen}
+					target={{ kind: 'file', fileUuid, filename: filename ?? 'file' }}
+				/>
+			) : null}
 			<FileDownloadDialog
 				filename={filename ?? 'file'}
 				isOpen={isDownloadOpen}

@@ -38,6 +38,7 @@ import {
 	isClusterEligibleField,
 	isClusterItem,
 	isSearchSchemaResponse,
+	type SearchSchemaResponse,
 	normalizeItemOrder,
 	type MetadataCluster,
 	normalizeSearchFilterRow,
@@ -167,7 +168,7 @@ function SearchAdvancedFiltersPanel(props: {
 	);
 }
 
-export function SearchView() {
+export function SearchView(props: { readonly initialSchema?: SearchSchemaResponse | undefined }) {
 	const [queryStates, setQueryStates] = useQueryStates({
 		created_by: parseAsString,
 		filters: parseAsString,
@@ -208,6 +209,9 @@ export function SearchView() {
 			return data;
 		},
 	});
+	// The command menu may already have created this query in the browser before the page data is hydrated, so the
+	// first browser render uses the schema the server rendered with, which keeps server and browser output identical.
+	const schemaData = schemaQuery.data ?? props.initialSchema;
 
 	useEffect(() => {
 		setSearch(searchQueryParam);
@@ -243,12 +247,10 @@ export function SearchView() {
 		void setQueryStates({ filters: nextParam });
 	}, [compressedFilters, queryStates.filters, setQueryStates]);
 
-	const sourceOptions = getSearchSourceOptions(schemaQuery.data);
+	const sourceOptions = getSearchSourceOptions(schemaData);
 	const sourceOptionKeys = Object.keys(sourceOptions);
-	const selectedTypes = schemaQuery.data
-		? getResolvedSearchResultTypes(queryStates.source ?? null, schemaQuery.data)
-		: [];
-	const fields = schemaQuery.data ? getFieldsForTypes(schemaQuery.data, selectedTypes) : [];
+	const selectedTypes = schemaData ? getResolvedSearchResultTypes(queryStates.source ?? null, schemaData) : [];
+	const fields = schemaData ? getFieldsForTypes(schemaData, selectedTypes) : [];
 	const createdByField = getSearchSimpleFilterField('created_by', fields);
 	const myPermissionsField = getSearchSimpleFilterField('my_permissions', fields);
 	const createdByOptionKeys = Object.keys(SEARCH_CREATED_BY_OPTIONS);
@@ -291,7 +293,7 @@ export function SearchView() {
 	]);
 
 	const searchQuery = useQuery({
-		queryKey: schemaQuery.data
+		queryKey: schemaData
 			? getSearchRouteResultsQueryKey({
 					createdByParam: normalizedCreatedByParam,
 					cursor,
@@ -300,7 +302,7 @@ export function SearchView() {
 					limit,
 					myPermissionsParam: normalizedMyPermissionsParam,
 					responseMode: 'full',
-					schema: schemaQuery.data,
+					schema: schemaData,
 					searchText: debouncedSearch,
 					selectedTypes,
 					sortParam: resolvedSortKey,
@@ -308,7 +310,7 @@ export function SearchView() {
 				})
 			: ['search-route-results', 'pending'],
 		queryFn: async () => {
-			const schema = schemaQuery.data;
+			const schema = schemaData;
 			if (!schema) {
 				return null;
 			}
@@ -336,14 +338,14 @@ export function SearchView() {
 
 			return data;
 		},
-		enabled: Boolean(schemaQuery.data) && hasCriteria,
+		enabled: Boolean(schemaData) && hasCriteria,
 		placeholderData: keepPreviousData,
 	});
 
 	const searchResults = hasCriteria ? getGlobalSearchDisplayResults(searchQuery.data ?? null) : [];
 	const hasResults = searchResults.length > 0;
 	const hasSearchError = searchQuery.isError;
-	const hasSchemaError = schemaQuery.isError;
+	const hasSchemaError = schemaQuery.isError && !schemaData;
 	const shouldShowNoResults =
 		hasCriteria && !searchQuery.isPending && !hasResults && !hasSearchError && !hasSchemaError;
 

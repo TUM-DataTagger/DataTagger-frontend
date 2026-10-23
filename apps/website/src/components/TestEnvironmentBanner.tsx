@@ -1,12 +1,14 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useBranding } from '@/contexts/BrandingContext';
 
 export function TestEnvironmentBanner() {
+	const { showTestEnvironmentBanner } = useBranding();
 	const isProductionEnvironment =
 		typeof window !== 'undefined' && window.location.href.startsWith('https://app.example.com');
 
-	if (isProductionEnvironment) {
+	if (isProductionEnvironment || !showTestEnvironmentBanner) {
 		return null;
 	}
 

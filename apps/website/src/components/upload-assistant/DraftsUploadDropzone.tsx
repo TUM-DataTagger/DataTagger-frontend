@@ -68,6 +68,11 @@ export function DraftsUploadDropzone({
 									Select files
 								</Button>
 							</UploadTrigger>
+							<UploadTrigger acceptDirectory origin={origin}>
+								<Button isDark size="sm" variant="filled">
+									Select folder
+								</Button>
+							</UploadTrigger>
 						</div>
 					)}
 				</div>

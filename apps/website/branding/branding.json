@@ -1,0 +1,25 @@
+{
+	"appName": "DataTagger",
+	"institution": {
+		"name": "Johannes Kepler University Linz",
+		"shortName": "JKU",
+		"unit": "Institute for Chemical Technology of Organic Materials",
+		"url": "https://www.jku.at/cto"
+	},
+	"logo": {
+		"light": "logo.svg",
+		"dark": "logo-dark.svg",
+		"alt": "JKU"
+	},
+	"icons": {
+		"favicon": "favicon.ico",
+		"icon": "favicon-32x32.png",
+		"appleTouchIcon": "apple-touch-icon.png",
+		"app": ["android-chrome-192x192.png", "android-chrome-256x256.png"]
+	},
+	"links": {
+		"contact": "https://www.jku.at/kontakt/",
+		"imprint": "https://www.jku.at/impressum/"
+	},
+	"showTestEnvironmentBanner": false
+}

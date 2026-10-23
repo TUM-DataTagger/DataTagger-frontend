@@ -15,6 +15,7 @@ import { ShareButton } from '@/components/ShareButton';
 import { Separator } from '@/components/ui/Separator';
 import { $api, openAPIClient } from '@/util/fetch';
 import { getQueryClient } from '@/util/getQueryClient';
+import { FileExperimentLinks } from './FileExperimentLinks';
 import { ProjectFolderFileBreadcrumbs } from './ProjectFolderFileBreadcrumbs';
 import { ProjectFolderFileMoreMenu } from './ProjectFolderFileMoreMenu';
 
@@ -101,6 +102,7 @@ export default async function Page({
 
 					<div className="flex flex-col gap-3 2xl:col-span-1 2xl:col-start-2">
 						<FileHeading fileUuid={fileUuid} />
+						<FileExperimentLinks fileUuid={fileUuid} folderUuid={folderUuid} />
 					</div>
 
 					<div className="flex flex-col-reverse gap-6 2xl:col-span-2 2xl:col-start-2 2xl:inline-grid 2xl:grid-cols-[816px_396px]">

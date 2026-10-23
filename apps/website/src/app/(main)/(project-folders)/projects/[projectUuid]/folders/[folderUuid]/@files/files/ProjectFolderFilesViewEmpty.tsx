@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { FilePlusIcon, PackageOpenIcon } from 'lucide-react';
+import { FilePlusIcon, FolderUpIcon, PackageOpenIcon } from 'lucide-react';
 import { useState } from 'react';
 import { UploadTrigger } from '@/components/UploadTrigger';
 import { Button } from '@/components/ui/Button';
@@ -9,6 +9,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { $api } from '@/util/clientFetch';
 import { ProjectFolderFilesDraftFilesAssignDialog } from './ProjectFolderFilesDraftFilesAssignDialog';
+import { useCurrentSubfolder } from './useCurrentSubfolder';
 
 export function ProjectFolderFilesViewEmpty(props: { readonly folderUuid: string }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -34,6 +35,7 @@ export function ProjectFolderFilesViewEmpty(props: { readonly folderUuid: string
 		}),
 	);
 
+	const [currentSubfolder] = useCurrentSubfolder();
 	const canUploadFiles = folderPermissionData?.[0]?.is_folder_admin || folderPermissionData?.[0]?.can_edit;
 
 	return (
@@ -48,10 +50,23 @@ export function ProjectFolderFilesViewEmpty(props: { readonly folderUuid: string
 						folderName={folderData?.name}
 						folderUuid={props.folderUuid}
 						projectUuid={folderData?.project.pk}
+						subfolderUuid={currentSubfolder}
 					>
 						<Button variant="filled">
 							<FilePlusIcon aria-hidden size={18} strokeWidth={1.5} />
 							Upload files
+						</Button>
+					</UploadTrigger>
+					<UploadTrigger
+						acceptDirectory
+						folderName={folderData?.name}
+						folderUuid={props.folderUuid}
+						projectUuid={folderData?.project.pk}
+						subfolderUuid={currentSubfolder}
+					>
+						<Button variant="filled">
+							<FolderUpIcon aria-hidden size={18} strokeWidth={1.5} />
+							Upload folder
 						</Button>
 					</UploadTrigger>
 					<Modal isOpen={isOpen} onOpenChange={setIsOpen}>

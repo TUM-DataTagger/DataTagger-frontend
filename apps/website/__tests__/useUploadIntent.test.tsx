@@ -10,6 +10,7 @@ import { useUploadIntent } from '@/uploads/useUploadIntent';
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { dashboardSnapshotQueryOptions } from '@/util/dashboardSnapshot';
 import { processDropItem } from '@/util/processDropItem';
+import type * as ProcessDropItemModule from '@/util/processDropItem';
 
 const nuqsState = vi.hoisted(() => ({
 	setVersionQueryState: vi.fn(),
@@ -49,7 +50,8 @@ vi.mock('@/util/recentActivity', () => ({
 	recordRecentProjectUploadActivity: vi.fn(),
 }));
 
-vi.mock('@/util/processDropItem', () => ({
+vi.mock('@/util/processDropItem', async (importOriginal) => ({
+	...(await importOriginal<typeof ProcessDropItemModule>()),
 	processDropItem: vi.fn(),
 }));
 
@@ -138,6 +140,30 @@ describe('useUploadIntent', () => {
 		expect(invalidateQueries).not.toHaveBeenCalledWith({ queryKey: dashboardSnapshotQueryOptions($api).queryKey });
 	});
 
+	it('keeps the relative directory of files selected via a folder picker', async () => {
+		const queryClient = new QueryClient();
+		const { result } = renderHook(() => useUploadIntent(), { wrapper: createWrapper(queryClient) });
+		const file = new File(['content'], 'acqus', { type: '' });
+		Object.defineProperty(file, 'webkitRelativePath', { value: '10/pdata/1/acqus' });
+
+		await act(async () => {
+			await result.current.startSelectedCreateUploads({
+				destination: { kind: 'draft' },
+				files: [file],
+			});
+		});
+
+		expect(setUpload).toHaveBeenCalledWith(
+			file,
+			expect.objectContaining({
+				metadata: expect.objectContaining({
+					filename: 'acqus',
+					filepath: '10 / pdata / 1',
+				}),
+			}),
+		);
+	});
+
 	it('refreshes the Dashboard Snapshot after a dashboard-origin Upload completes', async () => {
 		const queryClient = new QueryClient();
 		const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
@@ -182,6 +208,38 @@ describe('useUploadIntent', () => {
 		});
 	});
 
+	it('creates folder Uploads in the current subfolder and recreates the selected folder structure', async () => {
+		vi.mocked(openAPIClient.POST).mockResolvedValueOnce({
+			data: { pk: 'dataset-folder-1' },
+			error: undefined,
+			response: new Response(null, { status: 201 }),
+		} as never);
+
+		const { result } = renderHook(() => useUploadIntent(), { wrapper: createWrapper() });
+		const file = new File(['content'], '1r', { type: '' });
+		Object.defineProperty(file, 'webkitRelativePath', { value: '10/pdata/1/1r' });
+
+		await act(async () => {
+			await result.current.startSelectedCreateUploads({
+				destination: {
+					kind: 'folder',
+					folderUuid: 'folder-1',
+					subfolderUuid: 'subfolder-1',
+				},
+				files: [file],
+			});
+		});
+
+		expect(openAPIClient.POST).toHaveBeenCalledWith('/api/v1/uploads-dataset/', {
+			body: {
+				folder: 'folder-1',
+				name: '1r',
+				subfolder: 'subfolder-1',
+				subfolder_path: '10 / pdata / 1',
+			},
+		});
+	});
+
 	it('starts selected files as folder Uploads and keeps folder context in the Upload Queue', async () => {
 		vi.mocked(openAPIClient.POST).mockResolvedValueOnce({
 			data: { pk: 'dataset-folder-1' },
@@ -223,6 +281,8 @@ describe('useUploadIntent', () => {
 			body: {
 				folder: 'folder-1',
 				name: 'records.csv',
+				subfolder: null,
+				subfolder_path: null,
 			},
 		});
 		expect(setUpload).toHaveBeenCalledWith(

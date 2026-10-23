@@ -194,7 +194,7 @@ export function ProjectFolderMoreMenu({
 						Export available data from <span className="text-base-label-md">
 							{props.folderName ?? 'this folder'}
 						</span>{' '}
-						to a zip file.
+						to a zip file. Without metadata, the zip keeps the original subfolder structure.
 					</>
 				}
 				exportType={EXPORT_TYPES.Folder}

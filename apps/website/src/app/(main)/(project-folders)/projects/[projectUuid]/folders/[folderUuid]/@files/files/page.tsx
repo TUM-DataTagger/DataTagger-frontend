@@ -5,6 +5,7 @@ import { getQueryClient } from '@/util/getQueryClient';
 import { getServerUserSettings } from '@/util/getServerUserSettings';
 import { GRID_PAGE_LIMIT_WITH_LEADING_ACTION, TABLE_PAGE_LIMIT } from '@/util/paginationLimits';
 import { ProjectFolderFilesView } from './ProjectFolderFilesView';
+import { getSubfolderDatasetQuery } from './subfolderQuery';
 
 export const metadata: Metadata = {
 	title: 'Folder page | Files',
@@ -18,7 +19,13 @@ export default async function Page({
 	readonly searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
 	const { folderUuid } = await params;
-	const { page: searchParamsPage, sort: searchParamsSort, q: searchParamsSearch } = await searchParams;
+	const {
+		page: searchParamsPage,
+		sort: searchParamsSort,
+		q: searchParamsSearch,
+		subfolder: searchParamsSubfolder,
+	} = await searchParams;
+	const subfolderQuery = getSubfolderDatasetQuery(searchParamsSubfolder, searchParamsSearch);
 
 	const page = searchParamsPage ? Number(searchParamsPage) : 1;
 	const settings = await getServerUserSettings();
@@ -40,6 +47,7 @@ export default async function Page({
 						offset: tableOffset,
 						ordering: sort,
 						search: searchParamsSearch ?? '',
+						...subfolderQuery,
 					},
 				},
 			}),
@@ -53,6 +61,7 @@ export default async function Page({
 						offset: gridOffset,
 						ordering: sort,
 						search: searchParamsSearch ?? '',
+						...subfolderQuery,
 					},
 				},
 			}),

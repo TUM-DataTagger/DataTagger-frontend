@@ -86,7 +86,7 @@ export default async function Page({
 			<h1 className="sr-only">Search</h1>
 
 			<HydrationBoundary state={dehydrate(queryClient)}>
-				<SearchView />
+				<SearchView initialSchema={isSearchSchemaResponse(searchSchemaData) ? searchSchemaData : undefined} />
 			</HydrationBoundary>
 		</div>
 	);

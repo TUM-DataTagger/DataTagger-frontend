@@ -214,6 +214,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/elabftw/connection/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The eLabFTW connection of the current user and the experiments it gives access to. */
+        get: operations["v1_elabftw_connection_retrieve"];
+        /** @description The eLabFTW connection of the current user and the experiments it gives access to. */
+        put: operations["v1_elabftw_connection_update"];
+        post?: never;
+        /** @description The eLabFTW connection of the current user and the experiments it gives access to. */
+        delete: operations["v1_elabftw_connection_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/elabftw/connection/test/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description The eLabFTW connection of the current user and the experiments it gives access to. */
+        post: operations["v1_elabftw_connection_test_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/elabftw/experiments/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description The eLabFTW connection of the current user and the experiments it gives access to. */
+        get: operations["v1_elabftw_experiments_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiment-link/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_experiment_link_list"];
+        put?: never;
+        post: operations["v1_experiment_link_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiment-link/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["v1_experiment_link_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/experiment-link/experiments/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description All eLabFTW experiments linked anywhere the user has access to, with where they are linked and how many files
+         *     they cover (including files inside linked folders and subfolders).
+         */
+        get: operations["v1_experiment_link_experiments_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/export/": {
         parameters: {
             query?: never;
@@ -1513,6 +1618,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/subfolder/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_subfolder_list"];
+        put?: never;
+        post: operations["v1_subfolder_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/subfolder/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_subfolder_retrieve"];
+        put: operations["v1_subfolder_update"];
+        post?: never;
+        delete: operations["v1_subfolder_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["v1_subfolder_partial_update"];
+        trace?: never;
+    };
+    "/api/v1/subfolder/{id}/metadata/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Replaces the metadata of a subfolder, in the same format as the metadata of folders and files. */
+        put: operations["v1_subfolder_metadata_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uploads-dataset/": {
         parameters: {
             query?: never;
@@ -1967,6 +2121,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/uploads-version-file/{id}/retry-processing/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_uploads_version_file_retry_processing_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uploads-version/{id}/": {
         parameters: {
             query?: never;
@@ -2085,24 +2255,24 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         ApprovalQueue: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            /** Format: date-time */
-            readonly last_modification_date: string;
+            content_object: string;
             /** Format: uuid */
             object_id: string;
-            approved_by?: number | null;
+            /** Format: date-time */
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            content_object: string;
+            content_type: number;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
             /** Format: date-time */
             approved_at?: string | null;
+            approved_by?: number | null;
             /** Format: date-time */
-            readonly creation_date: string;
-            readonly created_by: components["schemas"]["MinimalUser"];
-            content_type: number;
+            readonly last_modification_date: string;
         };
         /** @enum {string} */
         AssignedToContentTypeDf0Enum: "folders.folder" | "projects.project" | "uploads.uploadsdataset";
@@ -2185,7 +2355,14 @@ export interface components {
             result_type: components["schemas"]["ResultTypeEnum"];
             readonly item: components["schemas"]["CompactSearchResultItem"];
         };
-        CompactSearchResultItem: components["schemas"]["CompactProjectItem"] | components["schemas"]["CompactFolderItem"] | components["schemas"]["CompactDatasetItem"] | components["schemas"]["CompactDatasetVersionItem"] | components["schemas"]["CompactFileItem"] | components["schemas"]["CompactTemplateItem"] | components["schemas"]["CompactTemplateVersionItem"];
+        CompactSearchResultItem: components["schemas"]["CompactProjectItem"] | components["schemas"]["CompactFolderItem"] | components["schemas"]["CompactSubfolderItem"] | components["schemas"]["CompactDatasetItem"] | components["schemas"]["CompactDatasetVersionItem"] | components["schemas"]["CompactFileItem"] | components["schemas"]["CompactTemplateItem"] | components["schemas"]["CompactTemplateVersionItem"];
+        CompactSubfolderItem: {
+            /** Format: uuid */
+            pk: string;
+            name: string;
+            path: components["schemas"]["CompactNestedPkName"][];
+            folder: components["schemas"]["CompactFolderItem"];
+        };
         CompactTemplateItem: {
             /** Format: uuid */
             pk: string;
@@ -2253,6 +2430,29 @@ export interface components {
          * @enum {string}
          */
         DirectionEnum: "asc" | "desc";
+        ElabftwConnection: {
+            url: string;
+            readonly has_api_key: boolean;
+            verify_tls?: boolean;
+        };
+        ElabftwConnectionRequest: {
+            url: string;
+            api_key?: string;
+            verify_tls?: boolean;
+        };
+        ElabftwConnectionTest: {
+            fullname: string;
+            email: string | null;
+        };
+        ElabftwExperiment: {
+            id: number;
+            title: string;
+            date: string | null;
+            category: string | null;
+            status: string | null;
+            owner: string | null;
+            url: string;
+        };
         Email: {
             /** Format: email */
             email: string;
@@ -2261,30 +2461,63 @@ export interface components {
             /** Format: email */
             email: string;
         };
-        ExportJob: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            readonly include_uploads_version_file: boolean;
+        ExperimentLink: {
+            target_type: components["schemas"]["TargetTypeEnum"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            readonly export_type: string;
-            readonly metadata_format: components["schemas"]["MetadataFormatEnum"];
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            experiment_id: number;
             /** Format: date-time */
-            readonly finished_at: string | null;
-            readonly include_uploads_version_file_metadata: boolean;
-            readonly download_url: string;
-            readonly object_ids: unknown;
+            readonly last_modification_date: string;
+            elabftw_url: string;
+            /** Format: uuid */
+            target_id: string;
+            readonly inherited_from: components["schemas"]["ExperimentLinkInheritedFrom"] | null;
+            readonly experiment_url: string;
+            title?: string;
+        };
+        ExperimentLinkCreateRequest: {
+            target_type: components["schemas"]["TargetTypeEnum"];
+            /** Format: uuid */
+            target_id: string;
+            experiment_id: number;
+        };
+        ExperimentLinkInheritedFrom: {
+            target_type: components["schemas"]["TargetTypeEnum"];
+            /** Format: uuid */
+            target_id: string;
+            name: string;
+        };
+        ExportJob: {
             readonly error_message: string | null;
+            readonly include_uploads_version_file: boolean;
+            readonly download_url: string;
+            readonly include_uploads_version_file_metadata: boolean;
             /** Format: date-time */
             readonly creation_date: string;
             readonly status: components["schemas"]["Status024Enum"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly finished_at: string | null;
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly object_ids: unknown;
+            readonly export_type: string;
             /** Format: date-time */
             readonly expires_at: string | null;
+            readonly metadata_format: components["schemas"]["MetadataFormatEnum"];
         };
         ExportJobCreateRequest: {
             export_type: components["schemas"]["ExportTypeEnum"];
@@ -2297,7 +2530,7 @@ export interface components {
             include_uploads_version_file_metadata: boolean;
         };
         /** @enum {string} */
-        ExportTypeEnum: "projects.project" | "folders.folder" | "uploads.uploadsdataset" | "uploads.uploadsversion";
+        ExportTypeEnum: "projects.project" | "folders.folder" | "folders.subfolder" | "elabftw.experimentlink" | "uploads.uploadsdataset" | "uploads.uploadsversion";
         ExtendedResetPasswordValidate: {
             status: string;
             username: string;
@@ -2359,53 +2592,53 @@ export interface components {
          */
         FieldTypeEnum: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
         FileParserConfiguration: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             /** Format: date-time */
-            readonly last_modification_date: string;
-            /** Format: uuid */
-            assigned_to_object_id: string;
-            config?: unknown;
+            readonly creation_date: string;
+            assigned_to_content_type: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparser" | "file_parser.fileparserconfiguration" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "metadata.metadatatag" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "folders.subfolder" | "elabftw.experimentlink" | "elabftw.elabftwconnection") | number;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            assigned_to_content_type: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "blacklist.blacklistedtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "file_parser.fileparser" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "metadata.metadatatag" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparserconfiguration") | number;
-            parser_type: components["schemas"]["ParserTypeEnum"];
-            /** Format: date-time */
-            readonly creation_date: string;
-            enabled?: boolean;
-            readonly created_by: components["schemas"]["MinimalUser"];
-        };
-        FileParserConfigurationRequest: {
             /** Format: uuid */
             assigned_to_object_id: string;
-            config?: unknown;
-            assigned_to_content_type: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "blacklist.blacklistedtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "file_parser.fileparser" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "metadata.metadatatag" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparserconfiguration") | number;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
             parser_type: components["schemas"]["ParserTypeEnum"];
+            config?: unknown;
+            enabled?: boolean;
+        };
+        FileParserConfigurationRequest: {
+            assigned_to_content_type: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparser" | "file_parser.fileparserconfiguration" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "metadata.metadatatag" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "folders.subfolder" | "elabftw.experimentlink" | "elabftw.elabftwconnection") | number;
+            /** Format: uuid */
+            assigned_to_object_id: string;
+            parser_type: components["schemas"]["ParserTypeEnum"];
+            config?: unknown;
             enabled?: boolean;
         };
         Folder: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            readonly datasets_count: number;
-            name: string;
-            /** Format: date-time */
-            readonly last_modification_date: string;
             storage: components["schemas"]["Storage"];
             readonly metadata_templates_count: number;
-            project: components["schemas"]["MinimalProjectSearch"];
+            name: string;
+            /** Format: date-time */
+            readonly creation_date: string;
+            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
+            readonly datasets_count: number;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
-            description?: unknown;
-            /** Format: date-time */
-            readonly creation_date: string;
-            metadata?: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            project: components["schemas"]["MinimalProjectSearch"];
+            metadata?: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
             readonly members_count: number;
+            description?: unknown;
         };
         FolderCreatePayloadRequest: {
             name: string;
@@ -2448,24 +2681,24 @@ export interface components {
             folder_users?: components["schemas"]["FolderUsersRequest"][];
         };
         FolderList: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            datasets_count?: number;
+            metadata_templates_count?: number;
             name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            storage?: components["schemas"]["Storage"] | null;
-            metadata_templates_count?: number;
-            project: components["schemas"]["MinimalProjectSearch"];
+            readonly creation_date: string;
+            metadata_template?: components["schemas"]["MinimalMetadataTemplate"] | null;
+            datasets_count?: number;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            metadata_template?: components["schemas"]["MinimalMetadataTemplate"] | null;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            project: components["schemas"]["MinimalProjectSearch"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
             members_count?: number;
+            storage?: components["schemas"]["Storage"] | null;
         };
         FolderMetadataTemplateContainerPoolActionRequest: {
             metadata_template_container: string[];
@@ -2500,20 +2733,20 @@ export interface components {
             folder_users: components["schemas"]["FolderUsersRequest"][];
         };
         FolderSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            storage: components["schemas"]["Storage"];
-            project: components["schemas"]["MinimalProjectSearch"];
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            project: components["schemas"]["MinimalProjectSearch"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            storage: components["schemas"]["Storage"];
         };
         FolderUpdatePayloadRequest: {
             name: string;
@@ -2563,6 +2796,30 @@ export interface components {
             /** ID */
             readonly pk: number;
             name: string;
+        };
+        LinkedExperiment: {
+            elabftw_url: string;
+            experiment_id: number;
+            title: string;
+            experiment_url: string;
+            link_ids: string[];
+            places: components["schemas"]["LinkedExperimentPlace"][];
+            files_count: number;
+        };
+        LinkedExperimentPlace: {
+            /** Format: uuid */
+            link_id: string;
+            target_type: components["schemas"]["TargetTypeEnum"];
+            /** Format: uuid */
+            target_id: string;
+            name: string;
+            path: string;
+            /** Format: uuid */
+            project_id: string | null;
+            /** Format: uuid */
+            folder_id: string | null;
+            /** Format: uuid */
+            subfolder_id: string | null;
         };
         LockStatus: {
             readonly locked: boolean;
@@ -2646,44 +2903,44 @@ export interface components {
             readonly value: string;
         };
         MetadataTemplate: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            metadata_template_container: components["schemas"]["MinimalMetadataTemplateContainer"];
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            metadata_template_container: components["schemas"]["MinimalMetadataTemplateContainer"];
         };
         MetadataTemplateContainer: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly metadata_templates: components["schemas"]["MetadataTemplatesForMetadataTemplateContainer"][];
             name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
+            assigned_to_content_type?: components["schemas"]["AssignedToContentTypeDf0Enum"];
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
             /** Format: uuid */
             assigned_to_object_id?: string | null;
-            readonly assigned_to_content_object_name: string | null;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly project: {
                 /** Format: uuid */
                 pk?: string;
                 name?: string;
             } | null;
-            /**
-             * Id
-             * Format: uuid
-             */
-            readonly pk: string;
-            assigned_to_content_type?: components["schemas"]["AssignedToContentTypeDf0Enum"];
-            latest_metadata_template?: components["schemas"]["MinimalMetadataTemplate"] | null;
+            readonly assigned_to_content_object_name: string | null;
             /** Format: date-time */
-            readonly creation_date: string;
-            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modification_date: string;
+            latest_metadata_template?: components["schemas"]["MinimalMetadataTemplate"] | null;
         };
         MetadataTemplateContainerCloneActionPayloadRequest: {
             assigned_to_content_type?: ("folders.folder" | "projects.project" | "uploads.uploadsdataset") | number | null;
@@ -2741,22 +2998,22 @@ export interface components {
             new: components["schemas"]["MetadataTemplateField"] | null;
         };
         MetadataTemplateExportJob: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly error_message: string | null;
+            readonly download_url: string;
+            readonly status: components["schemas"]["Status024Enum"];
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
             /** Format: date-time */
             readonly finished_at: string | null;
-            readonly download_url: string;
-            readonly error_message: string | null;
             /** Format: date-time */
-            readonly creation_date: string;
-            readonly status: components["schemas"]["Status024Enum"];
-            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modification_date: string;
             readonly metadata_template_container_ids: unknown;
             /** Format: date-time */
             readonly expires_at: string | null;
@@ -2952,18 +3209,26 @@ export interface components {
             readonly creation_date: string;
         };
         MinimalProjectSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+        };
+        MinimalSubfolder: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            name: string;
         };
         MinimalUploadsDataset: {
             /**
@@ -2975,19 +3240,19 @@ export interface components {
             display_name?: string | null;
         };
         MinimalUploadsDatasetWithFolderSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            folder?: components["schemas"]["FolderSearch"] | null;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            folder?: components["schemas"]["FolderSearch"] | null;
         };
         MinimalUploadsVersion: {
             /**
@@ -3012,25 +3277,25 @@ export interface components {
             readonly creation_date: string;
         };
         MinimalUploadsVersionFile: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            is_referenced?: boolean;
-            readonly is_published: boolean;
-            /** Format: date-time */
-            publication_date?: string | null;
+            readonly creation_date: string;
+            status?: components["schemas"]["StatusDe1Enum"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
-            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
-            status?: components["schemas"]["StatusDe1Enum"];
-            readonly metadata: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly is_published: boolean;
+            readonly metadata: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            is_referenced?: boolean;
+            /** Format: date-time */
+            publication_date?: string | null;
+            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
         };
         MinimalUploadsVersionFileDiff: {
             /**
@@ -3043,33 +3308,33 @@ export interface components {
             readonly creation_date: string;
         };
         MinimalUploadsVersionFileSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
         };
         MinimalUploadsVersionSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
         };
         MinimalUser: {
             /** ID */
@@ -3359,11 +3624,11 @@ export interface components {
             token: string;
         };
         PatchedFileParserConfigurationRequest: {
+            assigned_to_content_type?: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparser" | "file_parser.fileparserconfiguration" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "metadata.metadatatag" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "folders.subfolder" | "elabftw.experimentlink" | "elabftw.elabftwconnection") | number;
             /** Format: uuid */
             assigned_to_object_id?: string;
-            config?: unknown;
-            assigned_to_content_type?: ("uploads.uploadsversion" | "uploads.uploadsversionfile" | "projects.project" | "folders.folder" | "admin.logentry" | "auth.permission" | "auth.group" | "contenttypes.contenttype" | "sessions.session" | "blacklist.blacklistedtoken" | "django_rest_passwordreset.resetpasswordtoken" | "waffle.flag" | "waffle.sample" | "waffle.switch" | "dbsettings.setting" | "faq.faqcategory" | "faq.faq" | "file_parser.fileparser" | "folders.folderpermission" | "metadata.metadatafield" | "metadata.metadata" | "metadata.metadatatemplate" | "metadata.metadatatemplatefield" | "metadata.metadatatemplatecontainer" | "projects.projectmembership" | "rest_framework_tus.upload" | "storages.storage" | "storages.dynamicstorage" | "uploads.uploadsdataset" | "users.user" | "users.group" | "shibboleth.shibbolethauthcode" | "cms.content" | "approval_queue.approvalqueue" | "token_blacklist.blacklistedtoken" | "token_blacklist.outstandingtoken" | "metadata.metadatatag" | "exports.exportjob" | "exports.metadatatemplateexportjob" | "file_parser.fileparserconfiguration") | number;
             parser_type?: components["schemas"]["ParserTypeEnum"];
+            config?: unknown;
             enabled?: boolean;
         };
         PatchedFolderPermissionUpdateRequest: {
@@ -3454,6 +3719,11 @@ export interface components {
                 order?: number | null;
             }[];
         };
+        PatchedSubfolderUpdateRequest: {
+            /** Format: uuid */
+            parent?: string | null;
+            name?: string;
+        };
         PatchedUploadRequest: {
             /** Format: uuid */
             guid?: string;
@@ -3474,6 +3744,8 @@ export interface components {
         };
         PatchedUploadsDatasetUpdatePayloadRequest: {
             name?: string | null;
+            /** Format: uuid */
+            subfolder?: string | null;
             metadata_template?: string | {
                 name: string;
                 metadata_template_fields: {
@@ -3499,28 +3771,28 @@ export interface components {
             settings?: unknown;
         };
         Project: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            readonly datasets_count: number;
-            name: string;
-            /** Format: date-time */
-            readonly last_modification_date: string;
-            readonly folders: components["schemas"]["MinimalFolder"][];
             readonly my_membership: components["schemas"]["MyMembershipEnum"];
             readonly metadata_templates_count: number;
+            name: string;
+            /** Format: date-time */
+            readonly creation_date: string;
             metadata_template?: components["schemas"]["MetadataTemplate"] | null;
+            readonly datasets_count: number;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            readonly folders_count: number;
-            description?: unknown;
-            /** Format: date-time */
-            readonly creation_date: string;
-            readonly is_deletable: boolean;
-            metadata?: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly folders_count: number;
+            metadata?: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly folders: components["schemas"]["MinimalFolder"][];
             readonly members_count: number;
+            description?: unknown;
+            readonly is_deletable: boolean;
         };
         ProjectCreatePayloadRequest: {
             name: string;
@@ -3592,18 +3864,18 @@ export interface components {
             metadata_template_container: string[];
         };
         ProjectSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
         };
         ProjectUpdatePayloadRequest: {
             name: string;
@@ -3682,6 +3954,7 @@ export interface components {
         /**
          * @description * `project` - project
          *     * `folder` - folder
+         *     * `subfolder` - subfolder
          *     * `dataset` - dataset
          *     * `dataset_version` - dataset_version
          *     * `file` - file
@@ -3689,10 +3962,11 @@ export interface components {
          *     * `template_version` - template_version
          * @enum {string}
          */
-        ResultTypeEnum: "project" | "folder" | "dataset" | "dataset_version" | "file" | "template" | "template_version";
+        ResultTypeEnum: "project" | "folder" | "subfolder" | "dataset" | "dataset_version" | "file" | "template" | "template_version";
         /**
          * @description * `project` - project
          *     * `folder` - folder
+         *     * `subfolder` - subfolder
          *     * `dataset` - dataset
          *     * `dataset_version` - dataset_version
          *     * `file` - file
@@ -3700,7 +3974,7 @@ export interface components {
          *     * `template_version` - template_version
          * @enum {string}
          */
-        ResultTypesEnum: "project" | "folder" | "dataset" | "dataset_version" | "file" | "template" | "template_version";
+        ResultTypesEnum: "project" | "folder" | "subfolder" | "dataset" | "dataset_version" | "file" | "template" | "template_version";
         SearchMetadataChoiceOptionGroup: {
             key: string;
             field_type: components["schemas"]["FieldTypeEnum"];
@@ -3736,6 +4010,7 @@ export interface components {
              * @default [
              *       "project",
              *       "folder",
+             *       "subfolder",
              *       "dataset",
              *       "dataset_version",
              *       "file",
@@ -3786,7 +4061,7 @@ export interface components {
             result_type: components["schemas"]["ResultTypeEnum"];
             readonly item: components["schemas"]["SearchResultItem"];
         };
-        SearchResultItem: components["schemas"]["ProjectSearch"] | components["schemas"]["FolderSearch"] | components["schemas"]["UploadsDatasetSearch"] | components["schemas"]["UploadsVersionSearch"] | components["schemas"]["UploadsVersionFileSearch"] | components["schemas"]["MetadataTemplateSearch"] | components["schemas"]["MetadataTemplateVersionSearch"];
+        SearchResultItem: components["schemas"]["ProjectSearch"] | components["schemas"]["FolderSearch"] | components["schemas"]["SubfolderSearch"] | components["schemas"]["UploadsDatasetSearch"] | components["schemas"]["UploadsVersionSearch"] | components["schemas"]["UploadsVersionFileSearch"] | components["schemas"]["MetadataTemplateSearch"] | components["schemas"]["MetadataTemplateVersionSearch"];
         SearchSchemaDefaultSortCondition: {
             when: string;
             sort: components["schemas"]["SearchSchemaDefaultSortConditionSort"][];
@@ -3892,17 +4167,19 @@ export interface components {
          */
         StatusDe1Enum: "SCHEDULED" | "PROCESSED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
         Storage: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name: string;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            default?: boolean;
-            local_private_dss_path: string;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            default?: boolean;
             /**
              * @description Type of storage provider
              *
@@ -3910,10 +4187,8 @@ export interface components {
              *     * `private_dss` - Private DSS Storage
              */
             storage_type?: components["schemas"]["StorageTypeEnum"];
+            local_private_dss_path: string;
             description?: unknown;
-            /** Format: date-time */
-            readonly creation_date: string;
-            readonly created_by: components["schemas"]["MinimalUser"];
         };
         StorageCreatePayloadRequest: {
             name: string;
@@ -3936,6 +4211,81 @@ export interface components {
          * @enum {string}
          */
         StorageTypeEnum: "default_local" | "private_dss";
+        Subfolder: {
+            readonly path: components["schemas"]["MinimalSubfolder"][];
+            name: string;
+            /** Format: date-time */
+            readonly creation_date: string;
+            readonly datasets_count: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly metadata: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            /** Format: uuid */
+            parent?: string | null;
+            readonly subfolders_count: number;
+            /** Format: uuid */
+            folder: string;
+        };
+        SubfolderCreateRequest: {
+            /** Format: uuid */
+            folder: string;
+            /** Format: uuid */
+            parent?: string | null;
+            name: string;
+        };
+        SubfolderMetadataPayloadRequest: {
+            metadata: {
+                field?: {
+                    key: string;
+                    /** @enum {string} */
+                    field_type: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                } | (string | null);
+                custom_key?: string | null;
+                /** @enum {string} */
+                field_type?: "INTEGER" | "DECIMAL" | "DATETIME" | "DATE" | "TIME" | "TEXT" | "WYSIWYG" | "SELECTION" | "MULTI_SELECTION" | "TAG";
+                value?: (string | null) | (string[] | null) | (Record<string, unknown> | null);
+                config?: Record<string, unknown> | null;
+                /** Format: uuid */
+                metadata_template_field?: string | null;
+                order?: number | null;
+            }[];
+        };
+        SubfolderSearch: {
+            readonly path: components["schemas"]["MinimalSubfolder"][];
+            name: string;
+            /** Format: date-time */
+            readonly creation_date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            readonly pk: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly metadata: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            folder: components["schemas"]["FolderSearch"];
+        };
+        SubfolderUpdateRequest: {
+            /** Format: uuid */
+            parent?: string | null;
+            name?: string;
+        };
+        /**
+         * @description * `folder` - Folder
+         *     * `subfolder` - Subfolder
+         *     * `dataset` - File
+         * @enum {string}
+         */
+        TargetTypeEnum: "folder" | "subfolder" | "dataset";
         /** @description Used only for OpenAPI generator */
         TokenResponse: {
             readonly token: string;
@@ -3987,33 +4337,35 @@ export interface components {
             dataset?: string | null;
         };
         UploadsDataset: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            name?: string | null;
-            /** Format: date-time */
-            readonly last_modification_date: string;
-            display_name?: string | null;
-            readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
-            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
-            readonly is_published: boolean;
-            readonly is_expired: boolean;
+            status?: components["schemas"]["Status024Enum"];
+            readonly created_by: components["schemas"]["MinimalUser"];
             /** Format: date-time */
             publication_date?: string | null;
-            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
+            display_name?: string | null;
+            /** Format: date-time */
+            expiry_date?: string | null;
+            name?: string | null;
+            /** Format: date-time */
+            readonly creation_date: string;
+            /** Format: uuid */
+            subfolder?: string | null;
+            /** Format: date-time */
+            readonly deletable_until_date: string | null;
+            readonly uploads_versions_count: number;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            status?: components["schemas"]["Status024Enum"];
-            /** Format: date-time */
-            readonly deletable_until_date: string | null;
-            /** Format: date-time */
-            expiry_date?: string | null;
+            readonly is_published: boolean;
             folder?: components["schemas"]["Folder"] | null;
+            readonly is_expired: boolean;
+            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
+            readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
+            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
             /** Format: date-time */
-            readonly creation_date: string;
-            readonly uploads_versions_count: number;
-            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modification_date: string;
         };
         UploadsDatasetBulkDelete: {
             success: string[];
@@ -4104,6 +4456,8 @@ export interface components {
             uploads_datasets: string[];
             /** Format: uuid */
             folder: string;
+            /** Format: uuid */
+            subfolder?: string | null;
         };
         UploadsDatasetBulkPublishError: {
             /** Format: uuid */
@@ -4117,40 +4471,46 @@ export interface components {
             name?: string | null;
             /** Format: uuid */
             folder?: string | null;
+            /** Format: uuid */
+            subfolder?: string | null;
+            /** @description Relative path (e.g. '10 / pdata / 1') below the subfolder. Missing subfolders are created. */
+            subfolder_path?: string | null;
         };
         UploadsDatasetFileActionRequest: {
             /** Format: binary */
             file: string;
         };
         UploadsDatasetList: {
-            readonly is_published: boolean;
-            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
-            uploads_versions_count?: number;
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
-            name?: string | null;
+            readonly created_by: components["schemas"]["MinimalUser"];
             /** Format: date-time */
             publication_date?: string | null;
+            display_name?: string | null;
+            /** Format: date-time */
+            expiry_date?: string | null;
+            name?: string | null;
             /** Format: date-time */
             readonly creation_date: string;
-            readonly created_by: components["schemas"]["MinimalUser"];
-            metadata_upgrade_status?: components["schemas"]["MetadataUpgradeStatusEnum"];
-            display_name?: string | null;
-            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
-            readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
+            /** Format: uuid */
+            subfolder?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            readonly is_expired: boolean;
+            deletable_until_date?: string | null;
+            uploads_versions_count?: number;
             has_upgradeable_metadata_templates?: boolean;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            deletable_until_date?: string | null;
-            /** Format: date-time */
-            expiry_date?: string | null;
+            readonly is_published: boolean;
             folder?: components["schemas"]["FolderSearch"] | null;
+            readonly is_expired: boolean;
+            latest_version?: components["schemas"]["MinimalUploadsVersion"] | null;
+            readonly uploads_versions: components["schemas"]["UploadsVersionsForUploadsDataset"][];
+            metadata_template?: components["schemas"]["MetadataTemplate"] | null;
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            metadata_upgrade_status?: components["schemas"]["MetadataUpgradeStatusEnum"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
         };
         UploadsDatasetMetadataUpgradeStatus: {
             readonly has_upgradeable_metadata_templates: boolean;
@@ -4159,6 +4519,8 @@ export interface components {
         UploadsDatasetPublishActionRequest: {
             /** Format: uuid */
             folder?: string;
+            /** Format: uuid */
+            subfolder?: string | null;
         };
         UploadsDatasetResolveUpgradeMetadataConflictPayloadRequest: {
             /** Format: uuid */
@@ -4174,26 +4536,28 @@ export interface components {
             uploads_version: string;
         };
         UploadsDatasetSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            latest_version?: components["schemas"]["MinimalUploadsVersionSearch"] | null;
             name?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            display_name?: string | null;
-            latest_version?: components["schemas"]["MinimalUploadsVersionSearch"] | null;
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
+            readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
             /** Format: date-time */
             deletable_until_date?: string | null;
             folder?: components["schemas"]["FolderSearch"] | null;
-            /** Format: date-time */
-            readonly creation_date: string;
-            readonly created_by: components["schemas"]["MinimalUser"];
+            display_name?: string | null;
         };
         UploadsDatasetUpdatePayloadRequest: {
             name?: string | null;
+            /** Format: uuid */
+            subfolder?: string | null;
             metadata_template?: string | {
                 name: string;
                 metadata_template_fields: {
@@ -4261,28 +4625,28 @@ export interface components {
             }[];
         };
         UploadsVersion: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly metadata_templates: components["schemas"]["MinimalMetadataTemplate"][];
             name?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            readonly dataset: components["schemas"]["MinimalUploadsDataset"];
-            readonly version_file: components["schemas"]["MinimalUploadsVersionFile"];
-            readonly is_published: boolean;
-            metadata_is_complete?: boolean;
-            /** Format: date-time */
-            publication_date?: string | null;
+            readonly creation_date: string;
+            status?: components["schemas"]["Status024Enum"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            status?: components["schemas"]["Status024Enum"];
-            /** Format: date-time */
-            readonly creation_date: string;
-            metadata?: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly restored_uploads_version: components["schemas"]["MinimalUploadsVersion"] | null;
+            readonly version_file: components["schemas"]["MinimalUploadsVersionFile"];
+            readonly is_published: boolean;
+            metadata?: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            readonly dataset: components["schemas"]["MinimalUploadsDataset"];
+            /** Format: date-time */
+            publication_date?: string | null;
+            metadata_is_complete?: boolean;
         };
         UploadsVersionDiff: {
             old: components["schemas"]["MinimalUploadsVersionDiff"];
@@ -4299,52 +4663,52 @@ export interface components {
             new: components["schemas"]["MinimalMetadata"] | null;
         };
         UploadsVersionFile: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly uploads_versions: components["schemas"]["MinimalFlatUploadsVersion"][];
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             readonly name: string;
-            is_referenced?: boolean;
-            readonly is_published: boolean;
-            /** Format: date-time */
-            publication_date?: string | null;
+            status?: components["schemas"]["StatusDe1Enum"];
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
-            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
-            status?: components["schemas"]["StatusDe1Enum"];
-            readonly metadata: components["schemas"]["MinimalMetadata"][];
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            readonly is_published: boolean;
+            readonly metadata: components["schemas"]["MinimalMetadata"][];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            is_referenced?: boolean;
+            /** Format: date-time */
+            publication_date?: string | null;
+            storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
         };
         UploadsVersionFileDiff: {
             old: components["schemas"]["MinimalUploadsVersionFileDiff"] | null;
             new: components["schemas"]["MinimalUploadsVersionFileDiff"] | null;
         };
         UploadsVersionFileRequest: {
+            status?: components["schemas"]["StatusDe1Enum"];
             is_referenced?: boolean;
             /** Format: date-time */
             publication_date?: string | null;
             storage_relocating?: components["schemas"]["StorageRelocatingEnum"];
-            status?: components["schemas"]["StatusDe1Enum"];
         };
         UploadsVersionFileSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             readonly uploads_versions: components["schemas"]["MinimalFlatUploadsVersionSearch"][];
             /** Format: date-time */
-            readonly last_modification_date: string;
+            readonly creation_date: string;
             readonly name: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
         };
         UploadsVersionPayloadRequest: {
             name?: string | null;
@@ -4353,20 +4717,20 @@ export interface components {
         /** @enum {string} */
         UploadsVersionPayloadStatusEnum: "SCHEDULED" | "IN_PROGRESS" | "ERROR" | "FINISHED";
         UploadsVersionSearch: {
-            readonly last_modified_by: components["schemas"]["MinimalUser"];
             name?: string | null;
             /** Format: date-time */
-            readonly last_modification_date: string;
-            dataset: components["schemas"]["MinimalUploadsDatasetWithFolderSearch"];
-            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
+            readonly creation_date: string;
             /**
              * Id
              * Format: uuid
              */
             readonly pk: string;
-            /** Format: date-time */
-            readonly creation_date: string;
             readonly created_by: components["schemas"]["MinimalUser"];
+            readonly last_modified_by: components["schemas"]["MinimalUser"];
+            version_file: components["schemas"]["MinimalUploadsVersionFileSearch"];
+            /** Format: date-time */
+            readonly last_modification_date: string;
+            dataset: components["schemas"]["MinimalUploadsDatasetWithFolderSearch"];
         };
         UploadsVersionsForUploadsDataset: {
             /**
@@ -4749,10 +5113,200 @@ export interface operations {
             };
         };
     };
+    v1_elabftw_connection_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElabftwConnection"];
+                };
+            };
+        };
+    };
+    v1_elabftw_connection_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ElabftwConnectionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ElabftwConnectionRequest"];
+                "multipart/form-data": components["schemas"]["ElabftwConnectionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElabftwConnection"];
+                };
+            };
+        };
+    };
+    v1_elabftw_connection_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_elabftw_connection_test_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElabftwConnectionTest"];
+                };
+            };
+        };
+    };
+    v1_elabftw_experiments_list: {
+        parameters: {
+            query?: {
+                /** @description Search term or experiment ID */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ElabftwExperiment"][];
+                };
+            };
+        };
+    };
+    v1_experiment_link_list: {
+        parameters: {
+            query: {
+                target_id: string;
+                target_type: "dataset" | "folder" | "subfolder";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExperimentLink"][];
+                };
+            };
+        };
+    };
+    v1_experiment_link_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExperimentLinkCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ExperimentLinkCreateRequest"];
+                "multipart/form-data": components["schemas"]["ExperimentLinkCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExperimentLink"];
+                };
+            };
+        };
+    };
+    v1_experiment_link_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this experiment link. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_experiment_link_experiments_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedExperiment"][];
+                };
+            };
+        };
+    };
     v1_export_list: {
         parameters: {
             query?: {
-                export_type?: "folders.folder" | "projects.project" | "uploads.uploadsdataset" | "uploads.uploadsversion";
+                export_type?: "elabftw.experimentlink" | "folders.folder" | "folders.subfolder" | "projects.project" | "uploads.uploadsdataset" | "uploads.uploadsversion";
                 include_uploads_version_file?: boolean;
                 include_uploads_version_file_metadata?: boolean;
                 /** @description Number of results to return per page. */
@@ -7349,6 +7903,184 @@ export interface operations {
             };
         };
     };
+    v1_subfolder_list: {
+        parameters: {
+            query?: {
+                folder?: string;
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                parent?: string;
+                /** @description Filter by subfolders on the top level of the folder */
+                parent__isnull?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subfolder"][];
+                };
+            };
+        };
+    };
+    v1_subfolder_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubfolderCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SubfolderCreateRequest"];
+                "multipart/form-data": components["schemas"]["SubfolderCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subfolder"];
+                };
+            };
+        };
+    };
+    v1_subfolder_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this subfolder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subfolder"];
+                };
+            };
+        };
+    };
+    v1_subfolder_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this subfolder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SubfolderUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SubfolderUpdateRequest"];
+                "multipart/form-data": components["schemas"]["SubfolderUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subfolder"];
+                };
+            };
+        };
+    };
+    v1_subfolder_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this subfolder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    v1_subfolder_partial_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this subfolder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSubfolderUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSubfolderUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedSubfolderUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subfolder"];
+                };
+            };
+        };
+    };
+    v1_subfolder_metadata_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this subfolder. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubfolderMetadataPayloadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SubfolderMetadataPayloadRequest"];
+                "multipart/form-data": components["schemas"]["SubfolderMetadataPayloadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subfolder"];
+                };
+            };
+        };
+    };
     v1_uploads_dataset_list: {
         parameters: {
             query?: {
@@ -7370,6 +8102,16 @@ export interface operations {
                 /** @description Filter by metadata is complete (latest version) */
                 metadata_is_complete?: boolean;
                 metadata_template?: string;
+                metadata_template_processing_heartbeat_at?: string;
+                metadata_template_processing_lease_expires_at?: string;
+                metadata_template_processing_lease_token?: string;
+                /**
+                 * @description * `SCHEDULED` - Scheduled
+                 *     * `IN_PROGRESS` - In progress
+                 *     * `ERROR` - Error
+                 *     * `FINISHED` - Finished
+                 */
+                metadata_upgrade_availability_status?: "ERROR" | "FINISHED" | "IN_PROGRESS" | "SCHEDULED";
                 /**
                  * @description * `SCHEDULED` - Scheduled
                  *     * `IN_PROGRESS` - In progress
@@ -7392,6 +8134,9 @@ export interface operations {
                  *     * `FINISHED` - Finished
                  */
                 status?: "ERROR" | "FINISHED" | "IN_PROGRESS" | "SCHEDULED";
+                subfolder?: string;
+                /** @description Filter by datasets on the top level of the folder */
+                subfolder__isnull?: boolean;
                 uploads_versions_count?: number;
             };
             header?: never;
@@ -8248,6 +8993,34 @@ export interface operations {
         };
     };
     v1_uploads_version_file_retrigger_parser_processing_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this uploads version file. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UploadsVersionFileRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["UploadsVersionFileRequest"];
+                "multipart/form-data": components["schemas"]["UploadsVersionFileRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadsVersionFile"];
+                };
+            };
+        };
+    };
+    v1_uploads_version_file_retry_processing_create: {
         parameters: {
             query?: never;
             header?: never;

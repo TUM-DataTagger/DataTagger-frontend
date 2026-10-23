@@ -1,4 +1,11 @@
-import { BlocksIcon, PackageIcon, PackageOpenIcon, ScanSearchIcon, type LucideIcon } from 'lucide-react';
+import {
+	BlocksIcon,
+	FlaskConicalIcon,
+	PackageIcon,
+	PackageOpenIcon,
+	ScanSearchIcon,
+	type LucideIcon,
+} from 'lucide-react';
 
 export type MainNavigationItem = {
 	readonly href: string;
@@ -21,6 +28,13 @@ export const MAIN_NAVIGATION_ITEMS: readonly MainNavigationItem[] = [
 		icon: PackageIcon,
 		id: 'projects',
 		label: 'Projects',
+		showInDesktopHeader: true,
+	},
+	{
+		href: '/experiments',
+		icon: FlaskConicalIcon,
+		id: 'experiments',
+		label: 'Experiments',
 		showInDesktopHeader: true,
 	},
 	{

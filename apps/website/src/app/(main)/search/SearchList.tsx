@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRightIcon, BlocksIcon, FileIcon, FolderIcon, PackageIcon } from 'lucide-react';
+import { ArrowRightIcon, BlocksIcon, FileIcon, FolderIcon, FolderTreeIcon, PackageIcon } from 'lucide-react';
 import { HighlightedText } from '@/components/HighlightedText';
 import { StackedSubtitle } from '@/components/StackedSubtitle';
 import { Link } from '@/components/ui/Link';
@@ -13,6 +13,8 @@ function SearchListIcon(props: { readonly resultType: GlobalSearchDisplayResult[
 			return <PackageIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />;
 		case 'folder':
 			return <FolderIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />;
+		case 'subfolder':
+			return <FolderTreeIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />;
 		case 'template':
 		case 'template_version':
 			return <BlocksIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />;

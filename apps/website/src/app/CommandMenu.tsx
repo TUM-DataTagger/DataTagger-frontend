@@ -33,6 +33,7 @@ import {
 import { Input, InputGroup } from '@/components/ui/Input';
 import { Scrollbars } from '@/components/ui/Scrollbars';
 import { SearchField } from '@/components/ui/SearchField';
+import { useBranding } from '@/contexts/BrandingContext';
 import { cx } from '@/styles/cva';
 import { openAPIClient } from '@/util/clientFetch';
 import { formatErrorMessage } from '@/util/formatErrorMessage';
@@ -61,6 +62,8 @@ export function CommandMenu() {
 	const [search, setSearch] = useState('');
 	const [debouncedSearch, setDebouncedSearch] = useDebounceValue('', 250);
 	const [isMac, setIsMac] = useState(false);
+	const { institution, links } = useBranding();
+	const institutionLabel = [institution.shortName, institution.unit].filter(Boolean).join(' ');
 	const pathname = usePathname();
 
 	useEffect(() => {
@@ -393,29 +396,33 @@ export function CommandMenu() {
 								</CommandMenuSection>
 
 								<CommandMenuSection label="About">
-									<CommandMenuItem
-										id="about-contact"
-										href="https://example.com/contact"
-										rel="noreferrer noopener external"
-										target="_blank"
-									>
-										<div className="flex grow flex-col">
-											<span className="text-base-md">Contact</span>
-										</div>
-										<ExternalLinkIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />
-									</CommandMenuItem>
+									{links.contact ? (
+										<CommandMenuItem
+											id="about-contact"
+											href={links.contact}
+											rel="noreferrer noopener external"
+											target="_blank"
+										>
+											<div className="flex grow flex-col">
+												<span className="text-base-md">Contact</span>
+											</div>
+											<ExternalLinkIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />
+										</CommandMenuItem>
+									) : null}
 
-									<CommandMenuItem
-										id="about-imprint"
-										href="https://example.com/legal-notice"
-										rel="noreferrer noopener external"
-										target="_blank"
-									>
-										<div className="flex grow flex-col">
-											<span className="text-base-md">Imprint</span>
-										</div>
-										<ExternalLinkIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />
-									</CommandMenuItem>
+									{links.imprint ? (
+										<CommandMenuItem
+											id="about-imprint"
+											href={links.imprint}
+											rel="noreferrer noopener external"
+											target="_blank"
+										>
+											<div className="flex grow flex-col">
+												<span className="text-base-md">Imprint</span>
+											</div>
+											<ExternalLinkIcon aria-hidden className="shrink-0" size={18} strokeWidth={1.5} />
+										</CommandMenuItem>
+									) : null}
 
 									<CommandMenuItem href="/privacy-policy" id="about-privacy-policy">
 										<div className="flex grow flex-col">
@@ -453,7 +460,7 @@ export function CommandMenu() {
 								</span>
 								<Version className="text-base-sm" />
 								<span className="text-base-sm text-base-neutral-600 md:hidden dark:text-base-neutral-300">
-									TUM University Library
+									{institutionLabel}
 								</span>
 							</div>
 						</div>
@@ -461,7 +468,7 @@ export function CommandMenu() {
 				</Scrollbars>
 
 				<CommandMenuFooter className="hidden md:flex">
-					<span className="text-base-sm text-base-neutral-600 dark:text-base-neutral-300">TUM University Library</span>
+					<span className="text-base-sm text-base-neutral-600 dark:text-base-neutral-300">{institutionLabel}</span>
 
 					<div className="flex place-items-center gap-2">
 						<span className="flex place-items-center gap-2">

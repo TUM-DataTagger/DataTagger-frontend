@@ -159,6 +159,7 @@ export function ProjectFolderFilesTable(props: {
 								<TableCell style={{ width: '50px' }} textValue="Actions">
 									<div className="flex place-content-end">
 										<ProjectFolderFilesMoreMenu
+											canMove={props.canBulkEdit}
 											fileUuid={item.pk}
 											filename={item.display_name}
 											folderUuid={params.folderUuid}

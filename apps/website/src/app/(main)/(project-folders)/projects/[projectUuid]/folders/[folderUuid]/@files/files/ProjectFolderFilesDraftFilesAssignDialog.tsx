@@ -10,6 +10,7 @@ import { ModalBody, ModalClose, ModalContent, ModalFooter, ModalHeader, ModalTit
 import { $api, openAPIClient } from '@/util/clientFetch';
 import { convertDataRateLog } from '@/util/convertDataRate';
 import { logger, LogCategory } from '@/util/logger';
+import { useCurrentSubfolder } from './useCurrentSubfolder';
 
 export function ProjectFolderFilesDraftFilesAssignDialog(props: ModalOverlayProps & { readonly folderUuid: string }) {
 	const [draftUploadsSelection, setDraftUploadsSelection] = useState(new Set<Key | string>());
@@ -28,11 +29,14 @@ export function ProjectFolderFilesDraftFilesAssignDialog(props: ModalOverlayProp
 		),
 	);
 
+	const [currentSubfolder] = useCurrentSubfolder();
+
 	const { mutate, isPending } = useMutation({
 		mutationFn: async () => {
 			await openAPIClient.POST('/api/v1/uploads-dataset/bulk-publish/', {
 				body: {
 					folder: props.folderUuid,
+					subfolder: currentSubfolder,
 					uploads_datasets: [...draftUploadsSelection] as string[],
 				},
 			});

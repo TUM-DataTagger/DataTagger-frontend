@@ -388,6 +388,7 @@ export function getDefaultSortForTypes(
 
 type ProjectSearch = components['schemas']['ProjectSearch'];
 type FolderSearch = components['schemas']['FolderSearch'];
+type SubfolderSearch = components['schemas']['SubfolderSearch'];
 type UploadsDatasetSearch = components['schemas']['UploadsDatasetSearch'];
 type UploadsVersionSearch = components['schemas']['UploadsVersionSearch'];
 type UploadsVersionFileSearch = components['schemas']['UploadsVersionFileSearch'];
@@ -704,6 +705,7 @@ type SearchResultBase = {
 export type GlobalSearchDisplayResult =
 	| (SearchResultBase & { readonly resultType: 'project'; readonly item: ProjectSearch })
 	| (SearchResultBase & { readonly resultType: 'folder'; readonly item: FolderSearch })
+	| (SearchResultBase & { readonly resultType: 'subfolder'; readonly item: SubfolderSearch })
 	| (SearchResultBase & { readonly resultType: 'dataset'; readonly item: UploadsDatasetSearch })
 	| (SearchResultBase & { readonly resultType: 'dataset_version'; readonly item: UploadsVersionSearch })
 	| (SearchResultBase & { readonly resultType: 'file'; readonly item: UploadsVersionFileSearch })
@@ -1266,6 +1268,32 @@ function toDisplayResult(result: {
 				item,
 				resultType: 'folder',
 				subtitle: item.project?.name ? [`Project: ${item.project.name}`] : undefined,
+				title: item.name,
+			};
+		}
+		case 'subfolder': {
+			const item = result.item as SubfolderSearch;
+			const projectPk = item.folder?.project?.pk;
+			const metadata = item.metadata
+				.map(
+					(entry) =>
+						`${entry.custom_key ?? ''}: ${Array.isArray(entry.value) ? entry.value.join(', ') : String(entry.value ?? '')}`,
+				)
+				.join(' · ');
+
+			return {
+				createdAt: item.creation_date,
+				href: hasString(projectPk)
+					? `/projects/${projectPk}/folders/${item.folder.pk}?subfolder=${item.pk}`
+					: undefined,
+				id: item.pk,
+				item,
+				resultType: 'subfolder',
+				subtitle: [
+					`Project: ${item.folder?.project?.name ?? ''}`,
+					`Folder: ${[item.folder?.name, ...item.path.map((entry) => entry.name)].join(' / ')}`,
+					...(metadata ? [`Metadata: ${metadata}`] : []),
+				],
 				title: item.name,
 			};
 		}

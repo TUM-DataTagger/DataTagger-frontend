@@ -25,6 +25,7 @@ export const uploadsQueueAtom = atomWithImmer<
 		readonly projectUuid?: string | undefined;
 		readonly retryKind?: 'create' | 'update' | undefined;
 		readonly selected?: boolean;
+		readonly subfolderUuid?: string | null | undefined;
 		readonly tusUpload?: Upload | undefined;
 		readonly uploadSpeed: number;
 		readonly uuid: string;

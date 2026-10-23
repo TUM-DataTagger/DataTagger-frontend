@@ -13,6 +13,7 @@ import {
 } from '@/components/BulkEditFilesToolbar';
 import { GenericComponentErrorBoundary } from '@/components/ErrorBoundary';
 import { ShareButton } from '@/components/ShareButton';
+import { ExperimentLinks } from '@/components/elabftw/ExperimentLinks';
 import { ViewSwitch } from '@/components/query-controls/ViewSwitch';
 import { Button } from '@/components/ui/Button';
 import { Input, InputGroup } from '@/components/ui/Input';
@@ -27,6 +28,10 @@ import { ProjectFolderFilesGrid } from './ProjectFolderFilesGrid';
 import { ProjectFolderFilesSortByMenu } from './ProjectFolderFilesSortByMenu';
 import { ProjectFolderFilesTable } from './ProjectFolderFilesTable';
 import { ProjectFolderFilesViewEmpty } from './ProjectFolderFilesViewEmpty';
+import { ProjectFolderSubfolders } from './ProjectFolderSubfolders';
+import { SubfolderMetadata } from './SubfolderMetadata';
+import { getSubfolderDatasetQuery } from './subfolderQuery';
+import { useCurrentSubfolder } from './useCurrentSubfolder';
 
 export function ProjectFolderFilesView(props: { readonly folderUuid: string; readonly limit: number }) {
 	const { currentUserData } = useCurrentUser();
@@ -41,6 +46,7 @@ export function ProjectFolderFilesView(props: { readonly folderUuid: string; rea
 		selected: parseAsArrayOf(parseAsString).withDefault([]),
 		q: parseAsString.withDefault(''),
 	});
+	const [currentSubfolder] = useCurrentSubfolder();
 	const isMobile = useMediaQuery('(max-width: 600px)', { initializeWithValue: false });
 	const isGridLayout = queryStates.view === 'grid' || isMobile;
 	const [search, setSearch] = useState(queryStates.q);
@@ -73,6 +79,7 @@ export function ProjectFolderFilesView(props: { readonly folderUuid: string; rea
 						offset,
 						ordering: queryStates.sort,
 						search: queryStates.q,
+						...getSubfolderDatasetQuery(currentSubfolder, queryStates.q),
 					},
 				},
 			},
@@ -144,6 +151,25 @@ export function ProjectFolderFilesView(props: { readonly folderUuid: string; rea
 					resetPageOnChange
 				/>
 			</div>
+
+			{queryStates.q ? null : (
+				<ExperimentLinks
+					canEdit={canUploadFiles}
+					key={`experiment-links-${currentSubfolder ?? props.folderUuid}`}
+					targetId={currentSubfolder ?? props.folderUuid}
+					targetType={currentSubfolder ? 'subfolder' : 'folder'}
+				/>
+			)}
+
+			{queryStates.q || !currentSubfolder ? null : (
+				<SubfolderMetadata
+					canEdit={canUploadFiles}
+					key={`subfolder-metadata-${currentSubfolder}`}
+					subfolderUuid={currentSubfolder}
+				/>
+			)}
+
+			{queryStates.q ? null : <ProjectFolderSubfolders canManage={canUploadFiles} folderUuid={props.folderUuid} />}
 
 			{hasResults ? (
 				<BulkEditFilesToolbar count={datasetsData?.count ?? 0} isDisabled={!canBulkEdit}>
